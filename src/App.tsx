@@ -23,58 +23,69 @@ function App() {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route 
-            path="/" 
-            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} 
-          />
-          <Route 
-            path="/login" 
-            element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
-          />
-          <Route
-            path="/dashboard"
-            element={
+      <Routes>
+        {/* Routes publiques SANS Layout */}
+        <Route 
+          path="/" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} 
+        />
+        <Route 
+          path="/login" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+        />
+        
+        {/* Routes protégées AVEC Layout */}
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/events"
-            element={
+            </Layout>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <Layout>
               <ProtectedRoute>
                 <Events />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/associations"
-            element={
+            </Layout>
+          }
+        />
+        <Route
+          path="/associations"
+          element={
+            <Layout>
               <ProtectedRoute requiredRole="Super Admin">
                 <Associations />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/clubs"
-            element={
+            </Layout>
+          }
+        />
+        <Route
+          path="/clubs"
+          element={
+            <Layout>
               <ProtectedRoute>
                 <Clubs />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-club"
-            element={
+            </Layout>
+          }
+        />
+        <Route
+          path="/my-club"
+          element={
+            <Layout>
               <ProtectedRoute requiredRole="Club Admin">
                 <Clubs />
               </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Layout>
+            </Layout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }
