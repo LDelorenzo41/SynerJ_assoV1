@@ -81,6 +81,7 @@ export type Database = {
           role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
           club_id: string | null;
           association_id: string | null;
+          avatar_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -90,6 +91,7 @@ export type Database = {
           role?: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
           club_id?: string | null;
           association_id?: string | null;
+          avatar_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -99,6 +101,7 @@ export type Database = {
           role?: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
           club_id?: string | null;
           association_id?: string | null;
+          avatar_url?: string | null;
           created_at?: string;
         };
       };

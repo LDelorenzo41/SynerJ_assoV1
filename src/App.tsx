@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
 import Associations from './pages/Associations';
 import Clubs from './pages/Clubs';
+import Settings from './pages/Settings';
 
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
@@ -81,6 +82,16 @@ function App() {
             <Layout>
               <ProtectedRoute requiredRole="Club Admin">
                 <Clubs />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <Layout>
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             </Layout>
           }
