@@ -9,6 +9,7 @@ interface Profile {
   role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
   club_id: string | null;
   association_id: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -63,11 +64,82 @@ export function useAuthNew() {
     await supabase.auth.signOut();
   };
 
+  const updateProfile = async (updates: Partial<Profile>) => {
+  if (!user || !profile) return { success: false, error: new Error('Utilisateur non authentifié') };
+
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (error) throw error;
+
+    // Mettre à jour le state local
+    setProfile({ ...profile, ...updates });
+    
+    return { success: true, error: undefined };
+  } catch (error) {
+    console.error('Profile update error:', error);
+    return { success: false, error };
+  }
+};
+
+  const uploadAvatar = async (file: File): Promise<string> => {
+  if (!user) throw new Error('Utilisateur non authentifié');
+
+  try {
+    // Créer un nom de fichier unique
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const filePath = `avatars/${fileName}`;
+
+    // Supprimer l'ancienne photo s'il y en a une
+    if (profile?.avatar_url) {
+      const oldPath = profile.avatar_url.split('/').pop();
+      if (oldPath) {
+        await supabase.storage
+          .from('avatars')
+          .remove([`avatars/${oldPath}`]);
+      }
+    }
+
+    // Uploader la nouvelle photo
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Obtenir l'URL publique
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    // Mettre à jour le profil avec la nouvelle URL
+    const updateResult = await updateProfile({ avatar_url: publicUrl });
+    
+    if (!updateResult.success) {
+      throw updateResult.error;
+    }
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    throw error;
+  }
+};
+
   return {
     user,
     profile,
     loading,
     signOut,
+    updateProfile,
+    uploadAvatar,
     isAuthenticated: !!user,
     isSuperAdmin: profile?.role === 'Super Admin',
     isClubAdmin: profile?.role === 'Club Admin',

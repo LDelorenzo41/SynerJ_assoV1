@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
-import { LogOut, Users, Calendar, Building, Home } from 'lucide-react';
+import { LogOut, Users, Calendar, Building, Home, Settings, User } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -46,6 +46,9 @@ export default function Layout({ children }: LayoutProps) {
       );
     }
 
+    // Ajouter les paramètres pour tous les utilisateurs connectés
+    items.push({ path: '/settings', label: 'Paramètres', icon: Settings });
+
     return items;
   };
 
@@ -78,12 +81,29 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700">
-                  {profile?.first_name} {profile?.last_name}
-                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    {profile?.role}
-                  </span>
-                </span>
+                {/* Affichage du profil avec photo */}
+                <div className="flex items-center space-x-3">
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt="Photo de profil"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200">
+                      <User className="h-4 w-4 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="text-sm">
+                    <span className="text-gray-700 font-medium">
+                      {profile?.first_name} {profile?.last_name}
+                    </span>
+                    <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full inline-block ml-2">
+                      {profile?.role}
+                    </div>
+                  </div>
+                </div>
+                
                 <button
                   onClick={handleSignOut}
                   className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors"
