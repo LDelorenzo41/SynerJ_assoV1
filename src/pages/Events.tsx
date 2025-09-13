@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Plus, Eye, EyeOff, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Eye, EyeOff, Edit, Trash2, AlertCircle, Users } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -41,13 +41,46 @@ export default function Events() {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
+      // ✅ SÉCURITÉ : Vérifier les permissions avant de récupérer les événements
+      if (!profile) {
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Supporter sans association = aucun accès
+      if (profile.role === 'Supporter' && !profile.association_id) {
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+
+      let query = supabase
         .from('events')
         .select(`
           *,
-          clubs (name)
+          clubs (name, association_id)
         `)
         .order('date', { ascending: true });
+
+      // ✅ Filtrer selon le rôle et les permissions
+      if (profile.role === 'Super Admin') {
+        // Super Admin : tous les événements de son association
+        query = query.eq('clubs.association_id', profile.association_id);
+        
+      } else if (profile.role === 'Club Admin') {
+        // Club Admin : événements de son club + événements publics de l'association
+        query = query.or(`club_id.eq.${profile.club_id},and(clubs.association_id.eq.${profile.association_id},visibility.eq.Public)`);
+        
+      } else if (profile.role === 'Member') {
+        // Member : événements de son club + événements publics de l'association
+        query = query.or(`club_id.eq.${profile.club_id},and(clubs.association_id.eq.${profile.association_id},visibility.eq.Public)`);
+        
+      } else if (profile.role === 'Supporter' && profile.association_id) {
+        // Supporter avec association : seulement les événements publics de son association
+        query = query.eq('clubs.association_id', profile.association_id).eq('visibility', 'Public');
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setEvents(data || []);
@@ -134,6 +167,37 @@ export default function Events() {
     return isClubAdmin && event.club_id === profile?.club_id;
   };
 
+  // ✅ SÉCURITÉ : Affichage spécial pour supporter sans association
+  if (profile?.role === 'Supporter' && !profile?.association_id) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Événements</h1>
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <div className="flex items-start">
+            <AlertCircle className="h-6 w-6 text-yellow-600 mr-3 mt-1" />
+            <div>
+              <h2 className="text-lg font-semibold text-yellow-900 mb-2">Association requise</h2>
+              <p className="text-yellow-800 mb-4">
+                Pour voir les événements, vous devez d'abord rejoindre une association. 
+                Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
+              </p>
+              <a
+                href="/dashboard"
+                className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Aller au tableau de bord
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -164,6 +228,29 @@ export default function Events() {
             <span>Créer un Événement</span>
           </button>
         )}
+      </div>
+
+      {/* ✅ Information contextuelle selon le rôle */}
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <Calendar className="h-5 w-5 text-blue-600" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-blue-800">
+              {profile?.role === 'Super Admin' && 'Tous les événements de votre association'}
+              {profile?.role === 'Club Admin' && 'Événements de votre club et événements publics'}
+              {profile?.role === 'Member' && 'Événements de votre club et événements publics'}
+              {profile?.role === 'Supporter' && 'Événements publics de votre association'}
+            </h3>
+            <div className="mt-1 text-sm text-blue-700">
+              {profile?.role === 'Super Admin' && 'Vous voyez tous les événements publics et privés de votre association.'}
+              {profile?.role === 'Club Admin' && 'Vous pouvez créer des événements pour votre club et voir les événements publics.'}
+              {profile?.role === 'Member' && 'Vous voyez les événements de votre club et les événements publics de l\'association.'}
+              {profile?.role === 'Supporter' && 'Vous ne voyez que les événements publics de votre association.'}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Event Form Modal */}
@@ -251,7 +338,7 @@ export default function Events() {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
-            Tous les Événements ({events.length})
+            Événements ({events.length})
           </h2>
         </div>
         <div className="divide-y divide-gray-200">
@@ -263,9 +350,9 @@ export default function Events() {
                     <h3 className="text-lg font-semibold text-gray-900">{event.name}</h3>
                     <div className="flex items-center space-x-2">
                       {event.visibility === 'Public' ? (
-                        <Eye className="h-4 w-4 text-green-600" title="Public Event" />
+                        <Eye className="h-4 w-4 text-green-600" />
                       ) : (
-                        <EyeOff className="h-4 w-4 text-orange-600" title="Members Only" />
+                        <EyeOff className="h-4 w-4 text-orange-600" />
                       )}
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         event.visibility === 'Public'
@@ -278,7 +365,7 @@ export default function Events() {
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{event.clubs.name}</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {new Date(event.date).toLocaleDateString('en-US', {
+                    {new Date(event.date).toLocaleDateString('fr-FR', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -317,6 +404,11 @@ export default function Events() {
             <div className="px-6 py-12 text-center">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-gray-500">Aucun événement trouvé</p>
+              <p className="text-sm text-gray-400 mt-2">
+                {profile?.role === 'Supporter' && 'Aucun événement public dans votre association.'}
+                {profile?.role === 'Member' && 'Aucun événement dans votre club ou votre association.'}
+                {(profile?.role === 'Club Admin' || profile?.role === 'Super Admin') && 'Commencez par créer un événement.'}
+              </p>
             </div>
           )}
         </div>

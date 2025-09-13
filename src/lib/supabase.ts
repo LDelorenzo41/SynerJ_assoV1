@@ -76,12 +76,16 @@ export type Database = {
       profiles: {
         Row: {
           id: string;
-          first_name: string;
-          last_name: string;
+          first_name: string | null;
+          last_name: string | null;
           role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
           club_id: string | null;
           association_id: string | null;
           avatar_url: string | null;
+          email_consent_clubs: boolean;
+          email_consent_association: boolean;
+          email_consent_municipality: boolean;
+          email_consent_sponsors: boolean;
           created_at: string;
         };
         Insert: {
@@ -92,6 +96,10 @@ export type Database = {
           club_id?: string | null;
           association_id?: string | null;
           avatar_url?: string | null;
+          email_consent_clubs?: boolean;
+          email_consent_association?: boolean;
+          email_consent_municipality?: boolean;
+          email_consent_sponsors?: boolean;
           created_at?: string;
         };
         Update: {
@@ -102,6 +110,10 @@ export type Database = {
           club_id?: string | null;
           association_id?: string | null;
           avatar_url?: string | null;
+          email_consent_clubs?: boolean;
+          email_consent_association?: boolean;
+          email_consent_municipality?: boolean;
+          email_consent_sponsors?: boolean;
           created_at?: string;
         };
       };
