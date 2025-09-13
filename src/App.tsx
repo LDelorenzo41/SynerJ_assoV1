@@ -10,6 +10,7 @@ import Events from './pages/Events';
 import Associations from './pages/Associations';
 import Clubs from './pages/Clubs';
 import Settings from './pages/Settings';
+import Sponsors from './pages/Sponsors';
 
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
@@ -82,6 +83,16 @@ function App() {
             <Layout>
               <ProtectedRoute requiredRole="Club Admin">
                 <Clubs />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/sponsors"
+          element={
+            <Layout>
+              <ProtectedRoute>
+                <Sponsors />
               </ProtectedRoute>
             </Layout>
           }

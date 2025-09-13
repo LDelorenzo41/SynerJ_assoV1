@@ -1,0 +1,1007 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { 
+  Building, 
+  Users, 
+  UserPlus, 
+  ArrowRight, 
+  Check,
+  AlertCircle
+} from 'lucide-react';
+import ProfilePictureUpload from './ProfilePictureUpload';
+
+type FormType = 'association' | 'club' | 'user' | null;
+
+interface AssociationForm {
+  name: string;
+  city: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
+interface ClubForm {
+  name: string;
+  description: string;
+  club_email: string;
+  association_code: string;
+}
+
+interface UserForm {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  club_code: string;
+  avatar_url: string;
+  email_consents: {
+    clubs: boolean;
+    association: boolean;
+    municipality: boolean;
+    sponsors: boolean;
+  };
+}
+
+export default function RegistrationForms() {
+  const [activeForm, setActiveForm] = useState<FormType>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const navigate = useNavigate();
+
+  // États pour l'inscription utilisateur multi-étapes
+  const [userStep, setUserStep] = useState(1);
+  const [clubValidation, setClubValidation] = useState<{loading: boolean, valid: boolean | null, clubName: string}>({
+    loading: false,
+    valid: null,
+    clubName: ''
+  });
+
+  const [associationForm, setAssociationForm] = useState<AssociationForm>({
+    name: '',
+    city: '',
+    email: '',
+    phone: '',
+    description: '',
+  });
+
+  const [clubForm, setClubForm] = useState<ClubForm>({
+    name: '',
+    description: '',
+    club_email: '',
+    association_code: '',
+  });
+
+  const [userForm, setUserForm] = useState<UserForm>({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    club_code: '',
+    avatar_url: '',
+    email_consents: {
+      clubs: false,
+      association: false,
+      municipality: false,
+      sponsors: false
+    }
+  });
+
+  // Validation en temps réel du code de club
+  const validateClubCode = async (code: string) => {
+    if (!code || code.length < 8) {
+      setClubValidation({ loading: false, valid: null, clubName: '' });
+      return;
+    }
+
+    setClubValidation({ loading: true, valid: null, clubName: '' });
+
+    try {
+      // Nettoyer et normaliser le code comme pour la création de club
+      const cleanClubCode = code.trim().toUpperCase();
+      
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('name')
+        .eq('club_code', cleanClubCode)
+        .single();
+
+      if (error || !data) {
+        setClubValidation({ loading: false, valid: false, clubName: '' });
+      } else {
+        setClubValidation({ loading: false, valid: true, clubName: data.name });
+      }
+    } catch (err) {
+      setClubValidation({ loading: false, valid: false, clubName: '' });
+    }
+  };
+
+  const handleClubCodeChange = (code: string) => {
+    setUserForm({ ...userForm, club_code: code });
+    
+    const timeoutId = setTimeout(() => {
+      validateClubCode(code);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  };
+
+  const handleAvatarSelect = (file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUserForm({ ...userForm, avatar_url: e.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setUserForm({ ...userForm, avatar_url: '' });
+    }
+  };
+
+  const handleCreateAssociation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const { data: existingUser } = await supabase.auth.getUser();
+      let userId = null;
+      
+      if (existingUser?.user) {
+        userId = existingUser.user.id;
+      } else {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: associationForm.email,
+          password: 'TempPassword123!',
+          options: {
+            data: {
+              first_name: 'Super',
+              last_name: 'Admin'
+            }
+          }
+        });
+
+        if (authError) {
+          if (authError.message.includes('User already registered')) {
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: associationForm.email,
+              password: 'TempPassword123!'
+            });
+            
+            if (signInError) {
+              throw new Error('Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.');
+            } else {
+              userId = signInData.user?.id;
+            }
+          } else {
+            throw authError;
+          }
+        } else {
+          userId = authData.user?.id;
+        }
+      }
+
+      if (!userId) {
+        throw new Error('Impossible de créer ou récupérer l\'utilisateur');
+      }
+
+      const { data: association, error: assocError } = await supabase
+        .from('associations')
+        .insert([associationForm])
+        .select()
+        .single();
+
+      if (assocError) throw assocError;
+
+      if (userId) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            first_name: 'Super',
+            last_name: 'Admin',
+            role: 'Super Admin',
+            association_id: association.id,
+          });
+
+        if (profileError) throw profileError;
+      }
+
+      setMessage({
+        type: 'success',
+        text: `Association créée avec succès! Code: ${association.association_code}. Mot de passe temporaire: TempPassword123! (changez-le après connexion)`,
+      });
+
+      setTimeout(() => navigate('/dashboard'), 2000);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateClub = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const cleanAssociationCode = clubForm.association_code.trim().toUpperCase();
+      
+      const { data: association, error: assocError } = await supabase
+        .from('associations')
+        .select('id')
+        .eq('association_code', cleanAssociationCode)
+        .single();
+
+      if (assocError) {
+        if (assocError.code === 'PGRST116') {
+          throw new Error(`Code d'association invalide: ${cleanAssociationCode}`);
+        }
+        throw assocError;
+      }
+
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: clubForm.club_email,
+        password: 'TempPassword123!',
+        options: {
+          data: {
+            first_name: 'Club',
+            last_name: 'Admin'
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      const { data: club, error: clubError } = await supabase
+        .from('clubs')
+        .insert([{
+          name: clubForm.name,
+          description: clubForm.description,
+          club_email: clubForm.club_email,
+          association_id: association.id
+        }])
+        .select()
+        .single();
+
+      if (clubError) throw clubError;
+
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: 'Club',
+            last_name: 'Admin',
+            role: 'Club Admin',
+            club_id: club.id,
+            association_id: association.id,
+          })
+          .eq('id', authData.user.id);
+
+        if (profileError) throw profileError;
+      }
+
+      setMessage({
+        type: 'success',
+        text: `Club créé avec succès! Code: ${club.club_code}. Mot de passe temporaire: TempPassword123! (changez-le après connexion)`,
+      });
+
+      setTimeout(() => navigate('/dashboard'), 2000);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserRegistration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      let clubId = null;
+      let associationId = null;
+      let role: 'Member' | 'Supporter' = 'Supporter';
+
+      if (userForm.club_code.trim()) {
+        // Clean and normalize the club code (comme pour la création de club)
+        const cleanClubCode = userForm.club_code.trim().toUpperCase();
+        
+        const { data: club, error: clubError } = await supabase
+          .from('clubs')
+          .select('id, association_id, name')
+          .eq('club_code', cleanClubCode)
+          .single();
+
+        if (clubError || !club) {
+          console.error('Club code validation error:', clubError);
+          throw new Error(`Code de club invalide: ${cleanClubCode}`);
+        }
+
+        clubId = club.id;
+        associationId = club.association_id;
+        role = 'Member';
+      }
+
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userForm.email,
+        password: userForm.password,
+        options: {
+          data: {
+            first_name: userForm.first_name,
+            last_name: userForm.last_name,
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        let avatarUrl = null;
+
+        if (userForm.avatar_url && userForm.avatar_url.startsWith('data:')) {
+          try {
+            const response = await fetch(userForm.avatar_url);
+            const blob = await response.blob();
+            const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+
+            const fileExt = file.type.split('/')[1];
+            const fileName = `${authData.user.id}-${Date.now()}.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('avatars')
+              .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+              });
+
+            if (!uploadError) {
+              const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+              
+              avatarUrl = publicUrl;
+            }
+          } catch (uploadError) {
+            console.error('Erreur upload avatar:', uploadError);
+          }
+        }
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: userForm.first_name,
+            last_name: userForm.last_name,
+            role,
+            club_id: clubId,
+            association_id: associationId,
+            avatar_url: avatarUrl,
+            email_consent_clubs: userForm.email_consents.clubs,
+            email_consent_association: userForm.email_consents.association,
+            email_consent_municipality: userForm.email_consents.municipality,
+            email_consent_sponsors: userForm.email_consents.sponsors,
+          })
+          .eq('id', authData.user.id);
+
+        if (profileError) throw profileError;
+
+        if (clubId) {
+          const { error: userClubError } = await supabase
+            .from('user_clubs')
+            .insert([{ user_id: authData.user.id, club_id: clubId }]);
+
+          if (userClubError) console.error('Error adding to user_clubs:', userClubError);
+        }
+      }
+
+      const successMessage = clubId 
+        ? 'Inscription réussie ! Vous êtes maintenant membre du club. Vérifiez votre email.'
+        : 'Inscription réussie ! Vérifiez votre email pour activer votre compte.';
+
+      setMessage({
+        type: 'success',
+        text: successMessage,
+      });
+
+      setUserForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        club_code: '',
+        avatar_url: '',
+        email_consents: {
+          clubs: false,
+          association: false,
+          municipality: false,
+          sponsors: false
+        }
+      });
+      setUserStep(1);
+
+      setTimeout(() => navigate('/dashboard'), 2000);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderUserFormStep = () => {
+    switch (userStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Inscription Utilisateur</h2>
+              <p className="text-gray-600">Étape 1/3 - Informations personnelles</p>
+              <div className="flex justify-center mt-4">
+                <div className="flex space-x-2">
+                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
+                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
+                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Prénom *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={userForm.first_name}
+                  onChange={(e) => setUserForm({ ...userForm, first_name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Jean"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={userForm.last_name}
+                  onChange={(e) => setUserForm({ ...userForm, last_name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Dupont"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Courriel *
+              </label>
+              <input
+                type="email"
+                required
+                value={userForm.email}
+                onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                placeholder="jean.dupont@email.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mot de passe *
+              </label>
+              <input
+                type="password"
+                required
+                value={userForm.password}
+                onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                minLength={6}
+                placeholder="Minimum 6 caractères"
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={() => setActiveForm(null)}
+                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Retour
+              </button>
+              <button
+                type="button"
+                onClick={() => setUserStep(2)}
+                disabled={!userForm.first_name || !userForm.last_name || !userForm.email || !userForm.password}
+                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Photo et Club</h2>
+              <p className="text-gray-600">Étape 2/3 - Photo de profil et club (optionnel)</p>
+              <div className="flex justify-center mt-4">
+                <div className="flex space-x-2">
+                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
+                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
+                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center space-y-6">
+              <ProfilePictureUpload
+                onImageSelect={handleAvatarSelect}
+                currentImage={userForm.avatar_url}
+              />
+              
+              <p className="text-sm text-gray-500 text-center max-w-md">
+                Ajoutez une photo de profil pour personnaliser votre compte. 
+                Vous pourrez la modifier plus tard dans vos paramètres.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Code de Club (Optionnel)
+              </label>
+              <input
+                type="text"
+                value={userForm.club_code}
+                onChange={(e) => handleClubCodeChange(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                  clubValidation.valid === true ? 'border-green-500' :
+                  clubValidation.valid === false ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="CLUB-12345678"
+              />
+              
+              {clubValidation.loading && (
+                <p className="mt-2 text-sm text-blue-600 flex items-center">
+                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  Vérification du code...
+                </p>
+              )}
+              
+              {clubValidation.valid === true && (
+                <p className="mt-2 text-sm text-green-600 flex items-center">
+                  <Check className="w-4 h-4 mr-2" />
+                  Club trouvé : {clubValidation.clubName}
+                </p>
+              )}
+              
+              {clubValidation.valid === false && userForm.club_code && (
+                <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Code de club invalide
+                </p>
+              )}
+              
+              <p className="mt-2 text-sm text-gray-500">
+                Laissez vide pour vous inscrire en tant que supporter avec accès aux événements publics uniquement.
+              </p>
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={() => setUserStep(1)}
+                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Précédent
+              </button>
+              <button
+                type="button"
+                onClick={() => setUserStep(3)}
+                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Préférences email</h2>
+              <p className="text-gray-600">Étape 3/3 - Choisissez vos notifications</p>
+              <div className="flex justify-center mt-4">
+                <div className="flex space-x-2">
+                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
+                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
+                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3">Consentements pour recevoir des emails</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Vous pouvez modifier ces préférences à tout moment dans vos paramètres.
+                </p>
+                
+                <div className="space-y-3">
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={userForm.email_consents.clubs}
+                      onChange={(e) => setUserForm({
+                        ...userForm,
+                        email_consents: { ...userForm.email_consents, clubs: e.target.checked }
+                      })}
+                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">Clubs affiliés</span>
+                      <div className="text-xs text-gray-500">Événements, actualités et communications des clubs que vous suivez</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={userForm.email_consents.association}
+                      onChange={(e) => setUserForm({
+                        ...userForm,
+                        email_consents: { ...userForm.email_consents, association: e.target.checked }
+                      })}
+                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">Association multiclub</span>
+                      <div className="text-xs text-gray-500">Actualités générales, événements inter-clubs et communications officielles</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={userForm.email_consents.municipality}
+                      onChange={(e) => setUserForm({
+                        ...userForm,
+                        email_consents: { ...userForm.email_consents, municipality: e.target.checked }
+                      })}
+                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">Instance communale</span>
+                      <div className="text-xs text-gray-500">Événements municipaux, subventions et informations locales</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={userForm.email_consents.sponsors}
+                      onChange={(e) => setUserForm({
+                        ...userForm,
+                        email_consents: { ...userForm.email_consents, sponsors: e.target.checked }
+                      })}
+                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">Sponsors des clubs</span>
+                      <div className="text-xs text-gray-500">Offres spéciales, promotions et communications des partenaires</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={() => setUserStep(2)}
+                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Précédent
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+              >
+                {loading ? 'Inscription...' : 'Finaliser l\'inscription'}
+              </button>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <section id="registration" className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Commencez dès aujourd'hui
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Choisissez votre point de départ et rejoignez la communauté SynerJ
+          </p>
+        </div>
+
+        {!activeForm && (
+          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+            <div 
+              onClick={() => setActiveForm('association')}
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-blue-200"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Building className="h-10 w-10 text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer une Association</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Démarrez votre organisation et gérez plusieurs clubs sous une association. 
+                  Parfait pour les grandes organisations.
+                </p>
+                <div className="inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
+                  Commencer
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => setActiveForm('club')}
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-green-200"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-100 to-green-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-10 w-10 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer un Club</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Rejoignez une association existante et créez votre club pour organiser 
+                  des événements et des membres.
+                </p>
+                <div className="inline-flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                  Commencer
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => {
+                setActiveForm('user');
+                setUserStep(1);
+              }}
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-purple-200"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-r from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <UserPlus className="h-10 w-10 text-purple-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Rejoindre en tant qu'Utilisateur</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Inscrivez-vous pour rejoindre des clubs, participer à des événements 
+                  et rester connecté avec vos communautés.
+                </p>
+                <div className="inline-flex items-center text-purple-600 font-semibold group-hover:text-purple-700">
+                  Commencer
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Association Form */}
+        {activeForm === 'association' && (
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Créer une Association</h2>
+            <form onSubmit={handleCreateAssociation} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom de l'Association *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={associationForm.name}
+                  onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Nom de votre association"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Courriel *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={associationForm.email}
+                  onChange={(e) => setAssociationForm({ ...associationForm, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="contact@association.com"
+                />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    value={associationForm.city}
+                    onChange={(e) => setAssociationForm({ ...associationForm, city: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="Paris"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Téléphone
+                  </label>
+                  <input
+                    type="tel"
+                    value={associationForm.phone}
+                    onChange={(e) => setAssociationForm({ ...associationForm, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="01 23 45 67 89"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  rows={4}
+                  value={associationForm.description}
+                  onChange={(e) => setAssociationForm({ ...associationForm, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Décrivez brièvement votre association..."
+                />
+              </div>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveForm(null)}
+                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Retour
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Création...' : 'Créer l\'Association'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Club Form */}
+        {activeForm === 'club' && (
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Créer un Club</h2>
+            <form onSubmit={handleCreateClub} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom du Club *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={clubForm.name}
+                  onChange={(e) => setClubForm({ ...clubForm, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="Nom de votre club"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Courriel du Club *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={clubForm.club_email}
+                  onChange={(e) => setClubForm({ ...clubForm, club_email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="contact@club.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Code d'Association *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={clubForm.association_code}
+                  onChange={(e) => setClubForm({ ...clubForm, association_code: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="ASSOC-12345678"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  Demandez le code d'association au super admin de votre organisation
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  rows={4}
+                  value={clubForm.description}
+                  onChange={(e) => setClubForm({ ...clubForm, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="Décrivez brièvement votre club..."
+                />
+              </div>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveForm(null)}
+                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Retour
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Création...' : 'Créer le Club'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* User Registration Form - Multi-step */}
+        {activeForm === 'user' && (
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <form onSubmit={handleUserRegistration}>
+              {renderUserFormStep()}
+            </form>
+          </div>
+        )}
+
+        {/* Success/Error Messages */}
+        {message && (
+          <div className={`mt-8 max-w-2xl mx-auto p-4 rounded-lg border ${
+            message.type === 'success' 
+              ? 'bg-green-50 text-green-700 border-green-200' 
+              : 'bg-red-50 text-red-700 border-red-200'
+          }`}>
+            <div className="flex items-center">
+              {message.type === 'success' ? (
+                <Check className="h-5 w-5 mr-2" />
+              ) : (
+                <div className="h-5 w-5 mr-2 rounded-full bg-red-600 flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
+                </div>
+              )}
+              {message.text}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
