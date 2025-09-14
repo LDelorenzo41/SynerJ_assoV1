@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { Calendar, Users, Building, Search, Eye, AlertCircle } from 'lucide-react';
@@ -6,15 +7,18 @@ import { Calendar, Users, Building, Search, Eye, AlertCircle } from 'lucide-reac
 interface AssociationInfo {
   id: string;
   name: string;
+  logo_url: string | null;
 }
 
 interface ClubInfo {
   id: string;
   name: string;
+  logo_url: string | null;
 }
 
 export default function Dashboard() {
   const { profile, isSuperAdmin, isClubAdmin } = useAuthNew();
+  const location = useLocation();
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +39,7 @@ export default function Dashboard() {
       if (profile.association_id) {
         const { data: association, error: assocError } = await supabase
           .from('associations')
-          .select('id, name')
+          .select('id, name, logo_url')
           .eq('id', profile.association_id)
           .single();
         if (!assocError && association) setAssociationInfo(association);
@@ -44,7 +48,7 @@ export default function Dashboard() {
       if (profile.club_id) {
         const { data: club, error: clubError } = await supabase
           .from('clubs')
-          .select('id, name')
+          .select('id, name, logo_url')
           .eq('id', profile.club_id)
           .single();
         if (!clubError && club) setClubInfo(club);
@@ -53,7 +57,7 @@ export default function Dashboard() {
       if (profile.role === 'Supporter') {
         const { data: associations, error: assocError } = await supabase
           .from('associations')
-          .select('id, name')
+          .select('id, name, logo_url')
           .order('name');
         if (!assocError && associations) {
           setAvailableAssociations(associations);
@@ -106,13 +110,54 @@ export default function Dashboard() {
     }
   };
 
+  // Interface pour les props du composant LogoDisplay
+  interface LogoDisplayProps {
+    src: string | null;
+    alt: string;
+    size?: string;
+    fallbackIcon: React.ComponentType<any>;
+    iconColor?: string;
+  }
+
+  // Composant pour afficher logo avec fallback
+  const LogoDisplay: React.FC<LogoDisplayProps> = ({ 
+    src, 
+    alt, 
+    size = 'w-8 h-8', 
+    fallbackIcon,
+    iconColor = 'text-gray-400' 
+  }) => {
+    const [imageError, setImageError] = useState(false);
+    const Icon = fallbackIcon;
+
+    return (
+      <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+        {src && !imageError ? (
+          <img 
+            src={src} 
+            alt={alt}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Icon className={`${size === 'w-8 h-8' ? 'h-5 w-5' : 'h-6 w-6'} ${iconColor}`} />
+        )}
+      </div>
+    );
+  };
+
   const renderClubSection = () => {
     if (profile?.role === 'Supporter') {
       return (
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center">
-            <Users className="h-8 w-8 text-gray-400 mr-3" />
-            <div>
+            <LogoDisplay 
+              src={null} 
+              alt="Aucun club" 
+              fallbackIcon={Users}
+              iconColor="text-gray-400"
+            />
+            <div className="ml-3">
               <p className="text-sm text-gray-600">Club</p>
               <p className="text-lg font-semibold text-gray-500">Aucun club</p>
               <p className="text-xs text-gray-400">Accès aux événements publics</p>
@@ -125,8 +170,13 @@ export default function Dashboard() {
       return (
         <div className="bg-green-50 p-4 rounded-lg">
           <div className="flex items-center">
-            <Building className="h-8 w-8 text-green-600 mr-3" />
-            <div>
+            <LogoDisplay 
+              src={clubInfo.logo_url} 
+              alt={`Logo ${clubInfo.name}`} 
+              fallbackIcon={Building}
+              iconColor="text-green-600"
+            />
+            <div className="ml-3">
               <p className="text-sm text-gray-600">Club</p>
               <p className="text-lg font-semibold text-gray-900">{clubInfo.name}</p>
             </div>
@@ -144,18 +194,23 @@ export default function Dashboard() {
       const iconColor = hasAssociation ? 'text-purple-600' : 'text-yellow-600';
       const buttonHoverBg = hasAssociation ? 'hover:bg-purple-100' : 'hover:bg-yellow-100';
 
-      // **CORRECTION : On pré-calcule la liste des autres associations**
+      // On pré-calcule la liste des autres associations
       const otherAssociations = availableAssociations.filter(assoc => assoc.id !== profile?.association_id);
 
       return (
         <div className={`${bgColor} p-4 rounded-lg`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Building className={`h-8 w-8 ${iconColor} mr-3`} />
-              <div>
+              <LogoDisplay 
+                src={associationInfo?.logo_url || null} 
+                alt={hasAssociation ? `Logo ${associationInfo?.name}` : 'Non affilié'} 
+                fallbackIcon={Building}
+                iconColor={iconColor}
+              />
+              <div className="ml-3">
                 <p className="text-sm text-gray-600">Association</p>
                 <p className="text-lg font-semibold text-gray-900">
-                  {hasAssociation ? associationInfo.name : 'Non affilié'}
+                  {hasAssociation ? associationInfo?.name : 'Non affilié'}
                 </p>
               </div>
             </div>
@@ -174,21 +229,26 @@ export default function Dashboard() {
                 {hasAssociation ? 'Changer pour :' : 'Associations disponibles :'}
               </p>
               
-              {/* **CORRECTION : On vérifie si la liste pré-calculée n'est pas vide** */}
               {otherAssociations.length > 0 ? (
                 <div className="max-h-32 overflow-y-auto space-y-1">
                   {otherAssociations.map((association) => (
                     <button
                       key={association.id}
                       onClick={() => handleAssociationSelection(association.id)}
-                      className="w-full text-left px-3 py-2 text-sm bg-white rounded border hover:bg-gray-50 transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm bg-white rounded border hover:bg-gray-50 transition-colors flex items-center space-x-2"
                     >
-                      {association.name}
+                      <LogoDisplay 
+                        src={association.logo_url} 
+                        alt={`Logo ${association.name}`} 
+                        size="w-6 h-6"
+                        fallbackIcon={Building}
+                        iconColor="text-gray-400"
+                      />
+                      <span>{association.name}</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                // **Message affiché si aucune autre association n'est disponible**
                 <p className="text-sm text-gray-500 italic px-3 py-2 bg-white rounded border">
                   Aucune autre association n'est disponible pour le moment.
                 </p>
@@ -203,8 +263,13 @@ export default function Dashboard() {
       return (
         <div className="bg-purple-50 p-4 rounded-lg">
           <div className="flex items-center">
-            <Building className="h-8 w-8 text-purple-600 mr-3" />
-            <div>
+            <LogoDisplay 
+              src={associationInfo.logo_url} 
+              alt={`Logo ${associationInfo.name}`} 
+              fallbackIcon={Building}
+              iconColor="text-purple-600"
+            />
+            <div className="ml-3">
               <p className="text-sm text-gray-600">Association</p>
               <p className="text-lg font-semibold text-gray-900">{associationInfo.name}</p>
             </div>
@@ -226,7 +291,39 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Section de bienvenue avec header personnalisé */}
       <div className="bg-white overflow-hidden shadow-sm rounded-lg">
+        {/* Header avec logos d'association */}
+        {associationInfo && (
+          <div className="px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 border-b border-purple-100">
+            <div className="flex items-center space-x-4">
+              <LogoDisplay 
+                src={associationInfo.logo_url} 
+                alt={`Logo ${associationInfo.name}`} 
+                size="w-12 h-12"
+                fallbackIcon={Building}
+                iconColor="text-purple-600"
+              />
+              <div>
+                <h3 className="text-lg font-semibold text-purple-900">
+                  {associationInfo.name}
+                </h3>
+                <p className="text-sm text-purple-700">
+                  {profile?.role === 'Super Admin' 
+                    ? 'Tableau de bord de l\'association'
+                    : profile?.role === 'Club Admin'
+                    ? 'Tableau de bord du club'
+                    : profile?.role === 'Member'
+                    ? 'Tableau de bord membre'
+                    : profile?.role === 'Supporter'
+                    ? 'Tableau de bord supporter'
+                    : 'Tableau de bord'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="px-6 py-4 border-b border-gray-200">
           <h1 className="text-3xl font-bold text-gray-900">
             Bienvenue, {profile?.first_name} {profile?.last_name}
@@ -235,6 +332,7 @@ export default function Dashboard() {
             Tableau de bord {getRoleDisplayName(profile?.role || '')}
           </p>
         </div>
+        
         <div className="p-6">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-blue-50 p-4 rounded-lg">
