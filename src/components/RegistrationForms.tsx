@@ -7,11 +7,16 @@ import {
   UserPlus, 
   ArrowRight, 
   Check,
-  AlertCircle
+  AlertCircle,
+  Crown,
+  Star,
+  Building2,
+  Zap
 } from 'lucide-react';
 import ProfilePictureUpload from './ProfilePictureUpload';
 
 type FormType = 'association' | 'club' | 'user' | null;
+type SubscriptionPlan = '1-4' | '5-10' | '11-15' | '16-25' | '25+';
 
 interface AssociationForm {
   name: string;
@@ -19,6 +24,9 @@ interface AssociationForm {
   email: string;
   phone: string;
   description: string;
+  subscription_plan: SubscriptionPlan;
+  logo_url: string;
+  password: string;
 }
 
 interface ClubForm {
@@ -26,6 +34,8 @@ interface ClubForm {
   description: string;
   club_email: string;
   association_code: string;
+  logo_url: string;
+  password: string;
 }
 
 interface UserForm {
@@ -43,6 +53,64 @@ interface UserForm {
   };
 }
 
+const SUBSCRIPTION_PLANS = [
+  {
+    id: '1-4' as SubscriptionPlan,
+    name: 'Starter',
+    description: '1 à 4 clubs',
+    price: '29€',
+    period: '/mois',
+    features: ['Jusqu\'à 4 clubs', 'Gestion des événements', 'Support email', 'Tableau de bord basique'],
+    icon: Building2,
+    color: 'from-green-400 to-green-600',
+    popular: false
+  },
+  {
+    id: '5-10' as SubscriptionPlan,
+    name: 'Growth',
+    description: '5 à 10 clubs',
+    price: '59€',
+    period: '/mois',
+    features: ['Jusqu\'à 10 clubs', 'Analytics avancées', 'Support prioritaire', 'Personnalisation'],
+    icon: Star,
+    color: 'from-blue-400 to-blue-600',
+    popular: true
+  },
+  {
+    id: '11-15' as SubscriptionPlan,
+    name: 'Professional',
+    description: '11 à 15 clubs',
+    price: '89€',
+    period: '/mois',
+    features: ['Jusqu\'à 15 clubs', 'API complète', 'Support dédié', 'Intégrations avancées'],
+    icon: Crown,
+    color: 'from-purple-400 to-purple-600',
+    popular: false
+  },
+  {
+    id: '16-25' as SubscriptionPlan,
+    name: 'Enterprise',
+    description: '16 à 25 clubs',
+    price: '149€',
+    period: '/mois',
+    features: ['Jusqu\'à 25 clubs', 'Support 24/7', 'Formation personnalisée', 'SLA garanti'],
+    icon: Building,
+    color: 'from-orange-400 to-orange-600',
+    popular: false
+  },
+  {
+    id: '25+' as SubscriptionPlan,
+    name: 'Ultimate',
+    description: 'Plus de 25 clubs',
+    price: 'Sur mesure',
+    period: '',
+    features: ['Clubs illimités', 'Solutions sur mesure', 'Account manager dédié', 'Infrastructure dédiée'],
+    icon: Zap,
+    color: 'from-red-400 to-red-600',
+    popular: false
+  }
+];
+
 export default function RegistrationForms() {
   const [activeForm, setActiveForm] = useState<FormType>(null);
   const [loading, setLoading] = useState(false);
@@ -57,12 +125,19 @@ export default function RegistrationForms() {
     clubName: ''
   });
 
+  // États pour les logos
+  const [associationLogo, setAssociationLogo] = useState<File | null>(null);
+  const [clubLogo, setClubLogo] = useState<File | null>(null);
+
   const [associationForm, setAssociationForm] = useState<AssociationForm>({
     name: '',
     city: '',
     email: '',
     phone: '',
     description: '',
+    subscription_plan: '5-10',
+    logo_url: '',
+    password: '',
   });
 
   const [clubForm, setClubForm] = useState<ClubForm>({
@@ -70,6 +145,8 @@ export default function RegistrationForms() {
     description: '',
     club_email: '',
     association_code: '',
+    logo_url: '',
+    password: '',
   });
 
   const [userForm, setUserForm] = useState<UserForm>({
@@ -87,6 +164,45 @@ export default function RegistrationForms() {
     }
   });
 
+  // Upload de logo vers Supabase Storage
+  const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
+    try {
+      console.log(`Début upload ${type} logo pour l'entité ${entityId}`);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${entityId}-${Date.now()}.${fileExt}`;
+      const filePath = `${type}-logos/${fileName}`;
+      
+      console.log('Tentative upload vers:', filePath);
+
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from('logos') // Le bucket 'logos' doit exister et être public
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+        
+      if (uploadError) {
+        console.error('Erreur upload logo:', uploadError);
+        // Lancer une erreur pour l'arrêter ici si nécessaire
+        throw new Error(`Échec de l'upload du logo: ${uploadError.message}`);
+      }
+      
+      console.log('Upload réussi:', uploadData);
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('logos')
+        .getPublicUrl(filePath);
+        
+      console.log('URL publique générée:', publicUrl);
+      return publicUrl;
+    } catch (error) {
+      console.error('Erreur lors de l\'upload:', error);
+      setMessage({ type: 'error', text: `Une erreur est survenue lors de l'upload du logo.` });
+      return null;
+    }
+  };
+
   // Validation en temps réel du code de club
   const validateClubCode = async (code: string) => {
     if (!code || code.length < 8) {
@@ -97,7 +213,6 @@ export default function RegistrationForms() {
     setClubValidation({ loading: true, valid: null, clubName: '' });
 
     try {
-      // Nettoyer et normaliser le code comme pour la création de club
       const cleanClubCode = code.trim().toUpperCase();
       
       const { data, error } = await supabase
@@ -138,82 +253,111 @@ export default function RegistrationForms() {
     }
   };
 
+  const handleAssociationLogoSelect = (file: File | null) => {
+    setAssociationLogo(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAssociationForm({ ...associationForm, logo_url: e.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setAssociationForm({ ...associationForm, logo_url: '' });
+    }
+  };
+
+  const handleClubLogoSelect = (file: File | null) => {
+    setClubLogo(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setClubForm({ ...clubForm, logo_url: e.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setClubForm({ ...clubForm, logo_url: '' });
+    }
+  };
+
   const handleCreateAssociation = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
     try {
-      const { data: existingUser } = await supabase.auth.getUser();
-      let userId = null;
-      
-      if (existingUser?.user) {
-        userId = existingUser.user.id;
-      } else {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: associationForm.email,
-          password: 'TempPassword123!',
-          options: {
-            data: {
-              first_name: 'Super',
-              last_name: 'Admin'
-            }
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: associationForm.email,
+        password: associationForm.password, // Utilise le mot de passe saisi
+        options: {
+          data: {
+            first_name: 'Super',
+            last_name: 'Admin'
           }
-        });
-
-        if (authError) {
-          if (authError.message.includes('User already registered')) {
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-              email: associationForm.email,
-              password: 'TempPassword123!'
-            });
-            
-            if (signInError) {
-              throw new Error('Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.');
-            } else {
-              userId = signInData.user?.id;
-            }
-          } else {
-            throw authError;
-          }
-        } else {
-          userId = authData.user?.id;
         }
-      }
+      });
 
-      if (!userId) {
-        throw new Error('Impossible de créer ou récupérer l\'utilisateur');
-      }
+      if (authError) throw authError;
+      if (!authData.user) throw new Error('Impossible de créer l\'utilisateur Super Admin.');
+
+      const userId = authData.user.id;
 
       const { data: association, error: assocError } = await supabase
         .from('associations')
-        .insert([associationForm])
+        .insert([{
+          name: associationForm.name,
+          city: associationForm.city,
+          email: associationForm.email,
+          phone: associationForm.phone,
+          description: associationForm.description,
+          subscription_plan: associationForm.subscription_plan,
+          logo_url: null
+        }])
         .select()
         .single();
 
       if (assocError) throw assocError;
 
-      if (userId) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: userId,
-            first_name: 'Super',
-            last_name: 'Admin',
-            role: 'Super Admin',
-            association_id: association.id,
-          });
-
-        if (profileError) throw profileError;
+      if (associationLogo) {
+        const logoUrl = await uploadLogo(associationLogo, 'association', association.id);
+        if (logoUrl) {
+          const { error: updateError } = await supabase
+            .from('associations')
+            .update({ logo_url: logoUrl })
+            .eq('id', association.id);
+            
+          if (updateError) console.error('Erreur mise à jour logo URL:', updateError);
+        }
       }
 
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: 'Super',
+          last_name: 'Admin',
+          role: 'Super Admin',
+          association_id: association.id,
+        })
+        .eq('id', userId);
+
+      if (profileError) throw profileError;
+      
       setMessage({
         type: 'success',
-        text: `Association créée avec succès! Code: ${association.association_code}. Mot de passe temporaire: TempPassword123! (changez-le après connexion)`,
+        text: `Association créée avec succès ! Un e-mail de confirmation a été envoyé à ${associationForm.email}. Veuillez valider votre compte avant de vous connecter.`,
       });
 
-      setTimeout(() => navigate('/dashboard'), 2000);
+      setAssociationForm({
+        name: '', city: '', email: '', phone: '', description: '',
+        subscription_plan: '5-10', logo_url: '', password: '',
+      });
+      setAssociationLogo(null);
+      
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+
     } catch (error: any) {
+      console.error('Erreur création association:', error);
       setMessage({ type: 'error', text: error.message });
     } finally {
       setLoading(false);
@@ -241,9 +385,10 @@ export default function RegistrationForms() {
         throw assocError;
       }
 
+      // CORRECTION: Utilisation du mot de passe du formulaire
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: clubForm.club_email,
-        password: 'TempPassword123!',
+        password: clubForm.password,
         options: {
           data: {
             first_name: 'Club',
@@ -253,6 +398,7 @@ export default function RegistrationForms() {
       });
 
       if (authError) throw authError;
+      if (!authData.user) throw new Error("Impossible de créer l'utilisateur Admin du club.");
 
       const { data: club, error: clubError } = await supabase
         .from('clubs')
@@ -260,34 +406,51 @@ export default function RegistrationForms() {
           name: clubForm.name,
           description: clubForm.description,
           club_email: clubForm.club_email,
-          association_id: association.id
+          association_id: association.id,
+          logo_url: null
         }])
         .select()
         .single();
 
       if (clubError) throw clubError;
 
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            first_name: 'Club',
-            last_name: 'Admin',
-            role: 'Club Admin',
-            club_id: club.id,
-            association_id: association.id,
-          })
-          .eq('id', authData.user.id);
-
-        if (profileError) throw profileError;
+      if (clubLogo) {
+        const logoUrl = await uploadLogo(clubLogo, 'club', club.id);
+        if (logoUrl) {
+          await supabase
+            .from('clubs')
+            .update({ logo_url: logoUrl })
+            .eq('id', club.id);
+        }
       }
 
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: 'Club',
+          last_name: 'Admin',
+          role: 'Club Admin',
+          club_id: club.id,
+          association_id: association.id,
+        })
+        .eq('id', authData.user.id);
+
+      if (profileError) throw profileError;
+
+      // CORRECTION: Message de succès mis à jour et cohérent
       setMessage({
         type: 'success',
-        text: `Club créé avec succès! Code: ${club.club_code}. Mot de passe temporaire: TempPassword123! (changez-le après connexion)`,
+        text: `Club créé ! Code: ${club.club_code}. Un email de confirmation a été envoyé à ${clubForm.club_email}. Veuillez valider votre compte avant de vous connecter.`,
       });
+      
+      // Réinitialisation du formulaire et redirection
+      setClubForm({ name: '', description: '', club_email: '', association_code: '', logo_url: '', password: '' });
+      setClubLogo(null);
 
-      setTimeout(() => navigate('/dashboard'), 2000);
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
     } finally {
@@ -306,7 +469,6 @@ export default function RegistrationForms() {
       let role: 'Member' | 'Supporter' = 'Supporter';
 
       if (userForm.club_code.trim()) {
-        // Clean and normalize the club code (comme pour la création de club)
         const cleanClubCode = userForm.club_code.trim().toUpperCase();
         
         const { data: club, error: clubError } = await supabase
@@ -337,92 +499,77 @@ export default function RegistrationForms() {
       });
 
       if (authError) throw authError;
+      if (!authData.user) throw new Error("Impossible de créer l'utilisateur.");
 
-      if (authData.user) {
-        let avatarUrl = null;
+      let avatarUrl = null;
 
-        if (userForm.avatar_url && userForm.avatar_url.startsWith('data:')) {
-          try {
-            const response = await fetch(userForm.avatar_url);
-            const blob = await response.blob();
-            const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+      if (userForm.avatar_url && userForm.avatar_url.startsWith('data:')) {
+        try {
+          const response = await fetch(userForm.avatar_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
 
-            const fileExt = file.type.split('/')[1];
-            const fileName = `${authData.user.id}-${Date.now()}.${fileExt}`;
-            const filePath = `avatars/${fileName}`;
+          const fileExt = file.type.split('/')[1];
+          const fileName = `${authData.user.id}-${Date.now()}.${fileExt}`;
+          const filePath = `avatars/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file);
+
+          if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage
               .from('avatars')
-              .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false
-              });
-
-            if (!uploadError) {
-              const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath);
-              
-              avatarUrl = publicUrl;
-            }
-          } catch (uploadError) {
-            console.error('Erreur upload avatar:', uploadError);
+              .getPublicUrl(filePath);
+            avatarUrl = publicUrl;
           }
-        }
-
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            first_name: userForm.first_name,
-            last_name: userForm.last_name,
-            role,
-            club_id: clubId,
-            association_id: associationId,
-            avatar_url: avatarUrl,
-            email_consent_clubs: userForm.email_consents.clubs,
-            email_consent_association: userForm.email_consents.association,
-            email_consent_municipality: userForm.email_consents.municipality,
-            email_consent_sponsors: userForm.email_consents.sponsors,
-          })
-          .eq('id', authData.user.id);
-
-        if (profileError) throw profileError;
-
-        if (clubId) {
-          const { error: userClubError } = await supabase
-            .from('user_clubs')
-            .insert([{ user_id: authData.user.id, club_id: clubId }]);
-
-          if (userClubError) console.error('Error adding to user_clubs:', userClubError);
+        } catch (uploadError) {
+          console.error('Erreur upload avatar:', uploadError);
         }
       }
 
-      const successMessage = clubId 
-        ? 'Inscription réussie ! Vous êtes maintenant membre du club. Vérifiez votre email.'
-        : 'Inscription réussie ! Vérifiez votre email pour activer votre compte.';
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: userForm.first_name,
+          last_name: userForm.last_name,
+          role,
+          club_id: clubId,
+          association_id: associationId,
+          avatar_url: avatarUrl,
+          email_consent_clubs: userForm.email_consents.clubs,
+          email_consent_association: userForm.email_consents.association,
+          email_consent_municipality: userForm.email_consents.municipality,
+          email_consent_sponsors: userForm.email_consents.sponsors,
+        })
+        .eq('id', authData.user.id);
 
+      if (profileError) throw profileError;
+
+      if (clubId) {
+        const { error: userClubError } = await supabase
+          .from('user_clubs')
+          .insert([{ user_id: authData.user.id, club_id: clubId }]);
+
+        if (userClubError) console.error('Error adding to user_clubs:', userClubError);
+      }
+      
       setMessage({
         type: 'success',
-        text: successMessage,
+        text: 'Inscription réussie ! Veuillez vérifier vos e-mails pour confirmer votre compte.',
       });
 
       setUserForm({
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        club_code: '',
-        avatar_url: '',
-        email_consents: {
-          clubs: false,
-          association: false,
-          municipality: false,
-          sponsors: false
-        }
+        first_name: '', last_name: '', email: '', password: '', club_code: '', avatar_url: '',
+        email_consents: { clubs: false, association: false, municipality: false, sponsors: false }
       });
       setUserStep(1);
 
-      setTimeout(() => navigate('/dashboard'), 2000);
+      // Redirection avec rechargement de la page pour mettre à jour le statut dans le header
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
     } finally {
@@ -807,73 +954,176 @@ export default function RegistrationForms() {
 
         {/* Association Form */}
         {activeForm === 'association' && (
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Créer une Association</h2>
-            <form onSubmit={handleCreateAssociation} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nom de l'Association *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={associationForm.name}
-                  onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Nom de votre association"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Courriel *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={associationForm.email}
-                  onChange={(e) => setAssociationForm({ ...associationForm, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="contact@association.com"
-                />
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
+          <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Créer une Association</h2>
+            
+            <form onSubmit={handleCreateAssociation} className="space-y-8">
+              {/* Informations générales */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">Informations générales</h3>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Nom de l'Association *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={associationForm.name}
+                      onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Nom de votre association"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Ville
+                    </label>
+                    <input
+                      type="text"
+                      value={associationForm.city}
+                      onChange={(e) => setAssociationForm({ ...associationForm, city: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Paris"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Téléphone
+                    </label>
+                    <input
+                      type="tel"
+                      value={associationForm.phone}
+                      onChange={(e) => setAssociationForm({ ...associationForm, phone: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="01 23 45 67 89"
+                    />
+                  </div>
+                  <div/>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Courriel de connexion *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={associationForm.email}
+                      onChange={(e) => setAssociationForm({ ...associationForm, email: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="contact@association.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Mot de passe *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={associationForm.password}
+                      onChange={(e) => setAssociationForm({ ...associationForm, password: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Minimum 6 caractères"
+                    />
+                  </div>
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ville
+                    Description
                   </label>
-                  <input
-                    type="text"
-                    value={associationForm.city}
-                    onChange={(e) => setAssociationForm({ ...associationForm, city: e.target.value })}
+                  <textarea
+                    rows={4}
+                    value={associationForm.description}
+                    onChange={(e) => setAssociationForm({ ...associationForm, description: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="Paris"
+                    placeholder="Décrivez brièvement votre association..."
                   />
                 </div>
+
+                {/* Logo Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Téléphone
-                  </label>
-                  <input
-                    type="tel"
-                    value={associationForm.phone}
-                    onChange={(e) => setAssociationForm({ ...associationForm, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="01 23 45 67 89"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de l'association</label>
+                  <ProfilePictureUpload
+                    onImageSelect={handleAssociationLogoSelect}
+                    currentImage={associationForm.logo_url}
                   />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Formats acceptés : PNG, JPG, SVG. Taille max : 2MB. Dimension recommandée : 200x200px
+                  </p>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  rows={4}
-                  value={associationForm.description}
-                  onChange={(e) => setAssociationForm({ ...associationForm, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Décrivez brièvement votre association..."
-                />
+
+              {/* Plan d'abonnement */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">Choisissez votre plan</h3>
+                
+                <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {SUBSCRIPTION_PLANS.map((plan) => {
+                    const Icon = plan.icon;
+                    return (
+                      <div
+                        key={plan.id}
+                        className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-300 border-2 ${
+                          associationForm.subscription_plan === plan.id
+                            ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
+                            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        } ${plan.popular ? 'ring-2 ring-blue-200' : ''}`}
+                        onClick={() => setAssociationForm({ ...associationForm, subscription_plan: plan.id })}
+                      >
+                        {plan.popular && (
+                          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                              Populaire
+                            </span>
+                          </div>
+                        )}
+                        
+                        <div className="text-center">
+                          <div className={`mx-auto w-12 h-12 bg-gradient-to-r ${plan.color} rounded-xl flex items-center justify-center mb-4`}>
+                            <Icon className="h-6 w-6 text-white" />
+                          </div>
+                          
+                          <h4 className="text-lg font-semibold text-gray-900 mb-1">{plan.name}</h4>
+                          <p className="text-sm text-gray-500 mb-3">{plan.description}</p>
+                          
+                          <div className="mb-4">
+                            <span className="text-2xl font-bold text-gray-900">{plan.price}</span>
+                            <span className="text-sm text-gray-500">{plan.period}</span>
+                          </div>
+                          
+                          <ul className="space-y-2 text-sm text-gray-600">
+                            {plan.features.map((feature, index) => (
+                              <li key={index} className="flex items-center">
+                                <Check className="h-4 w-4 text-green-500 mr-2" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <input
+                          type="radio"
+                          name="subscription_plan"
+                          value={plan.id}
+                          checked={associationForm.subscription_plan === plan.id}
+                          onChange={() => setAssociationForm({ ...associationForm, subscription_plan: plan.id })}
+                          className="sr-only"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+
               <div className="flex space-x-4">
                 <button
                   type="button"
@@ -914,7 +1164,7 @@ export default function RegistrationForms() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Courriel du Club *
+                  Courriel de connexion du Club *
                 </label>
                 <input
                   type="email"
@@ -923,6 +1173,21 @@ export default function RegistrationForms() {
                   onChange={(e) => setClubForm({ ...clubForm, club_email: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="contact@club.com"
+                />
+              </div>
+              {/* CORRECTION: Ajout du champ mot de passe pour le club */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mot de passe *
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={clubForm.password}
+                  onChange={(e) => setClubForm({ ...clubForm, password: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="Minimum 6 caractères"
                 />
               </div>
               <div>
@@ -953,6 +1218,19 @@ export default function RegistrationForms() {
                   placeholder="Décrivez brièvement votre club..."
                 />
               </div>
+
+              {/* Logo Upload pour club */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Logo du club</label>
+                <ProfilePictureUpload
+                  onImageSelect={handleClubLogoSelect}
+                  currentImage={clubForm.logo_url}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Formats acceptés : PNG, JPG, SVG. Taille max : 2MB. Dimension recommandée : 200x200px
+                </p>
+              </div>
+
               <div className="flex space-x-4">
                 <button
                   type="button"
@@ -989,15 +1267,13 @@ export default function RegistrationForms() {
               ? 'bg-green-50 text-green-700 border-green-200' 
               : 'bg-red-50 text-red-700 border-red-200'
           }`}>
-            <div className="flex items-center">
+            <div className="flex items-start">
               {message.type === 'success' ? (
-                <Check className="h-5 w-5 mr-2" />
+                <Check className="h-5 w-5 mr-3 flex-shrink-0" />
               ) : (
-                <div className="h-5 w-5 mr-2 rounded-full bg-red-600 flex items-center justify-center">
-                  <span className="text-white text-xs">!</span>
-                </div>
+                <AlertCircle className="h-5 w-5 mr-3 flex-shrink-0" />
               )}
-              {message.text}
+              <p className="flex-1">{message.text}</p>
             </div>
           </div>
         )}

@@ -8,6 +8,7 @@ interface Club {
   name: string;
   description: string | null;
   club_email: string;
+  contact_email?: string | null;
   club_code: string;
   created_at: string;
   association_id: string;
@@ -40,7 +41,7 @@ export default function Clubs() {
       setLoading(true);
       const { data, error } = await supabase
         .from('clubs')
-        .select('*')
+        .select('*, contact_email')
         .eq('association_id', profile?.association_id)
         .order('created_at', { ascending: false });
 
@@ -257,7 +258,7 @@ export default function Clubs() {
                   </h3>
                   <div className="flex items-center text-gray-600 text-sm mb-2">
                     <Mail className="h-4 w-4 mr-1" />
-                    {club.club_email}
+                    {club.contact_email || "Contact via l'association"}
                   </div>
                 </div>
                 {getClubActionButton(club)}
