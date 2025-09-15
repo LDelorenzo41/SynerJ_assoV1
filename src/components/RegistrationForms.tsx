@@ -33,6 +33,7 @@ interface ClubForm {
   name: string;
   description: string;
   club_email: string;
+  contact_email: string; // Ajout du champ contact_email
   association_code: string;
   logo_url: string;
   password: string;
@@ -144,6 +145,7 @@ export default function RegistrationForms() {
     name: '',
     description: '',
     club_email: '',
+    contact_email: '', // Ajout du champ contact_email dans l'état initial
     association_code: '',
     logo_url: '',
     password: '',
@@ -169,14 +171,34 @@ export default function RegistrationForms() {
     try {
       console.log(`Début upload ${type} logo pour l'entité ${entityId}`);
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${entityId}-${Date.now()}.${fileExt}`;
-      const filePath = `${type}-logos/${fileName}`;
-      
-      console.log('Tentative upload vers:', filePath);
+      // Vérifier que le fichier est valide
+      if (!file || file.size === 0) {
+        throw new Error('Fichier invalide');
+      }
 
+      // Vérifier la taille (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        throw new Error('Le fichier ne doit pas dépasser 2MB');
+      }
+
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Seuls les fichiers image sont acceptés');
+      }
+
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${entityId}-${Date.now()}.${fileExt}`;
+      
+      // Utiliser le bucket "logos" avec le bon dossier selon le type
+      const bucketName = 'logos';
+      const folderName = type === 'association' ? 'association-logos' : 'club-logos';
+      const filePath = `${folderName}/${fileName}`;
+      
+      console.log(`Tentative upload vers le bucket "${bucketName}", chemin: ${filePath}`);
+
+      // Essayer directement l'upload sans vérifier l'existence du bucket
       const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('logos') // Le bucket 'logos' doit exister et être public
+        .from(bucketName)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -184,21 +206,33 @@ export default function RegistrationForms() {
         
       if (uploadError) {
         console.error('Erreur upload logo:', uploadError);
-        // Lancer une erreur pour l'arrêter ici si nécessaire
         throw new Error(`Échec de l'upload du logo: ${uploadError.message}`);
+      }
+      
+      if (!uploadData) {
+        throw new Error('Upload échoué: aucune donnée retournée');
       }
       
       console.log('Upload réussi:', uploadData);
       
       const { data: { publicUrl } } = supabase.storage
-        .from('logos')
+        .from(bucketName)
         .getPublicUrl(filePath);
         
       console.log('URL publique générée:', publicUrl);
+      
+      // Vérifier que l'URL est valide
+      if (!publicUrl || !publicUrl.includes(fileName)) {
+        throw new Error('URL publique invalide générée');
+      }
+      
       return publicUrl;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'upload:', error);
-      setMessage({ type: 'error', text: `Une erreur est survenue lors de l'upload du logo.` });
+      setMessage({ 
+        type: 'error', 
+        text: `Erreur upload logo: ${error.message}` 
+      });
       return null;
     }
   };
@@ -370,6 +404,10 @@ export default function RegistrationForms() {
     setMessage(null);
 
     try {
+      console.log('=== DÉBUT CRÉATION CLUB ===');
+      console.log('Formulaire club:', clubForm);
+      console.log('Logo sélectionné:', clubLogo);
+
       const cleanAssociationCode = clubForm.association_code.trim().toUpperCase();
       
       const { data: association, error: assocError } = await supabase
@@ -385,7 +423,8 @@ export default function RegistrationForms() {
         throw assocError;
       }
 
-      // CORRECTION: Utilisation du mot de passe du formulaire
+      console.log('Association trouvée:', association);
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: clubForm.club_email,
         password: clubForm.password,
@@ -400,12 +439,15 @@ export default function RegistrationForms() {
       if (authError) throw authError;
       if (!authData.user) throw new Error("Impossible de créer l'utilisateur Admin du club.");
 
+      console.log('Utilisateur créé:', authData.user.id);
+
       const { data: club, error: clubError } = await supabase
         .from('clubs')
         .insert([{
           name: clubForm.name,
           description: clubForm.description,
           club_email: clubForm.club_email,
+          contact_email: clubForm.contact_email || null,
           association_id: association.id,
           logo_url: null
         }])
@@ -414,14 +456,44 @@ export default function RegistrationForms() {
 
       if (clubError) throw clubError;
 
+      console.log('Club créé:', club);
+
+      // Upload du logo si un fichier a été sélectionné
       if (clubLogo) {
-        const logoUrl = await uploadLogo(clubLogo, 'club', club.id);
-        if (logoUrl) {
-          await supabase
-            .from('clubs')
-            .update({ logo_url: logoUrl })
-            .eq('id', club.id);
+        console.log('=== DÉBUT UPLOAD LOGO ===');
+        console.log('Fichier logo:', {
+          name: clubLogo.name,
+          size: clubLogo.size,
+          type: clubLogo.type
+        });
+        
+        try {
+          const logoUrl = await uploadLogo(clubLogo, 'club', club.id);
+          console.log('Résultat upload:', logoUrl);
+          
+          if (logoUrl) {
+            console.log('=== MISE À JOUR BDD AVEC LOGO ===');
+            const { data: updateData, error: updateError } = await supabase
+              .from('clubs')
+              .update({ logo_url: logoUrl })
+              .eq('id', club.id)
+              .select();
+              
+            if (updateError) {
+              console.error('Erreur mise à jour logo URL:', updateError);
+              throw new Error(`Erreur lors de la sauvegarde de l'URL du logo: ${updateError.message}`);
+            } else {
+              console.log('URL du logo sauvegardée avec succès:', updateData);
+            }
+          } else {
+            console.warn('Upload du logo échoué, le club sera créé sans logo');
+          }
+        } catch (logoError) {
+          console.error('Erreur lors de l\'upload du logo:', logoError);
+          // Ne pas faire échouer la création du club si seul le logo pose problème
         }
+      } else {
+        console.log('Aucun logo sélectionné');
       }
 
       const { error: profileError } = await supabase
@@ -437,14 +509,23 @@ export default function RegistrationForms() {
 
       if (profileError) throw profileError;
 
-      // CORRECTION: Message de succès mis à jour et cohérent
+      console.log('=== CRÉATION CLUB TERMINÉE ===');
+
       setMessage({
         type: 'success',
         text: `Club créé ! Code: ${club.club_code}. Un email de confirmation a été envoyé à ${clubForm.club_email}. Veuillez valider votre compte avant de vous connecter.`,
       });
       
-      // Réinitialisation du formulaire et redirection
-      setClubForm({ name: '', description: '', club_email: '', association_code: '', logo_url: '', password: '' });
+      // Réinitialisation du formulaire et redirection avec le nouveau champ
+      setClubForm({ 
+        name: '', 
+        description: '', 
+        club_email: '', 
+        contact_email: '', // Ajout dans la réinitialisation
+        association_code: '', 
+        logo_url: '', 
+        password: '' 
+      });
       setClubLogo(null);
 
       setTimeout(() => {
@@ -452,6 +533,7 @@ export default function RegistrationForms() {
       }, 3000);
 
     } catch (error: any) {
+      console.error('=== ERREUR CRÉATION CLUB ===', error);
       setMessage({ type: 'error', text: error.message });
     } finally {
       setLoading(false);
@@ -730,7 +812,7 @@ export default function RegistrationForms() {
               
               {clubValidation.valid === false && userForm.club_code && (
                 <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                  <AlertCircle className="w-4 w-4 mr-2" />
                   Code de club invalide
                 </p>
               )}
@@ -1162,20 +1244,41 @@ export default function RegistrationForms() {
                   placeholder="Nom de votre club"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Courriel de connexion du Club *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={clubForm.club_email}
-                  onChange={(e) => setClubForm({ ...clubForm, club_email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                  placeholder="contact@club.com"
-                />
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Courriel de connexion *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={clubForm.club_email}
+                    onChange={(e) => setClubForm({ ...clubForm, club_email: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="admin@club.com"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Email pour se connecter au club
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email de contact
+                  </label>
+                  <input
+                    type="email"
+                    value={clubForm.contact_email}
+                    onChange={(e) => setClubForm({ ...clubForm, contact_email: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="contact@club.com"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Email affiché aux membres (optionnel)
+                  </p>
+                </div>
               </div>
-              {/* CORRECTION: Ajout du champ mot de passe pour le club */}
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Mot de passe *
