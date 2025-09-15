@@ -178,17 +178,47 @@ export default function Settings() {
     setMessage(null);
 
     try {
+      console.log('=== DÉBUT UPLOAD LOGO CLUB ===');
+      console.log('Club ID:', clubData.id);
+      console.log('Fichier:', file.name, file.size, file.type);
+
       // Upload du nouveau logo
       const logoUrl = await uploadLogo(file, 'club', clubData.id);
+      console.log('URL retournée par uploadLogo:', logoUrl);
       
       if (logoUrl) {
+        console.log('=== MISE À JOUR BASE DE DONNÉES ===');
         // Mettre à jour la base de données
-        const { error: updateError } = await supabase
+        const { data: updateData, error: updateError } = await supabase
           .from('clubs')
           .update({ logo_url: logoUrl })
-          .eq('id', clubData.id);
+          .eq('id', clubData.id)
+          .select();
 
-        if (updateError) throw updateError;
+        console.log('Résultat mise à jour BDD:', { updateData, updateError });
+
+        if (updateError) {
+          console.error('Erreur mise à jour BDD:', updateError);
+          throw updateError;
+        }
+
+        // Vérifier que la mise à jour a bien eu lieu
+        const { data: verifyData, error: verifyError } = await supabase
+          .from('clubs')
+          .select('logo_url')
+          .eq('id', clubData.id)
+          .single();
+
+        console.log('Vérification après mise à jour:', { verifyData, verifyError });
+
+        if (verifyData) {
+          console.log('Logo URL sauvegardé en BDD:', verifyData.logo_url);
+          if (verifyData.logo_url === logoUrl) {
+            console.log('✅ URL correctement sauvegardée');
+          } else {
+            console.log('❌ URL différente en BDD:', verifyData.logo_url, 'vs attendue:', logoUrl);
+          }
+        }
 
         // Mettre à jour les données locales
         setClubData({
@@ -200,8 +230,13 @@ export default function Settings() {
           type: 'success',
           text: 'Logo du club mis à jour avec succès !',
         });
+
+        console.log('=== UPLOAD LOGO CLUB TERMINÉ ===');
+      } else {
+        throw new Error('Upload échoué: aucune URL retournée');
       }
     } catch (error: any) {
+      console.error('=== ERREUR UPLOAD LOGO CLUB ===', error);
       setMessage({ type: 'error', text: `Erreur upload logo: ${error.message}` });
     } finally {
       setClubLoading(false);
