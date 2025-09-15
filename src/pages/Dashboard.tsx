@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Users, Building, Search, Eye, AlertCircle } from 'lucide-react';
+import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight } from 'lucide-react';
 
 interface AssociationInfo {
   id: string;
@@ -16,11 +16,19 @@ interface ClubInfo {
   logo_url: string | null;
 }
 
+interface FollowedClub {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  description: string | null;
+}
+
 export default function Dashboard() {
   const { profile, isSuperAdmin, isClubAdmin } = useAuthNew();
   const location = useLocation();
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
+  const [followedClubs, setFollowedClubs] = useState<FollowedClub[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [availableAssociations, setAvailableAssociations] = useState<AssociationInfo[]>([]);
@@ -61,6 +69,24 @@ export default function Dashboard() {
           .order('name');
         if (!assocError && associations) {
           setAvailableAssociations(associations);
+        }
+      }
+
+      // Récupérer les clubs suivis par l'utilisateur
+      if (profile.role === 'Supporter' || profile.role === 'Member') {
+        const { data: userClubs, error: userClubsError } = await supabase
+          .from('user_clubs')
+          .select(`
+            club_id,
+            clubs(id, name, logo_url, description)
+          `)
+          .eq('user_id', profile.id);
+
+        if (!userClubsError && userClubs) {
+          const followedClubsData = userClubs
+            .map((uc: any) => uc.clubs)
+            .filter((club: any): club is FollowedClub => club !== null);
+          setFollowedClubs(followedClubsData);
         }
       }
 
@@ -281,6 +307,86 @@ export default function Dashboard() {
     return null;
   };
 
+  // Nouvelle section pour afficher les clubs suivis
+  const renderFollowedClubsSection = () => {
+    if ((profile?.role !== 'Supporter' && profile?.role !== 'Member') || followedClubs.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="bg-white overflow-hidden shadow-sm rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+            <Eye className="h-5 w-5 mr-2" />
+            Clubs que vous suivez ({followedClubs.length})
+          </h2>
+        </div>
+        <div className="p-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {followedClubs.map((club) => (
+              <div key={club.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <LogoDisplay 
+                    src={club.logo_url} 
+                    alt={`Logo ${club.name}`} 
+                    size="w-10 h-10"
+                    fallbackIcon={Users}
+                    iconColor="text-blue-600"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">
+                      {club.name}
+                    </h3>
+                    {club.contact_email && (
+                      <p className="text-xs text-blue-600 mt-1">
+                        📧 {club.contact_email}
+                      </p>
+                    )}
+                    {club.description && (
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                        {club.description}
+                      </p>
+                    )}
+                    <div className="flex space-x-2 mt-3">
+                      <a
+                        href={`/events?club=${club.id}`}
+                        className="inline-flex items-center text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                        title="Voir les événements du club"
+                      >
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Événements
+                      </a>
+                      <a
+                        href={`/clubs/${club.id}/communication`}
+                        className="inline-flex items-center text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                        title="Communication du club"
+                      >
+                        <MessageCircle className="h-3 w-3 mr-1" />
+                        Communication
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {followedClubs.length > 0 && (
+            <div className="mt-6 text-center">
+              <a 
+                href="/clubs" 
+                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Gérer vos abonnements aux clubs
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -353,6 +459,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Nouvelle section pour les clubs suivis */}
+      {renderFollowedClubsSection()}
 
       <div className="bg-white overflow-hidden shadow-sm rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">

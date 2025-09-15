@@ -1,22 +1,45 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Camera, Lock, Save, User, AlertCircle } from 'lucide-react';
+import { Camera, Lock, Save, User, AlertCircle, Building2, Mail } from 'lucide-react';
 
 interface Message {
   type: 'success' | 'error';
   text: string;
 }
 
+interface ClubData {
+  id: string;
+  name: string;
+  contact_email: string | null;
+  logo_url: string | null;
+}
+
+interface AssociationData {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
+
 export default function Settings() {
   const { profile, user } = useAuthNew();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const clubLogoInputRef = useRef<HTMLInputElement>(null);
+  const associationLogoInputRef = useRef<HTMLInputElement>(null);
   
   const [message, setMessage] = useState<Message | null>(null);
   const [loading, setLoading] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(
     profile?.avatar_url || null
   );
+  
+  // État pour les données du club (Club Admin uniquement)
+  const [clubData, setClubData] = useState<ClubData | null>(null);
+  const [clubLoading, setClubLoading] = useState(false);
+  
+  // État pour les données de l'association (Super Admin uniquement)
+  const [associationData, setAssociationData] = useState<AssociationData | null>(null);
+  const [associationLoading, setAssociationLoading] = useState(false);
   
   // État pour le changement de mot de passe
   const [passwordForm, setPasswordForm] = useState({
@@ -30,6 +53,198 @@ export default function Settings() {
     first_name: profile?.first_name || '',
     last_name: profile?.last_name || '',
   });
+
+  // État pour les informations du club
+  const [clubForm, setClubForm] = useState({
+    contact_email: '',
+  });
+
+  // Charger les données du club si l'utilisateur est Club Admin
+  useEffect(() => {
+    if (profile?.role === 'Club Admin' && profile?.club_id) {
+      fetchClubData();
+    }
+    if (profile?.role === 'Super Admin' && profile?.association_id) {
+      fetchAssociationData();
+    }
+  }, [profile]);
+
+  const fetchClubData = async () => {
+    if (!profile?.club_id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('id, name, contact_email, logo_url')
+        .eq('id', profile.club_id)
+        .single();
+
+      if (error) throw error;
+
+      setClubData(data);
+      setClubForm({
+        contact_email: data.contact_email || '',
+      });
+    } catch (err: any) {
+      console.error('Erreur lors du chargement des données du club:', err);
+    }
+  };
+
+  const fetchAssociationData = async () => {
+    if (!profile?.association_id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('associations')
+        .select('id, name, logo_url')
+        .eq('id', profile.association_id)
+        .single();
+
+      if (error) throw error;
+
+      setAssociationData(data);
+    } catch (err: any) {
+      console.error('Erreur lors du chargement des données de l\'association:', err);
+    }
+  };
+
+  // Upload de logo (réutilise la logique de RegistrationForms.tsx)
+  const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
+    try {
+      console.log(`Début upload ${type} logo pour l'entité ${entityId}`);
+
+      // Vérifier que le fichier est valide
+      if (!file || file.size === 0) {
+        throw new Error('Fichier invalide');
+      }
+
+      // Vérifier la taille (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        throw new Error('Le fichier ne doit pas dépasser 2MB');
+      }
+
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Seuls les fichiers image sont acceptés');
+      }
+
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${entityId}-${Date.now()}.${fileExt}`;
+      
+      // Utiliser le bucket "logos" avec le bon dossier selon le type
+      const bucketName = 'logos';
+      const folderName = type === 'association' ? 'association-logos' : 'club-logos';
+      const filePath = `${folderName}/${fileName}`;
+      
+      console.log(`Tentative upload vers le bucket "${bucketName}", chemin: ${filePath}`);
+
+      // Essayer directement l'upload
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+        
+      if (uploadError) {
+        console.error('Erreur upload logo:', uploadError);
+        throw new Error(`Échec de l'upload du logo: ${uploadError.message}`);
+      }
+      
+      if (!uploadData) {
+        throw new Error('Upload échoué: aucune donnée retournée');
+      }
+      
+      console.log('Upload réussi:', uploadData);
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filePath);
+        
+      console.log('URL publique générée:', publicUrl);
+      
+      return publicUrl;
+    } catch (error: any) {
+      console.error('Erreur lors de l\'upload:', error);
+      throw error;
+    }
+  };
+
+  const handleClubLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !clubData) return;
+
+    setClubLoading(true);
+    setMessage(null);
+
+    try {
+      // Upload du nouveau logo
+      const logoUrl = await uploadLogo(file, 'club', clubData.id);
+      
+      if (logoUrl) {
+        // Mettre à jour la base de données
+        const { error: updateError } = await supabase
+          .from('clubs')
+          .update({ logo_url: logoUrl })
+          .eq('id', clubData.id);
+
+        if (updateError) throw updateError;
+
+        // Mettre à jour les données locales
+        setClubData({
+          ...clubData,
+          logo_url: logoUrl,
+        });
+
+        setMessage({
+          type: 'success',
+          text: 'Logo du club mis à jour avec succès !',
+        });
+      }
+    } catch (error: any) {
+      setMessage({ type: 'error', text: `Erreur upload logo: ${error.message}` });
+    } finally {
+      setClubLoading(false);
+    }
+  };
+
+  const handleAssociationLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !associationData) return;
+
+    setAssociationLoading(true);
+    setMessage(null);
+
+    try {
+      // Upload du nouveau logo
+      const logoUrl = await uploadLogo(file, 'association', associationData.id);
+      
+      if (logoUrl) {
+        // Mettre à jour la base de données
+        const { error: updateError } = await supabase
+          .from('associations')
+          .update({ logo_url: logoUrl })
+          .eq('id', associationData.id);
+
+        if (updateError) throw updateError;
+
+        // Mettre à jour les données locales
+        setAssociationData({
+          ...associationData,
+          logo_url: logoUrl,
+        });
+
+        setMessage({
+          type: 'success',
+          text: 'Logo de l\'association mis à jour avec succès !',
+        });
+      }
+    } catch (error: any) {
+      setMessage({ type: 'error', text: `Erreur upload logo: ${error.message}` });
+    } finally {
+      setAssociationLoading(false);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,6 +387,40 @@ export default function Settings() {
     }
   };
 
+  const handleClubUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clubData) return;
+
+    setClubLoading(true);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase
+        .from('clubs')
+        .update({
+          contact_email: clubForm.contact_email.trim() || null,
+        })
+        .eq('id', clubData.id);
+
+      if (error) throw error;
+
+      // Mettre à jour les données locales
+      setClubData({
+        ...clubData,
+        contact_email: clubForm.contact_email.trim() || null,
+      });
+
+      setMessage({
+        type: 'success',
+        text: 'Email de contact du club mis à jour avec succès !',
+      });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setClubLoading(false);
+    }
+  };
+
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
@@ -308,6 +557,183 @@ export default function Settings() {
               </div>
             </form>
           </div>
+
+          {/* Section Club (uniquement pour les Club Admins) */}
+          {profile?.role === 'Club Admin' && clubData && (
+            <div className="border-b border-gray-200 pb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <Building2 className="h-5 w-5 mr-2" />
+                Paramètres du club
+              </h2>
+              
+              <div className="bg-green-50 p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-green-900 mb-2">{clubData.name}</h3>
+                <p className="text-sm text-green-700">
+                  Vous êtes administrateur de ce club. Vous pouvez modifier les informations de contact et le logo.
+                </p>
+              </div>
+
+              {/* Logo du club */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Camera className="h-5 w-5 mr-2" />
+                  Logo du club
+                </h3>
+                
+                <div className="flex items-center space-x-6">
+                  <div className="relative">
+                    {clubData.logo_url ? (
+                      <img
+                        src={clubData.logo_url}
+                        alt={`Logo ${clubData.name}`}
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center border-4 border-gray-200">
+                        <Building2 className="h-8 w-8 text-gray-400" />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => clubLogoInputRef.current?.click()}
+                      disabled={clubLoading}
+                      className="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors shadow-lg"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-900">Logo du club</h4>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {clubData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
+                    </p>
+                    <button
+                      onClick={() => clubLogoInputRef.current?.click()}
+                      disabled={clubLoading}
+                      className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      {clubLoading ? 'Chargement...' : 'Changer le logo'}
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Formats acceptés: JPG, PNG (max 2MB)
+                    </p>
+                  </div>
+                </div>
+                
+                <input
+                  ref={clubLogoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleClubLogoChange}
+                  className="hidden"
+                />
+              </div>
+              
+              <form onSubmit={handleClubUpdate} className="space-y-6 max-w-md">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email de contact du club
+                  </label>
+                  <input
+                    type="email"
+                    value={clubForm.contact_email}
+                    onChange={(e) => setClubForm({
+                      ...clubForm,
+                      contact_email: e.target.value
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="contact@club.com"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Cet email sera affiché aux membres et followers pour vous contacter. 
+                    Laissez vide si vous ne souhaitez pas afficher d'email de contact.
+                  </p>
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={clubLoading}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center"
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  {clubLoading ? 'Sauvegarde...' : 'Mettre à jour l\'email de contact'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Section Association (uniquement pour les Super Admins) */}
+          {profile?.role === 'Super Admin' && associationData && (
+            <div className="border-b border-gray-200 pb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <Building2 className="h-5 w-5 mr-2" />
+                Paramètres de l'association
+              </h2>
+              
+              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-blue-900 mb-2">{associationData.name}</h3>
+                <p className="text-sm text-blue-700">
+                  Vous êtes super administrateur de cette association. Vous pouvez modifier le logo.
+                </p>
+              </div>
+
+              {/* Logo de l'association */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Camera className="h-5 w-5 mr-2" />
+                  Logo de l'association
+                </h3>
+                
+                <div className="flex items-center space-x-6">
+                  <div className="relative">
+                    {associationData.logo_url ? (
+                      <img
+                        src={associationData.logo_url}
+                        alt={`Logo ${associationData.name}`}
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center border-4 border-gray-200">
+                        <Building2 className="h-8 w-8 text-gray-400" />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => associationLogoInputRef.current?.click()}
+                      disabled={associationLoading}
+                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-900">Logo de l'association</h4>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {associationData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
+                    </p>
+                    <button
+                      onClick={() => associationLogoInputRef.current?.click()}
+                      disabled={associationLoading}
+                      className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      {associationLoading ? 'Chargement...' : 'Changer le logo'}
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Formats acceptés: JPG, PNG (max 2MB)
+                    </p>
+                  </div>
+                </div>
+                
+                <input
+                  ref={associationLogoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAssociationLogoChange}
+                  className="hidden"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Section Changement de Mot de Passe */}
           <div>

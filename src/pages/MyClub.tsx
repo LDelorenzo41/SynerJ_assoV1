@@ -11,7 +11,9 @@ import {
   AlertCircle,
   Building2,
   UserPlus,
-  Edit
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
 
 interface ClubData {
@@ -19,6 +21,7 @@ interface ClubData {
   name: string;
   description: string;
   club_email: string;
+  contact_email: string | null;
   club_code: string;
   logo_url?: string;
   created_at: string;
@@ -51,6 +54,16 @@ export default function MyClub() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  
+  // États pour l'édition des informations du club
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    description: '',
+    contact_email: ''
+  });
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && profile?.role === 'Club Admin' && profile?.club_id) {
@@ -78,6 +91,13 @@ export default function MyClub() {
 
       if (clubError) throw clubError;
       setClubData(club);
+      
+      // Initialiser le formulaire d'édition avec les données actuelles
+      setEditForm({
+        name: club.name || '',
+        description: club.description || '',
+        contact_email: club.contact_email || ''
+      });
 
       // Récupérer les membres du club - Solution sécurisée au niveau applicatif
       const { data: allMembers, error: membersError } = await supabase
@@ -127,6 +147,62 @@ export default function MyClub() {
     }
   };
 
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clubData) return;
+
+    setEditLoading(true);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase
+        .from('clubs')
+        .update({
+          name: editForm.name.trim(),
+          description: editForm.description.trim() || null,
+          contact_email: editForm.contact_email.trim() || null
+        })
+        .eq('id', clubData.id);
+
+      if (error) throw error;
+
+      // Mettre à jour les données locales
+      setClubData({
+        ...clubData,
+        name: editForm.name.trim(),
+        description: editForm.description.trim(),
+        contact_email: editForm.contact_email.trim() || null
+      });
+
+      setIsEditing(false);
+      setMessage({
+        type: 'success',
+        text: 'Informations du club mises à jour avec succès !'
+      });
+
+      // Effacer le message après 3 secondes
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err: any) {
+      setMessage({
+        type: 'error',
+        text: err.message
+      });
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setMessage(null);
+    // Restaurer les valeurs originales
+    setEditForm({
+      name: clubData?.name || '',
+      description: clubData?.description || '',
+      contact_email: clubData?.contact_email || ''
+    });
+  };
+
   if (!isAuthenticated || profile?.role !== 'Club Admin') {
     return (
       <div className="text-center py-12">
@@ -172,6 +248,24 @@ export default function MyClub() {
 
   return (
     <div className="space-y-6">
+      {/* Message de succès/erreur */}
+      {message && (
+        <div className={`p-4 rounded-lg border ${
+          message.type === 'success' 
+            ? 'bg-green-50 text-green-700 border-green-200' 
+            : 'bg-red-50 text-red-700 border-red-200'
+        }`}>
+          <div className="flex items-start">
+            {message.type === 'success' ? (
+              <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="h-5 w-5 mr-3 flex-shrink-0" />
+            )}
+            <p className="flex-1">{message.text}</p>
+          </div>
+        </div>
+      )}
+
       {/* En-tête du club */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -197,10 +291,15 @@ export default function MyClub() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                <Edit className="h-4 w-4 mr-2" />
-                Modifier
-              </button>
+              {!isEditing && (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -240,6 +339,83 @@ export default function MyClub() {
           </div>
         </div>
       </div>
+
+      {/* Formulaire d'édition */}
+      {isEditing && (
+        <div className="bg-white rounded-lg shadow-sm border">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+              <Edit className="h-5 w-5 mr-2" />
+              Modifier les informations du club
+            </h2>
+          </div>
+          <div className="p-6">
+            <form onSubmit={handleEditSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom du club *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="Nom de votre club"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email de contact
+                </label>
+                <input
+                  type="email"
+                  value={editForm.contact_email}
+                  onChange={(e) => setEditForm({ ...editForm, contact_email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="contact@club.com"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Email affiché aux membres et followers (optionnel). Différent de l'email de connexion.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  rows={4}
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="Décrivez brièvement votre club..."
+                />
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {editLoading ? 'Sauvegarde...' : 'Sauvegarder'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Code d'invitation */}
       <div className="bg-white rounded-lg shadow-sm border">
@@ -286,7 +462,7 @@ export default function MyClub() {
       </div>
 
       {/* Informations du club */}
-      {clubData.description && (
+      {!isEditing && clubData.description && (
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Description</h2>
@@ -321,14 +497,28 @@ export default function MyClub() {
               className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
             >
               <Settings className="h-6 w-6 text-blue-600 mb-2" />
-              <p className="font-medium text-gray-900">Paramètres du Club</p>
-              <p className="text-sm text-gray-600">Configuration</p>
+              <p className="font-medium text-gray-900">Paramètres du Compte</p>
+              <p className="text-sm text-gray-600">Configuration personnelle</p>
             </a>
             
-            <div className="block p-4 bg-green-50 rounded-lg">
+            <div className="p-4 bg-green-50 rounded-lg space-y-2">
               <Mail className="h-6 w-6 text-green-600 mb-2" />
-              <p className="font-medium text-gray-900">Contact Club</p>
-              <p className="text-sm text-gray-600 truncate">{clubData.club_email}</p>
+              <div>
+                <p className="font-medium text-gray-900">Emails du Club</p>
+                <p className="text-xs text-gray-600 truncate">
+                  <strong>Connexion :</strong> {clubData.club_email}
+                </p>
+                {clubData.contact_email && (
+                  <p className="text-xs text-gray-600 truncate">
+                    <strong>Contact :</strong> {clubData.contact_email}
+                  </p>
+                )}
+                {!clubData.contact_email && (
+                  <p className="text-xs text-gray-500 italic">
+                    Aucun email de contact défini
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
