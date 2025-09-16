@@ -19,6 +19,7 @@ interface ClubInfo {
 interface FollowedClub {
   id: string;
   name: string;
+  slug: string; // ✅ AJOUTER CETTE LIGNE
   logo_url: string | null;
   description: string | null;
 }
@@ -78,7 +79,7 @@ export default function Dashboard() {
           .from('user_clubs')
           .select(`
             club_id,
-            clubs(id, name, logo_url, description)
+            clubs(id, name, slug, logo_url, description)
           `)
           .eq('user_id', profile.id);
 
@@ -349,7 +350,7 @@ export default function Dashboard() {
                     )}
                     <div className="flex space-x-2 mt-3">
                       <a
-                        href={`/events?club=${club.id}`}
+                        href={`/events?club=${club.slug}`}  /* ✅ REMPLACER club.id par club.slug */
                         className="inline-flex items-center text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                         title="Voir les événements du club"
                       >
