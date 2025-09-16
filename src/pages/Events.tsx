@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { 
@@ -14,7 +15,10 @@ import {
   Upload,
   Sparkles,
   Image as ImageIcon,
-  X
+  X,
+  ChevronDown,
+  ChevronUp,
+  Building
 } from 'lucide-react';
 
 interface Event {
@@ -28,6 +32,7 @@ interface Event {
   club_id: string;
   clubs: {
     name: string;
+    logo_url?: string | null;
   };
 }
 
@@ -40,8 +45,38 @@ interface EventForm {
   visibility: 'Public' | 'Members Only';
 }
 
+interface LogoDisplayProps {
+  src: string | null | undefined;
+  alt: string;
+  size?: string;
+  fallbackIcon: React.ComponentType<{ className?: string }>;
+  iconColor?: string;
+}
+
+const LogoDisplay: React.FC<LogoDisplayProps> = ({ src, alt, size = 'w-8 h-8', fallbackIcon: FallbackIcon, iconColor = 'text-gray-400' }) => {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+      {src && !imageError ? (
+        <img 
+          src={src} 
+          alt={alt}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <FallbackIcon className={`${size === 'w-8 h-8' ? 'h-5 w-5' : 'h-6 w-6'} ${iconColor}`} />
+      )}
+    </div>
+  );
+};
+
 export default function Events() {
   const { profile, isClubAdmin } = useAuthNew();
+  const [searchParams] = useSearchParams();
+  const clubId = searchParams.get('club');
+  
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +85,8 @@ export default function Events() {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
+  const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [eventForm, setEventForm] = useState<EventForm>({
     name: '',
     description: '',
@@ -60,52 +97,105 @@ export default function Events() {
   });
 
   useEffect(() => {
+  const fetchClubInfo = async () => {
+    if (clubId) {
+      try {
+        const { data, error } = await supabase
+          .from('clubs')
+          .select('id, name, slug')
+          .or(`slug.eq.${clubId},id.eq.${clubId}`)
+          .single();
+        
+        if (!error && data) {
+          setClubInfo(data);
+        }
+      } catch (error) {
+        console.error('Error fetching club info:', error);
+      }
+    } else {
+      setClubInfo(null);
+    }
+  };
+
+  fetchClubInfo();
+}, [clubId]);
+
+  useEffect(() => {
     fetchEvents();
-  }, [profile, showHistory]);
+  }, [profile, showHistory, clubId]);
 
   const fetchEvents = async () => {
-    try {
-      if (!profile) {
-        setLoading(false);
-        return;
-      }
-
-      if (profile.role === 'Supporter' && !profile.association_id) {
-        setEvents([]);
-        setLoading(false);
-        return;
-      }
-
-      // Calculer la date limite (hier à minuit)
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(23, 59, 59, 999);
-
-      let query = supabase
-        .from('events')
-        .select(`
-          *,
-          clubs (name, association_id)
-        `);
-
-      // Filtrer selon l'affichage (actuel vs historique)
-      if (showHistory) {
-        // Historique : événements d'hier et plus anciens
-        query = query.lte('date', yesterday.toISOString());
-      } else {
-        // Actuel : événements d'aujourd'hui et futurs
-        query = query.gte('date', yesterday.toISOString());
-      }
-
-      const { data, error } = await query.order('date', { ascending: showHistory ? false : true });
-
-      if (error) throw error;
-      setEvents(data || []);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
+  try {
+    if (!profile) {
       setLoading(false);
+      return;
     }
+
+    if (profile.role === 'Supporter' && !profile.association_id) {
+      setEvents([]);
+      setLoading(false);
+      return;
+    }
+
+    // Calculer la date limite (hier à minuit)
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(23, 59, 59, 999);
+
+    let query = supabase
+      .from('events')
+      .select(`
+        *,
+        clubs (id, name, slug, association_id, logo_url)
+      `);
+
+    // Filtrage par club si paramètre présent
+if (clubId) {
+  // Si clubId ressemble à un UUID (ancien format), utiliser directement
+  if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    query = query.eq('club_id', clubId);
+  } else {
+    // Si c'est un slug, chercher l'ID correspondant
+    const { data: clubData } = await supabase
+      .from('clubs')
+      .select('id')
+      .eq('slug', clubId)
+      .single();
+    
+    if (clubData) {
+      query = query.eq('club_id', clubData.id);
+    }
+  }
+}
+
+    // Filtrer selon l'affichage (actuel vs historique)
+    if (showHistory) {
+      query = query.lte('date', yesterday.toISOString());
+    } else {
+      query = query.gte('date', yesterday.toISOString());
+    }
+
+    const { data, error } = await query.order('date', { ascending: showHistory ? false : true });
+
+    if (error) throw error;
+    setEvents(data || []);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const toggleEventExpansion = (eventId: string) => {
+    setExpandedEvents(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId);
+      } else {
+        newSet.add(eventId);
+      }
+      return newSet;
+    });
   };
 
   const handleImageUpload = async (file: File) => {
@@ -234,6 +324,48 @@ export default function Events() {
     return isClubAdmin && event.club_id === profile?.club_id;
   };
 
+  const getPageTitle = () => {
+    if (clubId && clubInfo) {
+      return `Événements - ${clubInfo.name}`;
+    }
+    return 'Événements';
+  };
+
+  const getPageDescription = () => {
+    if (clubId && clubInfo) {
+      return `Événements du club ${clubInfo.name}`;
+    }
+    
+    if (profile?.role === 'Super Admin') return 'Tous les événements de votre association';
+    if (profile?.role === 'Club Admin') return 'Événements de votre club et événements publics';
+    if (profile?.role === 'Member') return 'Événements de votre club et événements publics';
+    if (profile?.role === 'Supporter') return 'Événements publics de votre association';
+    return '';
+  };
+
+  const getPageSubDescription = () => {
+    if (clubId && clubInfo) {
+      return `Tous les événements organisés par ${clubInfo.name}`;
+    }
+    
+    if (profile?.role === 'Super Admin') return 'Vous voyez tous les événements publics et privés de votre association.';
+    if (profile?.role === 'Club Admin') return 'Vous pouvez créer des événements pour votre club et voir les événements publics.';
+    if (profile?.role === 'Member') return 'Vous voyez les événements de votre club et les événements publics de l\'association.';
+    if (profile?.role === 'Supporter') return 'Vous ne voyez que les événements publics de votre association.';
+    return '';
+  };
+
+  const getListTitle = () => {
+    if (clubId && clubInfo) {
+      if (showHistory) {
+        return `Historique des événements de ${clubInfo.name}`;
+      }
+      return `Événements à venir de ${clubInfo.name}`;
+    }
+    
+    return showHistory ? 'Historique des événements' : 'Événements à venir';
+  };
+
   if (profile?.role === 'Supporter' && !profile?.association_id) {
     return (
       <div className="space-y-6">
@@ -276,33 +408,47 @@ export default function Events() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <h1 className="text-3xl font-bold text-gray-900">Événements</h1>
-          
-          <div className="flex rounded-lg border border-gray-300 bg-white">
-            <button
-              onClick={() => setShowHistory(false)}
-              className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
-                !showHistory 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              À venir
-            </button>
-            <button
-              onClick={() => setShowHistory(true)}
-              className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
-                showHistory 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Historique
-            </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{getPageTitle()}</h1>
+            {clubId && clubInfo && (
+              <div className="mt-2 flex items-center space-x-2">
+                <a 
+                  href="/events" 
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
+                  ← Retour à tous les événements
+                </a>
+              </div>
+            )}
           </div>
+          
+          {!clubId && (
+            <div className="flex rounded-lg border border-gray-300 bg-white">
+              <button
+                onClick={() => setShowHistory(false)}
+                className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
+                  !showHistory 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                À venir
+              </button>
+              <button
+                onClick={() => setShowHistory(true)}
+                className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
+                  showHistory 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Historique
+              </button>
+            </div>
+          )}
         </div>
 
-        {isClubAdmin && !showHistory && (
+        {isClubAdmin && !showHistory && (!clubId || (clubInfo && clubInfo.id === profile?.club_id)) && (
           <button
             onClick={() => {
               setShowForm(true);
@@ -331,16 +477,10 @@ export default function Events() {
           </div>
           <div className="ml-3">
             <h3 className="text-sm font-medium text-blue-800">
-              {profile?.role === 'Super Admin' && 'Tous les événements de votre association'}
-              {profile?.role === 'Club Admin' && 'Événements de votre club et événements publics'}
-              {profile?.role === 'Member' && 'Événements de votre club et événements publics'}
-              {profile?.role === 'Supporter' && 'Événements publics de votre association'}
+              {getPageDescription()}
             </h3>
             <div className="mt-1 text-sm text-blue-700">
-              {profile?.role === 'Super Admin' && 'Vous voyez tous les événements publics et privés de votre association.'}
-              {profile?.role === 'Club Admin' && 'Vous pouvez créer des événements pour votre club et voir les événements publics.'}
-              {profile?.role === 'Member' && 'Vous voyez les événements de votre club et les événements publics de l\'association.'}
-              {profile?.role === 'Supporter' && 'Vous ne voyez que les événements publics de votre association.'}
+              {getPageSubDescription()}
             </div>
           </div>
         </div>
@@ -520,7 +660,7 @@ export default function Events() {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
-            {showHistory ? 'Historique des événements' : 'Événements à venir'} ({events.length})
+            {getListTitle()} ({events.length})
           </h2>
           {showHistory && (
             <p className="text-sm text-gray-500 mt-1">
@@ -529,102 +669,156 @@ export default function Events() {
           )}
         </div>
         <div className="divide-y divide-gray-200">
-          {events.map((event) => (
-            <div key={event.id} className="px-6 py-6 hover:bg-gray-50">
-              <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-                {event.image_url && (
-                  <div className="lg:w-80 lg:flex-shrink-0">
-                    <img 
-                      src={event.image_url} 
-                      alt={event.name}
-                      className="w-full h-48 lg:h-32 object-contain bg-gray-50 rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
-                      onClick={() => setSelectedImage(event.image_url)}
-                    />
+          {events.map((event) => {
+            const isExpanded = expandedEvents.has(event.id);
+            return (
+              <div key={event.id} className="px-6 py-6 hover:bg-gray-50">
+                {/* En-tête avec logo et nom du club (même en mode filtrage) */}
+                <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100">
+                  <LogoDisplay 
+                    src={event.clubs.logo_url} 
+                    alt={`Logo ${event.clubs.name}`} 
+                    size="w-10 h-10"
+                    fallbackIcon={Building}
+                    iconColor="text-blue-600"
+                  />
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900">{event.clubs.name}</h4>
+                    <div className="flex items-center space-x-2 mt-1">
+                      {event.visibility === 'Public' ? (
+                        <Eye className="h-3 w-3 text-green-600" />
+                      ) : (
+                        <EyeOff className="h-3 w-3 text-orange-600" />
+                      )}
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${
+                        event.visibility === 'Public'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-orange-100 text-orange-800'
+                      }`}>
+                        {event.visibility}
+                      </span>
+                    </div>
                   </div>
-                )}
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">{event.name}</h3>
-                        <div className="flex items-center space-x-2 flex-shrink-0">
-                          {event.visibility === 'Public' ? (
-                            <Eye className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <EyeOff className="h-4 w-4 text-orange-600" />
+                </div>
+
+                {/* Contenu principal de l'événement */}
+                <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                  {event.image_url && (
+                    <div className="lg:w-80 lg:flex-shrink-0">
+                      <img 
+                        src={event.image_url} 
+                        alt={event.name}
+                        className="w-full h-48 lg:h-32 object-contain bg-gray-50 rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setSelectedImage(event.image_url)}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        {/* Titre de l'événement */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-3">{event.name}</h3>
+                        
+                        {/* Informations date et lieu */}
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center text-gray-600">
+                            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                            <span className="text-sm">
+                              {new Date(event.date).toLocaleDateString('fr-FR', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </div>
+                          
+                          {event.location && (
+                            <div className="flex items-center text-gray-600">
+                              <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                              <span className="text-sm flex-1">{event.location}</span>
+                              <button 
+                                className="ml-2 text-xs text-blue-600 hover:text-blue-700 underline"
+                                onClick={() => {
+                                  // TODO: Ouvrir modal Google Maps
+                                  alert('Fonctionnalité "Voir sur la carte" à venir !');
+                                }}
+                              >
+                                Voir sur la carte
+                              </button>
+                            </div>
                           )}
-                          <span className={`px-2 py-1 text-xs rounded-full whitespace-nowrap ${
-                            event.visibility === 'Public'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-orange-100 text-orange-800'
-                          }`}>
-                            {event.visibility}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mb-2">{event.clubs.name}</p>
-                      
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-gray-500 mb-2">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
-                          <span className="truncate">
-                            {new Date(event.date).toLocaleDateString('fr-FR', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
                         </div>
                         
-                        {event.location && (
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                            <span className="truncate">{event.location}</span>
+                        {/* Description avec expansion */}
+                        {event.description && (
+                          <div className="mb-4">
+                            <p className={`text-gray-700 ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                              {event.description}
+                            </p>
+                            {event.description.length > 150 && (
+                              <button
+                                onClick={() => toggleEventExpansion(event.id)}
+                                className="mt-2 text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                              >
+                                {isExpanded ? (
+                                  <>
+                                    <ChevronUp className="h-4 w-4 mr-1" />
+                                    Voir moins
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown className="h-4 w-4 mr-1" />
+                                    Voir plus
+                                  </>
+                                )}
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
                       
-                      {event.description && (
-                        <p className="text-sm text-gray-600 mt-2 line-clamp-2">{event.description}</p>
+                      {/* Boutons de gestion (existants) */}
+                      {canManageEvent(event) && (
+                        <div className="flex space-x-2 ml-4 flex-shrink-0">
+                          <button
+                            onClick={() => handleEdit(event)}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                            title="Modifier l'Événement"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(event.id)}
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                            title="Supprimer l'Événement"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       )}
                     </div>
-                    
-                    {canManageEvent(event) && (
-                      <div className="flex space-x-2 ml-4 flex-shrink-0">
-                        <button
-                          onClick={() => handleEdit(event)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                          title="Modifier l'Événement"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(event.id)}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                          title="Supprimer l'Événement"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {events.length === 0 && (
             <div className="px-6 py-12 text-center">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-gray-500">
-                {showHistory ? 'Aucun événement dans l\'historique' : 'Aucun événement à venir'}
+                {clubId && clubInfo ? 
+                  (showHistory ? `Aucun événement passé pour ${clubInfo.name}` : `Aucun événement à venir pour ${clubInfo.name}`) :
+                  (showHistory ? 'Aucun événement dans l\'historique' : 'Aucun événement à venir')
+                }
               </p>
               <p className="text-sm text-gray-400 mt-2">
-                {showHistory ? (
+                {clubId && clubInfo ? (
+                  `Ce club n'a ${showHistory ? 'organisé aucun événement par le passé' : 'aucun événement programmé'}.`
+                ) : showHistory ? (
                   'Aucun événement passé trouvé pour votre profil.'
                 ) : (
                   <>
