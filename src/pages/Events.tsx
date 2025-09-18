@@ -18,7 +18,9 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  Building
+  Building,
+  CalendarPlus,
+  CalendarX
 } from 'lucide-react';
 
 interface Event {
@@ -87,6 +89,11 @@ export default function Events() {
   const [showHistory, setShowHistory] = useState(false);
   const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  
+  // États pour le calendrier personnel
+  const [userCalendarEvents, setUserCalendarEvents] = useState<string[]>([]);
+  const [addingToCalendarId, setAddingToCalendarId] = useState<string | null>(null);
+  
   const [eventForm, setEventForm] = useState<EventForm>({
     name: '',
     description: '',
@@ -121,8 +128,70 @@ export default function Events() {
 }, [clubId]);
 
   useEffect(() => {
-    fetchEvents();
+    if (profile) {
+      fetchEvents();
+      fetchUserCalendarEvents(); // Ajouter cette ligne
+    }
   }, [profile, showHistory, clubId]);
+
+  // Nouvelle fonction pour récupérer les événements du calendrier utilisateur
+  const fetchUserCalendarEvents = async () => {
+    if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_calendar_events')
+        .select('event_id')
+        .eq('user_id', profile.id);
+
+      if (error) throw error;
+
+      const eventIds = data?.map(item => item.event_id) || [];
+      setUserCalendarEvents(eventIds);
+    } catch (error: any) {
+      console.error('Error fetching user calendar events:', error);
+    }
+  };
+
+  // Nouvelle fonction pour ajouter/retirer un événement du calendrier
+  const toggleEventInCalendar = async (eventId: string) => {
+    if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
+
+    setAddingToCalendarId(eventId);
+    const isInCalendar = userCalendarEvents.includes(eventId);
+
+    try {
+      if (isInCalendar) {
+        // Retirer du calendrier
+        const { error } = await supabase
+          .from('user_calendar_events')
+          .delete()
+          .eq('user_id', profile.id)
+          .eq('event_id', eventId);
+
+        if (error) throw error;
+
+        setUserCalendarEvents(prev => prev.filter(id => id !== eventId));
+      } else {
+        // Ajouter au calendrier
+        const { error } = await supabase
+          .from('user_calendar_events')
+          .insert({
+            user_id: profile.id,
+            event_id: eventId
+          });
+
+        if (error) throw error;
+
+        setUserCalendarEvents(prev => [...prev, eventId]);
+      }
+    } catch (error: any) {
+      console.error('Error toggling event in calendar:', error);
+      alert('Erreur lors de la modification du calendrier: ' + error.message);
+    } finally {
+      setAddingToCalendarId(null);
+    }
+  };
 
   const fetchEvents = async () => {
   try {
@@ -779,27 +848,60 @@ if (clubId) {
                             )}
                           </div>
                         )}
-                      </div>
-                      
-                      {/* Boutons de gestion (existants) */}
-                      {canManageEvent(event) && (
-                        <div className="flex space-x-2 ml-4 flex-shrink-0">
-                          <button
-                            onClick={() => handleEdit(event)}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                            title="Modifier l'Événement"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(event.id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                            title="Supprimer l'Événement"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+
+                        {/* Boutons d'action */}
+                        <div className="flex items-center space-x-2 mt-4">
+                          {canManageEvent(event) && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(event)}
+                                className="flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm transition-colors"
+                              >
+                                <Edit className="h-4 w-4" />
+                                <span>Modifier</span>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(event.id)}
+                                className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span>Supprimer</span>
+                              </button>
+                            </>
+                          )}
+                          
+                          {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+                            <button
+                              onClick={() => toggleEventInCalendar(event.id)}
+                              disabled={addingToCalendarId === event.id}
+                              className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${
+                                userCalendarEvents.includes(event.id)
+                                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                  : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                              } disabled:opacity-50`}
+                              title={
+                                userCalendarEvents.includes(event.id) 
+                                  ? 'Retirer de mon calendrier' 
+                                  : 'Ajouter à mon calendrier'
+                              }
+                            >
+                              {addingToCalendarId === event.id ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              ) : userCalendarEvents.includes(event.id) ? (
+                                <>
+                                  <CalendarX className="h-4 w-4" />
+                                  <span>Dans mon calendrier</span>
+                                </>
+                              ) : (
+                                <>
+                                  <CalendarPlus className="h-4 w-4" />
+                                  <span>Ajouter au calendrier</span>
+                                </>
+                              )}
+                            </button>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
