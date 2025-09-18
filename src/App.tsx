@@ -12,6 +12,7 @@ import Clubs from './pages/Clubs';
 import MyClub from './pages/MyClub';
 import Settings from './pages/Settings';
 import Sponsors from './pages/Sponsors';
+import MonCalendrier from './pages/MonCalendrier';
 
 
 function App() {
@@ -48,6 +49,16 @@ function App() {
               </ProtectedRoute>
             </Layout>
           }
+        />
+        <Route 
+          path="/calendrier" 
+          element={
+            <ProtectedRoute allowedRoles={['Member', 'Supporter']}>
+              <Layout>
+                <MonCalendrier />
+              </Layout>
+            </ProtectedRoute>
+          } 
         />
         <Route
           path="/events"

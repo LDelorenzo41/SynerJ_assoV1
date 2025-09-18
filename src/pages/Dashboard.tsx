@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight } from 'lucide-react';
+import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight } from 'lucide-react';
 
 interface AssociationInfo {
   id: string;
@@ -19,9 +19,22 @@ interface ClubInfo {
 interface FollowedClub {
   id: string;
   name: string;
-  slug: string; // ✅ AJOUTER CETTE LIGNE
+  slug: string;
   logo_url: string | null;
   description: string | null;
+  contact_email?: string | null; // Ajouté pour correspondre à l'utilisation
+}
+
+interface UpcomingEvent {
+  id: string;
+  name: string;
+  date: string;
+  location: string | null;
+  visibility: 'Public' | 'Members Only';
+  club: {
+    name: string;
+    logo_url?: string | null;
+  };
 }
 
 export default function Dashboard() {
@@ -30,7 +43,9 @@ export default function Dashboard() {
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
   const [followedClubs, setFollowedClubs] = useState<FollowedClub[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   const [availableAssociations, setAvailableAssociations] = useState<AssociationInfo[]>([]);
   const [showAssociationSearch, setShowAssociationSearch] = useState(false);
@@ -40,6 +55,53 @@ export default function Dashboard() {
   useEffect(() => {
     fetchUserInfo();
   }, [profile]);
+  
+  // Nouvelle fonction pour récupérer les prochains événements du calendrier
+  const fetchUpcomingEvents = async () => {
+    if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
+
+    setEventsLoading(true);
+    try {
+      const now = new Date().toISOString();
+      
+      const { data, error } = await supabase
+        .from('user_calendar_events')
+        .select(`
+          events (
+            id,
+            name,
+            date,
+            location,
+            visibility,
+            clubs (
+              name,
+              logo_url
+            )
+          )
+        `)
+        .eq('user_id', profile.id)
+        .gte('events.date', now)
+        .order('events(date)', { ascending: true })
+        .limit(4);
+
+      if (error) throw error;
+
+      const transformedEvents = data?.map((item: any) => ({
+        id: item.events.id,
+        name: item.events.name,
+        date: item.events.date,
+        location: item.events.location,
+        visibility: item.events.visibility,
+        club: item.events.clubs,
+      })) || [];
+
+      setUpcomingEvents(transformedEvents);
+    } catch (error: any) {
+      console.error('Error fetching upcoming events:', error);
+    } finally {
+      setEventsLoading(false);
+    }
+  };
 
   const fetchUserInfo = async () => {
     if (!profile) return;
@@ -79,7 +141,7 @@ export default function Dashboard() {
           .from('user_clubs')
           .select(`
             club_id,
-            clubs(id, name, slug, logo_url, description)
+            clubs(id, name, slug, logo_url, description, contact_email)
           `)
           .eq('user_id', profile.id);
 
@@ -89,6 +151,9 @@ export default function Dashboard() {
             .filter((club: any): club is FollowedClub => club !== null);
           setFollowedClubs(followedClubsData);
         }
+
+        // Récupérer les prochains événements
+        fetchUpcomingEvents();
       }
 
     } catch (error) {
@@ -137,7 +202,30 @@ export default function Dashboard() {
     }
   };
 
-  // Interface pour les props du composant LogoDisplay
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const isTomorrow = date.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+    
+    if (isToday) return 'Aujourd\'hui';
+    if (isTomorrow) return 'Demain';
+    
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short'
+    });
+  };
+
+  const formatEventTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   interface LogoDisplayProps {
     src: string | null;
     alt: string;
@@ -146,7 +234,6 @@ export default function Dashboard() {
     iconColor?: string;
   }
 
-  // Composant pour afficher logo avec fallback
   const LogoDisplay: React.FC<LogoDisplayProps> = ({ 
     src, 
     alt, 
@@ -169,6 +256,108 @@ export default function Dashboard() {
         ) : (
           <Icon className={`${size === 'w-8 h-8' ? 'h-5 w-5' : 'h-6 w-6'} ${iconColor}`} />
         )}
+      </div>
+    );
+  };
+
+  const renderUpcomingEventsWidget = () => {
+    if (profile?.role !== 'Member' && profile?.role !== 'Supporter') return null;
+
+    return (
+      <div className="bg-white overflow-hidden shadow-sm rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+              <CalendarDays className="h-5 w-5 mr-2 text-purple-600" />
+              Mes prochains événements
+            </h2>
+            <Link 
+              to="/calendrier"
+              className="text-sm text-purple-600 hover:text-purple-700 flex items-center"
+            >
+              Voir tout
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          {eventsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            </div>
+          ) : upcomingEvents.length === 0 ? (
+            <div className="text-center py-8">
+              <CalendarDays className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 mb-2">Aucun événement à venir</p>
+              <p className="text-sm text-gray-400">
+                Ajoutez des événements depuis la page Événements
+              </p>
+              <Link
+                to="/events"
+                className="inline-flex items-center mt-3 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm"
+              >
+                <Eye className="h-4 w-4 mr-1" />
+                Voir les événements
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {upcomingEvents.map((event) => (
+                <div key={event.id} className="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                  <LogoDisplay 
+                    src={event.club.logo_url} 
+                    alt={`Logo ${event.club.name}`} 
+                    size="w-8 h-8"
+                    fallbackIcon={Building}
+                    iconColor="text-purple-600"
+                  />
+                  
+                  <div className="ml-3 flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {event.name}
+                    </p>
+                    <div className="flex items-center space-x-3 mt-1">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {formatEventDate(event.date)} à {formatEventTime(event.date)}
+                      </div>
+                      {event.location && (
+                        <div className="flex items-center text-xs text-gray-600">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          <span className="truncate max-w-20">{event.location}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                      {event.club.name}
+                    </span>
+                    {event.visibility === 'Public' ? (
+                      <Eye className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <Users className="h-3 w-3 text-orange-600" />
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              {upcomingEvents.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <Link
+                    to="/calendrier"
+                    className="w-full flex items-center justify-center px-4 py-2 text-sm text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors"
+                  >
+                    Voir mon calendrier complet
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -221,7 +410,6 @@ export default function Dashboard() {
       const iconColor = hasAssociation ? 'text-purple-600' : 'text-yellow-600';
       const buttonHoverBg = hasAssociation ? 'hover:bg-purple-100' : 'hover:bg-yellow-100';
 
-      // On pré-calcule la liste des autres associations
       const otherAssociations = availableAssociations.filter(assoc => assoc.id !== profile?.association_id);
 
       return (
@@ -308,7 +496,6 @@ export default function Dashboard() {
     return null;
   };
 
-  // Nouvelle section pour afficher les clubs suivis
   const renderFollowedClubsSection = () => {
     if ((profile?.role !== 'Supporter' && profile?.role !== 'Member') || followedClubs.length === 0) {
       return null;
@@ -350,7 +537,7 @@ export default function Dashboard() {
                     )}
                     <div className="flex space-x-2 mt-3">
                       <a
-                        href={`/events?club=${club.slug}`}  /* ✅ REMPLACER club.id par club.slug */
+                        href={`/events?club=${club.slug}`}
                         className="inline-flex items-center text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                         title="Voir les événements du club"
                       >
@@ -398,9 +585,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Section de bienvenue avec header personnalisé */}
       <div className="bg-white overflow-hidden shadow-sm rounded-lg">
-        {/* Header avec logos d'association */}
         {associationInfo && (
           <div className="px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 border-b border-purple-100">
             <div className="flex items-center space-x-4">
@@ -416,15 +601,13 @@ export default function Dashboard() {
                   {associationInfo.name}
                 </h3>
                 <p className="text-sm text-purple-700">
-                  {profile?.role === 'Super Admin' 
+                  {getRoleDisplayName(profile?.role || '') === 'Super Admin' 
                     ? 'Tableau de bord de l\'association'
-                    : profile?.role === 'Club Admin'
+                    : getRoleDisplayName(profile?.role || '') === 'Admin Club'
                     ? 'Tableau de bord du club'
-                    : profile?.role === 'Member'
+                    : getRoleDisplayName(profile?.role || '') === 'Membre'
                     ? 'Tableau de bord membre'
-                    : profile?.role === 'Supporter'
-                    ? 'Tableau de bord supporter'
-                    : 'Tableau de bord'}
+                    : 'Tableau de bord supporter'}
                 </p>
               </div>
             </div>
@@ -461,7 +644,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Nouvelle section pour les clubs suivis */}
+      {renderUpcomingEventsWidget()}
+
       {renderFollowedClubsSection()}
 
       <div className="bg-white overflow-hidden shadow-sm rounded-lg">
@@ -473,55 +657,110 @@ export default function Dashboard() {
         </div>
         <div className="p-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
             {isSuperAdmin && (
               <>
-                <a href="/associations" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <Building className="h-6 w-6 text-blue-600 mb-2" />
-                  <p className="font-medium text-gray-900">Gérer Association</p>
-                  <p className="text-sm text-gray-600">Modifier les détails</p>
-                </a>
-                <a href="/clubs" className="block p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <Users className="h-6 w-6 text-green-600 mb-2" />
-                  <p className="font-medium text-gray-900">Gérer Clubs</p>
-                  <p className="text-sm text-gray-600">Voir tous les clubs</p>
-                </a>
+                <Link to="/associations" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors">
+                      <Building className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Association</p>
+                      <p className="text-sm text-gray-600">Gérer l'association</p>
+                    </div>
+                  </div>
+                </Link>
+                <Link to="/clubs" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-600 rounded-lg group-hover:bg-green-700 transition-colors">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Clubs</p>
+                      <p className="text-sm text-gray-600">Gérer les clubs</p>
+                    </div>
+                  </div>
+                </Link>
               </>
             )}
-            
+
             {isClubAdmin && (
               <>
-                <a href="/my-club" className="block p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <Users className="h-6 w-6 text-green-600 mb-2" />
-                  <p className="font-medium text-gray-900">Mon Club</p>
-                  <p className="text-sm text-gray-600">Gérer mon club</p>
-                </a>
-                <a href="/events" className="block p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                  <Calendar className="h-6 w-6 text-purple-600 mb-2" />
-                  <p className="font-medium text-gray-900">Événements</p>
-                  <p className="text-sm text-gray-600">Créer et gérer</p>
-                </a>
+                <Link to="/my-club" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-600 rounded-lg group-hover:bg-green-700 transition-colors">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Mon Club</p>
+                      <p className="text-sm text-gray-600">Gérer mon club</p>
+                    </div>
+                  </div>
+                </Link>
+                <Link to="/events" className="bg-indigo-50 p-4 rounded-lg hover:bg-indigo-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-indigo-600 rounded-lg group-hover:bg-indigo-700 transition-colors">
+                      <Calendar className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Événements</p>
+                      <p className="text-sm text-gray-600">Créer et gérer</p>
+                    </div>
+                  </div>
+                </Link>
               </>
             )}
-            
-            <a href="/events" className="block p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
-              <Calendar className="h-6 w-6 text-yellow-600 mb-2" />
-              <p className="font-medium text-gray-900">Voir Événements</p>
-              <p className="text-sm text-gray-600">Parcourir les événements</p>
-            </a>
 
             {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-              <a href="/clubs" className="block p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
-                <Users className="h-6 w-6 text-indigo-600 mb-2" />
-                <p className="font-medium text-gray-900">Découvrir Clubs</p>
-                <p className="text-sm text-gray-600">Explorer et suivre</p>
-              </a>
+              <>
+                <Link to="/events" className="bg-indigo-50 p-4 rounded-lg hover:bg-indigo-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-indigo-600 rounded-lg group-hover:bg-indigo-700 transition-colors">
+                      <Eye className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Événements</p>
+                      <p className="text-sm text-gray-600">Voir les événements</p>
+                    </div>
+                  </div>
+                </Link>
+                <Link to="/calendrier" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-purple-600 rounded-lg group-hover:bg-purple-700 transition-colors">
+                      <CalendarDays className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Mon Calendrier</p>
+                      <p className="text-sm text-gray-600">Gérer mes événements</p>
+                    </div>
+                  </div>
+                </Link>
+                <Link to="/clubs" className="bg-yellow-50 p-4 rounded-lg hover:bg-yellow-100 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-600 rounded-lg group-hover:bg-yellow-700 transition-colors">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Découvrir Clubs</p>
+                      <p className="text-sm text-gray-600">Explorer et suivre</p>
+                    </div>
+                  </div>
+                </Link>
+              </>
             )}
 
-            <a href="/sponsors" className="block p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-              <Building className="h-6 w-6 text-orange-600 mb-2" />
-              <p className="font-medium text-gray-900">Nos Sponsors</p>
-              <p className="text-sm text-gray-600">Découvrir qui nous soutient</p>
-            </a>
+            <Link to="/sponsors" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors group">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-orange-600 rounded-lg group-hover:bg-orange-700 transition-colors">
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Nos Sponsors</p>
+                  <p className="text-sm text-gray-600">Découvrir qui nous soutient</p>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

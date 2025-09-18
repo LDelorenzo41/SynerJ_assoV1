@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LogIn, LogOut, Users, Calendar, Building, Home, Settings, User, Menu, X } from 'lucide-react';
+import { LogIn, LogOut, Users, Calendar, Building, Home, Settings, User, Menu, X, CalendarDays } from 'lucide-react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 
@@ -72,6 +72,7 @@ export default function Header() {
     if (profile.role === 'Member' || profile.role === 'Supporter') {
       items.push(
         { path: '/events', label: 'Événements', icon: Calendar },
+        { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
         { path: '/clubs', label: 'Clubs', icon: Users },
       );
     }
