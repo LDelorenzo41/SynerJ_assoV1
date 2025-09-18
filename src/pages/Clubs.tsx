@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Users, Calendar, MapPin, Mail, Plus, Eye, UserPlus, Shield, AlertCircle } from 'lucide-react';
+import { Users, Calendar, MapPin, Mail, Plus, Eye, UserPlus, Shield, AlertCircle, Building2, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Club {
   id: string;
@@ -9,10 +9,97 @@ interface Club {
   description: string | null;
   club_email: string;
   contact_email?: string | null;
+  logo_url?: string | null; // Ajout du logo
   club_code: string;
   created_at: string;
   association_id: string;
 }
+
+// Composant pour gérer l'affichage de la description extensible
+const ExpandableDescription = ({ description }: { description: string | null }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  if (!description) return null;
+
+  // Compter le nombre de lignes approximatif (basé sur 80 caractères par ligne)
+  const estimatedLines = Math.ceil(description.length / 80);
+  const shouldShowToggle = estimatedLines > 2;
+
+  // Si la description est courte, l'afficher directement
+  if (!shouldShowToggle) {
+    return (
+      <p className="text-gray-600 text-sm mb-4">
+        {description}
+      </p>
+    );
+  }
+
+  // Pour les descriptions longues, gérer l'expansion
+  return (
+    <div className="mb-4">
+      <p className={`text-gray-600 text-sm transition-all duration-200 ${
+        isExpanded ? '' : 'line-clamp-2'
+      }`}>
+        {description}
+      </p>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="text-blue-600 text-xs hover:text-blue-700 mt-1 flex items-center transition-colors"
+      >
+        {isExpanded ? (
+          <>
+            <ChevronUp className="h-3 w-3 mr-1" />
+            Voir moins
+          </>
+        ) : (
+          <>
+            <ChevronDown className="h-3 w-3 mr-1" />
+            Voir plus
+          </>
+        )}
+      </button>
+    </div>
+  );
+};
+
+// Composant pour afficher le logo du club
+const ClubLogo = ({ logoUrl, clubName }: { logoUrl: string | null; clubName: string }) => {
+  if (logoUrl) {
+    return (
+      <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-200 flex-shrink-0">
+        <img
+          src={logoUrl}
+          alt={`Logo ${clubName}`}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // En cas d'erreur de chargement, afficher le logo par défaut
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const parent = target.parentElement;
+            if (parent) {
+              parent.innerHTML = `
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <div class="w-8 h-8 text-gray-400">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0v-3.5a2.5 2.5 0 015 0V21m0 0h4.5a2.5 2.5 0 005-2.5v-8.5a2.5 2.5 0 00-2.5-2.5H15"></path>
+                    </svg>
+                  </div>
+                </div>
+              `;
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Logo par défaut si pas d'image
+  return (
+    <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center border-2 border-gray-200 flex-shrink-0">
+      <Building2 className="h-8 w-8 text-gray-400" />
+    </div>
+  );
+};
 
 export default function Clubs() {
   const { profile, isAuthenticated } = useAuthNew();
@@ -41,7 +128,7 @@ export default function Clubs() {
       setLoading(true);
       const { data, error } = await supabase
         .from('clubs')
-        .select('*, contact_email')
+        .select('*, contact_email, logo_url') // Ajout du logo_url dans la sélection
         .eq('association_id', profile?.association_id)
         .order('created_at', { ascending: false });
 
@@ -251,24 +338,32 @@ export default function Clubs() {
             }`}
           >
             <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {club.name}
-                  </h3>
-                  <div className="flex items-center text-gray-600 text-sm mb-2">
-                    <Mail className="h-4 w-4 mr-1" />
-                    {club.contact_email || "Contact via l'association"}
+              {/* En-tête avec logo et actions */}
+              <div className="flex items-start gap-4 mb-4">
+                <ClubLogo logoUrl={club.logo_url} clubName={club.name} />
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2 truncate">
+                        {club.name}
+                      </h3>
+                      <div className="flex items-center text-gray-600 text-sm mb-2">
+                        <Mail className="h-4 w-4 mr-1 flex-shrink-0" />
+                        <span className="truncate">
+                          {club.contact_email || "Contact via l'association"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="ml-2 flex-shrink-0">
+                      {getClubActionButton(club)}
+                    </div>
                   </div>
                 </div>
-                {getClubActionButton(club)}
               </div>
 
-              {club.description && (
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {club.description}
-                </p>
-              )}
+              {/* Description extensible */}
+              <ExpandableDescription description={club.description} />
 
               {/* Code d'invitation selon les permissions */}
               {shouldShowClubCode(club) && (
