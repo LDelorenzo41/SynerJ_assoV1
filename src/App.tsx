@@ -13,6 +13,7 @@ import MyClub from './pages/MyClub';
 import Settings from './pages/Settings';
 import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
+import PublicHeader from './components/PublicHeader';
 
 
 function App() {
@@ -29,14 +30,26 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Routes publiques SANS Layout */}
+        {/* Routes publiques SANS Layout mais AVEC PublicHeader */}
         <Route 
           path="/" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} 
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> :
+            <>
+              <PublicHeader />
+              <Landing />
+            </>
+          } 
         />
         <Route 
           path="/login" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> :
+            <>
+              <PublicHeader />
+              <Login />
+            </>
+          } 
         />
         
         {/* Routes protégées AVEC Layout */}

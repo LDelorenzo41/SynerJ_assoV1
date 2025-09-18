@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
+// import Header from '../components/Header'; // <-- SUPPRIMER CETTE LIGNE
 import HeroSection from '../components/HeroSection';
 import FeaturesSection from '../components/sections/FeaturesSection';
 import HowItWorksSection from '../components/sections/HowItWorksSection';
@@ -11,7 +11,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      {/* <Header /> */} {/* <-- SUPPRIMER CETTE LIGNE ÉGALEMENT */}
       <HeroSection onShowDemo={() => setShowDemo(true)} />
       <FeaturesSection />
       <HowItWorksSection />
