@@ -1,20 +1,172 @@
-import React from 'react';
-import Header from './Header';
+// Layout.tsx - Version mise à jour avec sidebar responsive
+import React, { useState, useEffect } from 'react';
+import { useAuthNew } from '../hooks/useAuthNew';
+import { supabase } from '../lib/supabase';
+import { 
+  Users, 
+  Calendar, 
+  Building, 
+  Home, 
+  Settings,
+  CalendarDays
+} from 'lucide-react';
+import { Sidebar } from './Sidebar';
+import { MobileTopBar } from './MobileTopBar';
+
+interface AssociationInfo {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
+
+interface NavigationItem {
+  path: string;
+  label: string;
+  icon: React.ComponentType<any>;
+}
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header commun qui gère tout */}
-      <Header />
-      
-      {/* Contenu principal avec marge pour le header fixe */}
-      <main className="pt-20 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  const { isAuthenticated, profile, signOut } = useAuthNew();
+  const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    fetchAssociationInfo();
+  }, [profile]);
+
+  // Gérer la fermeture de la sidebar mobile lors du redimensionnement
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const fetchAssociationInfo = async () => {
+    if (!isAuthenticated || !profile?.association_id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: association, error } = await supabase
+        .from('associations')
+        .select('id, name, logo_url')
+        .eq('id', profile.association_id)
+        .single();
+
+      if (!error && association) {
+        setAssociationInfo(association);
+      }
+    } catch (error) {
+      console.error('Error fetching association info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = '/';
+  };
+
+  const getNavigationItems = (): NavigationItem[] => {
+    if (!isAuthenticated || !profile) return [];
+
+    const items = [
+      { path: '/dashboard', label: 'Tableau de bord', icon: Home },
+    ];
+
+    if (profile.role === 'Super Admin') {
+      items.push(
+        { path: '/associations', label: 'Association', icon: Building },
+        { path: '/clubs', label: 'Clubs', icon: Users },
+      );
+    }
+
+    if (profile.role === 'Club Admin') {
+      items.push(
+        { path: '/my-club', label: 'Mon Club', icon: Users },
+        { path: '/events', label: 'Événements', icon: Calendar },
+      );
+    }
+
+    if (profile.role === 'Member' || profile.role === 'Supporter') {
+      items.push(
+        { path: '/events', label: 'Événements', icon: Calendar },
+        { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
+        { path: '/clubs', label: 'Clubs', icon: Users },
+      );
+    }
+
+    items.push({ path: '/settings', label: 'Paramètres', icon: Settings });
+    return items;
+  };
+
+  const toggleSidebar = () => {
+    if (window.innerWidth < 1024) {
+      // Mobile: toggle open/close
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      // Desktop: toggle collapsed/expanded
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
+
+  const navigationItems = getNavigationItems();
+
+  // Pour les utilisateurs non connectés ou les pages publiques
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
         {children}
-      </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={sidebarOpen || !sidebarCollapsed}
+        onToggle={toggleSidebar}
+        profile={profile}
+        associationInfo={associationInfo}
+        navigationItems={navigationItems}
+        onSignOut={handleSignOut}
+        loading={loading}
+      />
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile TopBar */}
+        <MobileTopBar 
+          onMenuToggle={() => setSidebarOpen(true)}
+          associationInfo={associationInfo}
+          loading={loading}
+        />
+
+        {/* Content avec marge adaptative */}
+        <main className={`
+          flex-1 p-4 sm:p-6 
+          pt-20 lg:pt-6
+          transition-all duration-300
+        `}>
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

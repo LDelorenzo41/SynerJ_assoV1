@@ -10,3 +10,30 @@
     -webkit-line-clamp: 2;
   }
 }
+
+/* Ajouts pour la nouvelle sidebar */
+@layer components {
+  .sidebar-tooltip {
+    @apply absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap z-50 pointer-events-none;
+    @apply opacity-0 group-hover:opacity-100 transition-opacity duration-200;
+  }
+}
+
+
+/* Amélioration des scrollbars pour la sidebar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
