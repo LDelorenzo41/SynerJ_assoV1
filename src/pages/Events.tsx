@@ -206,10 +206,8 @@ export default function Events() {
       return;
     }
 
-    // Calculer la date limite (hier à minuit)
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(23, 59, 59, 999);
+    // Utiliser l'heure actuelle
+    const now = new Date();
 
     let query = supabase
       .from('events')
@@ -237,12 +235,11 @@ if (clubId) {
   }
 }
 
-    // Filtrer selon l'affichage (actuel vs historique)
     if (showHistory) {
-      query = query.lte('date', yesterday.toISOString());
-    } else {
-      query = query.gte('date', yesterday.toISOString());
-    }
+  query = query.lt('date', now.toISOString());
+} else {
+  query = query.gte('date', now.toISOString());
+}
 
     const { data, error } = await query.order('date', { ascending: showHistory ? false : true });
 
