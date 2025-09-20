@@ -1,4 +1,4 @@
-// Layout.tsx - Version mise à jour avec sidebar responsive
+// Layout.tsx - Version mise à jour avec sidebar responsive et navigation équipement
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -8,7 +8,9 @@ import {
   Building, 
   Home, 
   Settings,
-  CalendarDays
+  CalendarDays,
+  Package,    // NOUVEAU: icône pour le matériel
+  Clipboard   // NOUVEAU: icône pour les demandes
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { MobileTopBar } from './MobileTopBar';
@@ -91,6 +93,8 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/associations', label: 'Association', icon: Building },
         { path: '/clubs', label: 'Clubs', icon: Users },
+        // ============ NOUVEAU: Navigation pour Super Admin ============
+        { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
       );
     }
 
@@ -98,6 +102,8 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/my-club', label: 'Mon Club', icon: Users },
         { path: '/events', label: 'Événements', icon: Calendar },
+        // ============ NOUVEAU: Navigation pour Club Admin ============
+        { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
       );
     }
 

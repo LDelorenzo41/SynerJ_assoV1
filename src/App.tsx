@@ -15,6 +15,9 @@ import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
 
+// Import des nouveaux composants de réservation
+import EquipmentManagement from './components/equipment/EquipmentManagement';
+import ClubReservation from './components/equipment/ClubReservation';
 
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
@@ -133,6 +136,33 @@ function App() {
             </Layout>
           }
         />
+
+        {/* ============ NOUVELLES ROUTES DE RÉSERVATION ============ */}
+        
+        {/* Gestion du matériel - Super Admins uniquement */}
+        <Route
+          path="/equipment-management"
+          element={
+            <Layout>
+              <ProtectedRoute requiredRole="Super Admin">
+                <EquipmentManagement />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        {/* Réservation de matériel - Club Admins et Super Admins */}
+        <Route
+          path="/equipment-reservation"
+          element={
+            <Layout>
+              <ProtectedRoute allowedRoles={['Club Admin', 'Super Admin']}>
+                <ClubReservation />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+        
       </Routes>
     </Router>
   );
