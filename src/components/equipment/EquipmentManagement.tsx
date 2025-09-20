@@ -1,6 +1,6 @@
 // src/components/equipment/EquipmentManagement.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../../hooks/useAuthNew';
 import { useEquipmentManagement } from '../../hooks/useEquipment';
 import { 
@@ -14,13 +14,23 @@ import {
   Clock, 
   Calendar,
   Settings,
-  Users
+  Users,
+  AlertTriangle,
+  XCircle,
 } from 'lucide-react';
 import { EQUIPMENT_CATEGORIES, STATUS_COLORS, type EquipmentItem, type CreateEquipmentItemForm } from '../../types/equipment';
+// 1. AJOUTER ces imports au début du fichier (après les imports existants)
+import { 
+  STATUS_LABELS,
+  getAvailabilityStatus,
+  formatAvailabilityMessage,
+  type RequestItemAvailability
+} from '../../types/equipment';
 
 
 export default function EquipmentManagement() {
   const { profile } = useAuthNew();
+  // 2. MODIFIER la destructuration du hook useEquipmentManagement pour ajouter les nouvelles méthodes
   const {
     items,
     requests,
@@ -31,12 +41,53 @@ export default function EquipmentManagement() {
     deleteItem,
     approveRequest,
     updateRequestStatus,
+    checkRequestAvailability, // ← AJOUTER
+    refresh, // ← AJOUTER (remplace le window.location.reload)
     isLoading
   } = useEquipmentManagement(profile?.association_id);
 
   const [activeTab, setActiveTab] = useState<'inventory' | 'requests' | 'calendar' | 'stats'>('inventory');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<EquipmentItem | null>(null);
+  
+  // 3. AJOUTER ces états dans le composant principal (après les états existants)
+  const [availabilityChecks, setAvailabilityChecks] = useState<Record<string, RequestItemAvailability[]>>({});
+  const [loadingAvailability, setLoadingAvailability] = useState<Record<string, boolean>>({});
+
+  // 4. AJOUTER cette fonction de vérification de disponibilité
+  const checkRequestAvailabilityHandler = async (request: any) => {
+    if (availabilityChecks[request.id] || loadingAvailability[request.id]) return;
+
+    setLoadingAvailability(prev => ({ ...prev, [request.id]: true }));
+
+    try {
+      const items = request.request_items?.map((ri: any) => ({
+        equipment_item_id: ri.equipment_item_id,
+        quantity_requested: ri.quantity_requested,
+      })) || [];
+
+      const availability = await checkRequestAvailability(
+        items,
+        new Date(request.start_date),
+        new Date(request.end_date)
+      );
+
+      setAvailabilityChecks(prev => ({ ...prev, [request.id]: availability }));
+    } catch (error) {
+      console.error('Erreur lors de la vérification de disponibilité:', error);
+    } finally {
+      setLoadingAvailability(prev => ({ ...prev, [request.id]: false }));
+    }
+  };
+
+  // 5. AJOUTER cet useEffect pour vérifier automatiquement les demandes en attente
+  useEffect(() => {
+    const pendingRequests = requests.filter(r => r.status === 'pending');
+    pendingRequests.forEach(request => {
+      checkRequestAvailabilityHandler(request);
+    });
+  }, [requests]);
+
 
   if (!profile || profile.role !== 'Super Admin') {
     return (
@@ -157,6 +208,10 @@ export default function EquipmentManagement() {
           onApproveRequest={approveRequest}
           onRejectRequest={updateRequestStatus}
           currentUserId={profile.id}
+          // Props ajoutées pour les nouvelles fonctionnalités
+          availabilityChecks={availabilityChecks}
+          loadingAvailability={loadingAvailability}
+          refresh={refresh}
         />
       )}
 
@@ -169,10 +224,12 @@ export default function EquipmentManagement() {
       )}
 
       {/* Modals */}
+      {/* Correction 3: Passer la fonction refresh aux modals */}
       {showAddModal && (
         <AddEquipmentModal
           onClose={() => setShowAddModal(false)}
           onAdd={createItem}
+          refresh={refresh}
         />
       )}
 
@@ -181,6 +238,7 @@ export default function EquipmentManagement() {
           item={editingItem}
           onClose={() => setEditingItem(null)}
           onUpdate={updateItem}
+          refresh={refresh}
         />
       )}
     </div>
@@ -359,9 +417,7 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
 
 // ============ AUTRES ONGLETS (versions simplifiées pour démarrer) ============
 
-// Remplacez la fonction RequestsTab par cette version améliorée
-
-function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, currentUserId }: any) {
+function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserId, availabilityChecks, loadingAvailability, refresh }: any) {
   const [selectedStatus, setSelectedStatus] = useState<string>('pending');
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
   const [rejectingRequest, setRejectingRequest] = useState<string | null>(null);
@@ -373,9 +429,26 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
     selectedStatus === 'all' || req.status === selectedStatus
   );
 
+  // 6. MODIFIER la fonction handleFullApprove pour ajouter la vérification
   const handleFullApprove = async (request: any) => {
     try {
       setProcessingRequest(request.id);
+      
+      // AJOUTER cette vérification de disponibilité
+      const availability = availabilityChecks[request.id];
+      if (!availability) {
+        alert('Vérification de disponibilité en cours, veuillez patienter...');
+        return;
+      }
+
+      const unavailableItems = availability.filter((item: any) => !item.is_available);
+      if (unavailableItems.length > 0) {
+        const itemNames = unavailableItems.map((item: any) => 
+          `${item.equipment_name} (${item.requested_quantity} demandés, ${item.available_quantity} disponibles)`
+        );
+        alert(`Impossible d'approuver entièrement : équipements non disponibles :\n${itemNames.join('\n')}\n\nUtilisez l'approbation partielle pour approuver les équipements disponibles.`);
+        return;
+      }
       
       const approvalData = {
         event_name: request.event_name,
@@ -390,17 +463,20 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
 
       await onApproveRequest(request.id, currentUserId, approvalData);
       
-      // LIGNE AJOUTÉE
-      setTimeout(() => window.location.reload(), 1000);
+      // REMPLACER cette ligne :
+      // setTimeout(() => window.location.reload(), 1000);
+      // PAR :
+      refresh();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'approbation:', error);
-      alert('Erreur lors de l\'approbation de la demande');
+      alert('Erreur lors de l\'approbation de la demande: ' + error.message);
     } finally {
       setProcessingRequest(null);
     }
   };
 
+  // 7. MODIFIER la fonction handlePartialApprove de la même manière
   const handlePartialApprove = async (requestId: string) => {
     const request = requests.find((r: any) => r.id === requestId);
     if (!request) return;
@@ -432,29 +508,40 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
       setApprovingRequest(null);
       setApprovalItems({});
 
-      // LIGNE AJOUTÉE
-      setTimeout(() => window.location.reload(), 1000);
+      // REMPLACER cette ligne :
+      // setTimeout(() => window.location.reload(), 1000);
+      // PAR :
+      refresh();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de l\'approbation partielle:', error);
-      alert('Erreur lors de l\'approbation partielle');
+      alert('Erreur lors de l\'approbation partielle: ' + error.message);
     } finally {
       setProcessingRequest(null);
     }
   };
-
+  
+  // 8. MODIFIER la fonction openPartialApproval pour utiliser les données de disponibilité
   const openPartialApproval = (request: any) => {
     setApprovingRequest(request.id);
-    // Initialiser avec les quantités demandées
+    // REMPLACER cette partie :
     const initialItems: Record<string, number> = {};
+    const availability = availabilityChecks[request.id] || [];
+    
     request.request_items?.forEach((ri: any) => {
-      const availability = getItemAvailability(ri.equipment_item_id, ri.quantity_requested);
-      initialItems[ri.equipment_item_id] = availability.available && availability.status === 'available' 
-        ? ri.quantity_requested 
-        : 0;
+      const itemAvailability = availability.find((a: any) => a.equipment_item_id === ri.equipment_item_id);
+      if (itemAvailability) {
+        // Proposer la quantité maximale disponible
+        const maxAvailable = Math.min(ri.quantity_requested, itemAvailability.available_quantity);
+        initialItems[ri.equipment_item_id] = itemAvailability.is_available ? maxAvailable : 0;
+      } else {
+        initialItems[ri.equipment_item_id] = 0;
+      }
     });
+    
     setApprovalItems(initialItems);
   };
+
 
   const updateApprovalQuantity = (itemId: string, quantity: number) => {
     setApprovalItems(prev => ({
@@ -474,24 +561,13 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
       await onRejectRequest(requestId, 'rejected', undefined, rejectReason);
       setRejectingRequest(null);
       setRejectReason('');
+      refresh();
     } catch (error) {
       console.error('Erreur lors du rejet:', error);
       alert('Erreur lors du rejet de la demande');
     } finally {
       setProcessingRequest(null);
     }
-  };
-
-  const getItemAvailability = (equipmentItemId: string, quantityRequested: number) => {
-    const item = items.find((i: any) => i.id === equipmentItemId);
-    if (!item) return { available: false, total: 0, requested: quantityRequested, status: 'unknown' };
-    
-    return {
-      available: item.quantity >= quantityRequested,
-      total: item.quantity,
-      requested: quantityRequested,
-      status: item.status
-    };
   };
 
   return (
@@ -585,17 +661,18 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
                   </h4>
                   
                   <div className="space-y-3">
+                    {/* 9. MODIFIER l'affichage des items dans RequestsTab pour montrer la disponibilité */}
                     {request.request_items.map((ri: any) => {
-                      const availability = getItemAvailability(ri.equipment_item_id, ri.quantity_requested);
-                      const isAvailable = availability.available && availability.status === 'available';
+                      const availability = availabilityChecks[request.id]?.find((a: any) => a.equipment_item_id === ri.equipment_item_id);
+                      const isLoadingThisItem = loadingAvailability[request.id];
                       
                       return (
                         <div 
                           key={ri.id} 
                           className={`flex items-center justify-between p-4 rounded-lg border-2 ${
-                            isAvailable 
+                            availability?.is_available 
                               ? 'border-green-200 bg-green-50' 
-                              : 'border-red-200 bg-red-50'
+                              : availability ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'
                           }`}
                         >
                           <div className="flex-1">
@@ -618,29 +695,43 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
                                 <div className="text-lg font-semibold text-gray-900">
                                   {ri.quantity_requested} demandé(s)
                                 </div>
-                                <div className={`text-sm ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
-                                  sur {availability.total} disponible(s)
-                                </div>
+                                {availability && (
+                                  <div className={`text-sm ${availability.is_available ? 'text-green-600' : 'text-red-600'}`}>
+                                    {availability.available_quantity}/{availability.total_quantity} disponible(s)
+                                  </div>
+                                )}
                               </div>
                             </div>
                             
                             <div className="mt-3 flex items-center gap-2">
-                              {isAvailable ? (
+                              {isLoadingThisItem ? (
                                 <>
-                                  <CheckCircle className="h-4 w-4 text-green-600" />
-                                  <span className="text-sm text-green-700 font-medium">Disponible</span>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                  <span className="text-sm text-gray-600">Vérification...</span>
                                 </>
-                              ) : (
-                                <>
-                                  <AlertCircle className="h-4 w-4 text-red-600" />
-                                  <span className="text-sm text-red-700 font-medium">
-                                    {availability.status !== 'available' 
-                                      ? `Indisponible (${availability.status === 'maintenance' ? 'Maintenance' : 'Cassé'})`
-                                      : 'Quantité insuffisante'
-                                    }
-                                  </span>
-                                </>
-                              )}
+                              ) : availability ? (
+                                availability.is_available ? (
+                                  <>
+                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                    <span className="text-sm text-green-700 font-medium">Disponible</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertCircle className="h-4 w-4 text-red-600" />
+                                    <span className="text-sm text-red-700 font-medium">
+                                      {availability.equipment_status !== 'available' 
+                                        ? `Indisponible (${STATUS_LABELS.equipment[availability.equipment_status as keyof typeof STATUS_LABELS.equipment]})`
+                                        : 'Quantité insuffisante'
+                                      }
+                                    </span>
+                                    {availability.conflicts.length > 0 && (
+                                      <span className="text-xs text-red-600 ml-2">
+                                        (Conflit avec {availability.conflicts.length} réservation(s))
+                                      </span>
+                                    )}
+                                  </>
+                                )
+                              ) : null}
                             </div>
                           </div>
                         </div>
@@ -648,27 +739,36 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
                     })}
                   </div>
                   
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">
-                        Statut global de la demande :
-                      </span>
-                      {request.request_items.every((ri: any) => 
-                        getItemAvailability(ri.equipment_item_id, ri.quantity_requested).available &&
-                        getItemAvailability(ri.equipment_item_id, ri.quantity_requested).status === 'available'
-                      ) ? (
-                        <span className="text-sm text-green-700 font-medium flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4" />
-                          Tout le matériel est disponible
-                        </span>
-                      ) : (
-                        <span className="text-sm text-red-700 font-medium flex items-center gap-1">
-                          <AlertCircle className="h-4 w-4" />
-                          Certains éléments ne sont pas disponibles
-                        </span>
-                      )}
+                  {/* 10. AJOUTER ce statut global de disponibilité après l'affichage des items */}
+                  {request.status === 'pending' && availabilityChecks[request.id] && (
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        {availabilityChecks[request.id].every((item: any) => item.is_available) ? (
+                          <>
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <span className="text-sm font-medium text-green-700">
+                              Tous les équipements sont disponibles
+                            </span>
+                          </>
+                        ) : availabilityChecks[request.id].some((item: any) => item.is_available) ? (
+                          <>
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                            <span className="text-sm font-medium text-yellow-700">
+                              Certains équipements sont disponibles (approbation partielle possible)
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-5 w-5 text-red-600" />
+                            <span className="text-sm font-medium text-red-700">
+                              Aucun équipement disponible sur cette période
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
                 </div>
               )}
 
@@ -737,9 +837,11 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
             
             {(() => {
               const request = requests.find((r: any) => r.id === approvingRequest);
+              const availability = availabilityChecks[request.id] || [];
+
               return request?.request_items?.map((ri: any) => {
-                const availability = getItemAvailability(ri.equipment_item_id, ri.quantity_requested);
-                const maxApprovalQuantity = Math.min(availability.total, ri.quantity_requested);
+                const itemAvailability = availability.find((a: any) => a.equipment_item_id === ri.equipment_item_id);
+                const maxApprovalQuantity = itemAvailability ? Math.min(ri.quantity_requested, itemAvailability.available_quantity) : 0;
                 
                 return (
                   <div key={ri.id} className="mb-4 p-4 border rounded-lg">
@@ -750,7 +852,7 @@ function RequestsTab({ requests, items, onApproveRequest, onRejectRequest, curre
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-600">
-                          Demandé: {ri.quantity_requested} | Disponible: {availability.total}
+                          Demandé: {ri.quantity_requested} | Disponible: {itemAvailability?.available_quantity || 0}
                         </div>
                       </div>
                     </div>
@@ -906,12 +1008,15 @@ function StatsTab({ stats }: any) {
 
 // ============ MODALS ============
 
+// Correction 4: Modifier les interfaces des modals
 interface AddEquipmentModalProps {
   onClose: () => void;
   onAdd: (item: CreateEquipmentItemForm) => Promise<EquipmentItem>;
+  refresh: () => void; // AJOUTEZ cette ligne
 }
 
-function AddEquipmentModal({ onClose, onAdd }: AddEquipmentModalProps) {
+// Correction 5: Modifier les signatures des fonctions des modals
+function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) {
   const [form, setForm] = useState<CreateEquipmentItemForm>({
     name: '',
     category: '',
@@ -920,11 +1025,13 @@ function AddEquipmentModal({ onClose, onAdd }: AddEquipmentModalProps) {
   });
   const [loading, setLoading] = useState(false);
 
+  // Correction 1: Modal d'ajout d'équipement
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       await onAdd(form);
+      refresh(); // AJOUTEZ cette ligne
       onClose();
     } catch (error) {
       console.error('Erreur lors de l\'ajout:', error);
@@ -1009,13 +1116,16 @@ function AddEquipmentModal({ onClose, onAdd }: AddEquipmentModalProps) {
   );
 }
 
+// Correction 4: Modifier les interfaces des modals
 interface EditEquipmentModalProps {
   item: EquipmentItem;
   onClose: () => void;
   onUpdate: (itemId: string, updates: Partial<EquipmentItem>) => Promise<EquipmentItem>;
+  refresh: () => void; // AJOUTEZ cette ligne
 }
 
-function EditEquipmentModal({ item, onClose, onUpdate }: EditEquipmentModalProps) {
+// Correction 5: Modifier les signatures des fonctions des modals
+function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentModalProps) {
   const [form, setForm] = useState({
     name: item.name,
     category: item.category,
@@ -1025,11 +1135,13 @@ function EditEquipmentModal({ item, onClose, onUpdate }: EditEquipmentModalProps
   });
   const [loading, setLoading] = useState(false);
 
+  // Correction 2: Modal d'édition d'équipement
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       await onUpdate(item.id, form);
+      refresh(); // AJOUTEZ cette ligne
       onClose();
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
