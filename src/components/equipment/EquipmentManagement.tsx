@@ -224,7 +224,6 @@ export default function EquipmentManagement() {
       )}
 
       {/* Modals */}
-      {/* Correction 3: Passer la fonction refresh aux modals */}
       {showAddModal && (
         <AddEquipmentModal
           onClose={() => setShowAddModal(false)}
@@ -429,12 +428,10 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
     selectedStatus === 'all' || req.status === selectedStatus
   );
 
-  // 6. MODIFIER la fonction handleFullApprove pour ajouter la vérification
   const handleFullApprove = async (request: any) => {
     try {
       setProcessingRequest(request.id);
       
-      // AJOUTER cette vérification de disponibilité
       const availability = availabilityChecks[request.id];
       if (!availability) {
         alert('Vérification de disponibilité en cours, veuillez patienter...');
@@ -463,9 +460,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
 
       await onApproveRequest(request.id, currentUserId, approvalData);
       
-      // REMPLACER cette ligne :
-      // setTimeout(() => window.location.reload(), 1000);
-      // PAR :
       refresh();
 
     } catch (error: any) {
@@ -476,7 +470,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
     }
   };
 
-  // 7. MODIFIER la fonction handlePartialApprove de la même manière
   const handlePartialApprove = async (requestId: string) => {
     const request = requests.find((r: any) => r.id === requestId);
     if (!request) return;
@@ -508,9 +501,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
       setApprovingRequest(null);
       setApprovalItems({});
 
-      // REMPLACER cette ligne :
-      // setTimeout(() => window.location.reload(), 1000);
-      // PAR :
       refresh();
 
     } catch (error: any) {
@@ -521,17 +511,14 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
     }
   };
   
-  // 8. MODIFIER la fonction openPartialApproval pour utiliser les données de disponibilité
   const openPartialApproval = (request: any) => {
     setApprovingRequest(request.id);
-    // REMPLACER cette partie :
     const initialItems: Record<string, number> = {};
     const availability = availabilityChecks[request.id] || [];
     
     request.request_items?.forEach((ri: any) => {
       const itemAvailability = availability.find((a: any) => a.equipment_item_id === ri.equipment_item_id);
       if (itemAvailability) {
-        // Proposer la quantité maximale disponible
         const maxAvailable = Math.min(ri.quantity_requested, itemAvailability.available_quantity);
         initialItems[ri.equipment_item_id] = itemAvailability.is_available ? maxAvailable : 0;
       } else {
@@ -661,7 +648,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   </h4>
                   
                   <div className="space-y-3">
-                    {/* 9. MODIFIER l'affichage des items dans RequestsTab pour montrer la disponibilité */}
                     {request.request_items.map((ri: any) => {
                       const availability = availabilityChecks[request.id]?.find((a: any) => a.equipment_item_id === ri.equipment_item_id);
                       const isLoadingThisItem = loadingAvailability[request.id];
@@ -739,7 +725,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                     })}
                   </div>
                   
-                  {/* 10. AJOUTER ce statut global de disponibilité après l'affichage des items */}
                   {request.status === 'pending' && availabilityChecks[request.id] && (
                     <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-2">
@@ -772,7 +757,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                 </div>
               )}
 
-              {/* Notes du club */}
               {request.notes && (
                 <div className="p-6 border-b bg-blue-50">
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Notes du club :</h4>
@@ -780,7 +764,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                 </div>
               )}
 
-              {/* Actions pour les demandes en attente */}
               {request.status === 'pending' && (
                 <div className="p-6 bg-gray-50 flex flex-wrap gap-3">
                   <button
@@ -812,7 +795,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                 </div>
               )}
 
-              {/* Messages d'admin pour les demandes traitées */}
               {(request.admin_notes || request.rejected_reason) && (
                 <div className="p-6 border-t bg-yellow-50">
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Réponse de l'administrateur :</h4>
@@ -826,7 +808,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
         )}
       </div>
 
-      {/* Modal d'approbation partielle */}
       {approvingRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -913,7 +894,6 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
         </div>
       )}
 
-      {/* Modal de rejet */}
       {rejectingRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -953,27 +933,358 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
   );
 }
 
+// Remplacez la fonction CalendarTab existante par cette version améliorée
 function CalendarTab({ reservations }: any) {
+  const [expandedReservations, setExpandedReservations] = useState<Set<string>>(new Set());
+  const [filterStatus, setFilterStatus] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('all');
+
+  // Fonction pour déterminer le statut d'une réservation
+  const getReservationStatus = (reservation: any) => {
+    const now = new Date();
+    const startDate = new Date(reservation.start_date);
+    const endDate = new Date(reservation.end_date);
+    
+    if (now < startDate) return 'upcoming';
+    if (now >= startDate && now <= endDate) return 'ongoing';
+    return 'past';
+  };
+
+  // Filtrer les réservations selon le statut sélectionné
+  const filteredReservations = reservations.filter((reservation: any) => {
+    if (filterStatus === 'all') return true;
+    return getReservationStatus(reservation) === filterStatus;
+  });
+
+  // Trier les réservations par date de début (plus récentes en premier)
+  const sortedReservations = [...filteredReservations].sort((a, b) => 
+    new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+  );
+
+  const toggleExpand = (reservationId: string) => {
+    setExpandedReservations(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(reservationId)) {
+        newSet.delete(reservationId);
+      } else {
+        newSet.add(reservationId);
+      }
+      return newSet;
+    });
+  };
+
+  // Fonction pour formater la durée
+  const formatDuration = (start: string, end: string) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return 'Même jour';
+    } else if (diffDays === 1) {
+      return '1 jour';
+    } else {
+      return `${diffDays} jours`;
+    }
+  };
+
+  // Fonction pour obtenir la couleur selon le statut
+  const getStatusColor = (reservation: any) => {
+    const status = getReservationStatus(reservation);
+    switch (status) {
+      case 'ongoing':
+        return 'border-green-500 bg-green-50';
+      case 'upcoming':
+        return 'border-blue-500 bg-blue-50';
+      case 'past':
+        return 'border-gray-400 bg-gray-50';
+      default:
+        return 'border-gray-400 bg-white';
+    }
+  };
+
+  // Fonction pour obtenir le badge de statut
+  const getStatusBadge = (reservation: any) => {
+    const status = getReservationStatus(reservation);
+    switch (status) {
+      case 'ongoing':
+        return (
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+            En cours
+          </span>
+        );
+      case 'upcoming':
+        return (
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+            À venir
+          </span>
+        );
+      case 'past':
+        return (
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+            Terminée
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Calendrier des réservations</h3>
-      {reservations.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">Aucune réservation</p>
+    <div className="space-y-6">
+      {/* Filtres */}
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <h3 className="text-lg font-semibold text-gray-900">Calendrier des réservations</h3>
+          
+          <div className="flex gap-2 ml-auto">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                filterStatus === 'all' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Toutes ({reservations.length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('upcoming')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                filterStatus === 'upcoming' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              À venir ({reservations.filter((r: any) => getReservationStatus(r) === 'upcoming').length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('ongoing')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                filterStatus === 'ongoing' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              En cours ({reservations.filter((r: any) => getReservationStatus(r) === 'ongoing').length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('past')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                filterStatus === 'past' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Passées ({reservations.filter((r: any) => getReservationStatus(r) === 'past').length})
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Liste des réservations */}
+      {sortedReservations.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border p-8">
+          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-center">
+            {filterStatus === 'all' ? 'Aucune réservation' : `Aucune réservation ${
+              filterStatus === 'upcoming' ? 'à venir' : 
+              filterStatus === 'ongoing' ? 'en cours' : 
+              'passée'
+            }`}
+          </p>
+        </div>
       ) : (
-        <div className="space-y-3">
-          {reservations.map((reservation: any) => (
-            <div key={reservation.id} className="border-l-4 border-blue-500 pl-4 py-2">
-              <p className="font-medium">{reservation.event_name}</p>
-              <p className="text-sm text-gray-600">
-                {reservation.club?.name} • {new Date(reservation.start_date).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
+        <div className="space-y-4">
+          {sortedReservations.map((reservation: any) => {
+            const isExpanded = expandedReservations.has(reservation.id);
+            const statusColor = getStatusColor(reservation);
+            
+            return (
+              <div 
+                key={reservation.id} 
+                className={`border-l-4 rounded-lg shadow-sm overflow-hidden transition-all duration-200 ${statusColor}`}
+              >
+                {/* En-tête de la réservation (toujours visible) */}
+                <div 
+                  className="p-4 cursor-pointer hover:bg-opacity-75 transition-colors"
+                  onClick={() => toggleExpand(reservation.id)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="text-lg font-semibold text-gray-900">
+                          {reservation.event_name}
+                        </h4>
+                        {getStatusBadge(reservation)}
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          <span>{reservation.club?.name || 'Club non spécifié'}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            {new Date(reservation.start_date).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                            {' - '}
+                            {new Date(reservation.end_date).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          <span className="text-gray-500">
+                            ({formatDuration(reservation.start_date, reservation.end_date)})
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Aperçu du matériel réservé */}
+                      {reservation.reservation_items && reservation.reservation_items.length > 0 && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <span className="font-medium">Matériel : </span>
+                          {!isExpanded && (
+                            <span>
+                              {reservation.reservation_items.slice(0, 2).map((item: any, index: number) => (
+                                <span key={item.id}>
+                                  {item.equipment_item?.name} ({item.quantity_reserved})
+                                  {index < Math.min(1, reservation.reservation_items.length - 1) && ', '}
+                                </span>
+                              ))}
+                              {reservation.reservation_items.length > 2 && (
+                                <span> et {reservation.reservation_items.length - 2} autre(s)...</span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="ml-4">
+                      <svg 
+                        className={`h-5 w-5 text-gray-500 transform transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Détails expansibles */}
+                {isExpanded && (
+                  <div className="border-t bg-white p-4 space-y-4">
+                    {/* Informations temporelles détaillées */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 mb-1">Date de début</h5>
+                        <p className="text-sm text-gray-900">
+                          {new Date(reservation.start_date).toLocaleDateString('fr-FR', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                          {' à '}
+                          {new Date(reservation.start_date).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 mb-1">Date de fin</h5>
+                        <p className="text-sm text-gray-900">
+                          {new Date(reservation.end_date).toLocaleDateString('fr-FR', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                          {' à '}
+                          {new Date(reservation.end_date).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Détails du matériel réservé */}
+                    {reservation.reservation_items && reservation.reservation_items.length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 mb-2">Matériel réservé</h5>
+                        <div className="bg-gray-50 rounded-md p-3">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="text-left text-gray-600">
+                                <th className="pb-2">Équipement</th>
+                                <th className="pb-2">Catégorie</th>
+                                <th className="pb-2 text-right">Quantité</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {reservation.reservation_items.map((item: any) => (
+                                <tr key={item.id}>
+                                  <td className="py-2 font-medium text-gray-900">
+                                    {item.equipment_item?.name || 'Équipement supprimé'}
+                                  </td>
+                                  <td className="py-2 text-gray-600">
+                                    {item.equipment_item?.category || '-'}
+                                  </td>
+                                  <td className="py-2 text-right text-gray-900">
+                                    {item.quantity_reserved}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {reservation.notes && (
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 mb-1">Notes</h5>
+                        <p className="text-sm text-gray-600 bg-gray-50 rounded-md p-3">
+                          {reservation.notes}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Informations sur l'approbation */}
+                    {reservation.approved_by && (
+                      <div className="text-xs text-gray-500 pt-2 border-t">
+                        Approuvée le {new Date(reservation.approved_at).toLocaleDateString('fr-FR')}
+                        {reservation.admin_notes && (
+                          <p className="mt-1 italic">Note admin : {reservation.admin_notes}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
+
 
 function StatsTab({ stats }: any) {
   if (!stats) return <div>Chargement...</div>;
@@ -1008,14 +1319,12 @@ function StatsTab({ stats }: any) {
 
 // ============ MODALS ============
 
-// Correction 4: Modifier les interfaces des modals
 interface AddEquipmentModalProps {
   onClose: () => void;
   onAdd: (item: CreateEquipmentItemForm) => Promise<EquipmentItem>;
-  refresh: () => void; // AJOUTEZ cette ligne
+  refresh: () => void;
 }
 
-// Correction 5: Modifier les signatures des fonctions des modals
 function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) {
   const [form, setForm] = useState<CreateEquipmentItemForm>({
     name: '',
@@ -1025,13 +1334,12 @@ function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) 
   });
   const [loading, setLoading] = useState(false);
 
-  // Correction 1: Modal d'ajout d'équipement
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       await onAdd(form);
-      refresh(); // AJOUTEZ cette ligne
+      refresh();
       onClose();
     } catch (error) {
       console.error('Erreur lors de l\'ajout:', error);
@@ -1116,15 +1424,13 @@ function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) 
   );
 }
 
-// Correction 4: Modifier les interfaces des modals
 interface EditEquipmentModalProps {
   item: EquipmentItem;
   onClose: () => void;
   onUpdate: (itemId: string, updates: Partial<EquipmentItem>) => Promise<EquipmentItem>;
-  refresh: () => void; // AJOUTEZ cette ligne
+  refresh: () => void;
 }
 
-// Correction 5: Modifier les signatures des fonctions des modals
 function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentModalProps) {
   const [form, setForm] = useState({
     name: item.name,
@@ -1135,13 +1441,12 @@ function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentM
   });
   const [loading, setLoading] = useState(false);
 
-  // Correction 2: Modal d'édition d'équipement
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       await onUpdate(item.id, form);
-      refresh(); // AJOUTEZ cette ligne
+      refresh();
       onClose();
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
