@@ -1,3 +1,5 @@
+// src/lib/supabase.ts - Version mise à jour avec les tables de réservation
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -162,6 +164,176 @@ export type Database = {
           club_id?: string;
           created_at?: string;
         };
+      };
+      // ============ NOUVELLES TABLES DE RÉSERVATION ============
+      equipment_items: {
+        Row: {
+          id: string;
+          name: string;
+          category: string;
+          association_id: string;
+          quantity: number;
+          description: string | null;
+          status: 'available' | 'maintenance' | 'broken';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          category: string;
+          association_id: string;
+          quantity?: number;
+          description?: string | null;
+          status?: 'available' | 'maintenance' | 'broken';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          category?: string;
+          association_id?: string;
+          quantity?: number;
+          description?: string | null;
+          status?: 'available' | 'maintenance' | 'broken';
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      reservation_requests: {
+        Row: {
+          id: string;
+          club_id: string;
+          requested_by: string;
+          event_name: string;
+          start_date: string;
+          end_date: string;
+          status: 'pending' | 'approved' | 'rejected';
+          notes: string | null;
+          admin_notes: string | null;
+          rejected_reason: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          club_id: string;
+          requested_by: string;
+          event_name: string;
+          start_date: string;
+          end_date: string;
+          status?: 'pending' | 'approved' | 'rejected';
+          notes?: string | null;
+          admin_notes?: string | null;
+          rejected_reason?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          club_id?: string;
+          requested_by?: string;
+          event_name?: string;
+          start_date?: string;
+          end_date?: string;
+          status?: 'pending' | 'approved' | 'rejected';
+          notes?: string | null;
+          admin_notes?: string | null;
+          rejected_reason?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      request_items: {
+        Row: {
+          id: string;
+          reservation_request_id: string;
+          equipment_item_id: string;
+          quantity_requested: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reservation_request_id: string;
+          equipment_item_id: string;
+          quantity_requested: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reservation_request_id?: string;
+          equipment_item_id?: string;
+          quantity_requested?: number;
+          created_at?: string;
+        };
+      };
+      equipment_reservations: {
+        Row: {
+          id: string;
+          club_id: string;
+          event_name: string;
+          start_date: string;
+          end_date: string;
+          approved_by: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          club_id: string;
+          event_name: string;
+          start_date: string;
+          end_date: string;
+          approved_by: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          club_id?: string;
+          event_name?: string;
+          start_date?: string;
+          end_date?: string;
+          approved_by?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+      };
+      reservation_items: {
+        Row: {
+          id: string;
+          reservation_id: string;
+          equipment_item_id: string;
+          quantity_reserved: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reservation_id: string;
+          equipment_item_id: string;
+          quantity_reserved: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reservation_id?: string;
+          equipment_item_id?: string;
+          quantity_reserved?: number;
+          created_at?: string;
+        };
+      };
+    };
+    Functions: {
+      check_equipment_availability: {
+        Args: {
+          p_equipment_item_id: string;
+          p_start_date: string;
+          p_end_date: string;
+          p_quantity_requested: number;
+          p_exclude_reservation_id?: string;
+        };
+        Returns: boolean;
       };
     };
   };

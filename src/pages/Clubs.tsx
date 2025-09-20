@@ -340,7 +340,7 @@ export default function Clubs() {
             <div className="p-6">
               {/* En-tête avec logo et actions */}
               <div className="flex items-start gap-4 mb-4">
-                <ClubLogo logoUrl={club.logo_url} clubName={club.name} />
+                <ClubLogo logoUrl={club.logo_url || null} clubName={club.name} />
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
