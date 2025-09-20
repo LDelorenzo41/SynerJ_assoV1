@@ -1,12 +1,8 @@
-// src/components/equipment/ClubReservation.tsx
+// src/components/equipment/ClubReservation.tsx - Version corrigée
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../../hooks/useAuthNew';
-import { 
-  useEquipmentItems, 
-  useReservationRequests, 
-  useEquipmentReservations 
-} from '../../hooks/useEquipment';
+import { useClubEquipmentManagement } from '../../hooks/useEquipment';
 import { 
   Calendar, 
   Clock, 
@@ -17,10 +13,20 @@ import {
   Eye,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
-import type { CreateReservationRequestForm } from '../../types/equipment';
-import { STATUS_COLORS } from '../../types/equipment';
+import type { 
+  CreateReservationRequestForm,
+  RequestItemAvailability,
+  EquipmentItem
+} from '../../types/equipment';
+import { 
+  STATUS_COLORS,
+  STATUS_LABELS,
+  getAvailabilityStatus,
+  formatAvailabilityMessage
+} from '../../types/equipment';
 
 export default function ClubReservation() {
   const { profile } = useAuthNew();
@@ -87,7 +93,7 @@ export default function ClubReservation() {
       )}
 
       {activeTab === 'history' && (
-        <RequestHistoryTab clubId={profile.club_id!} />
+        <RequestHistoryTab clubId={profile.club_id!} associationId={profile.association_id!} />
       )}
 
       {activeTab === 'calendar' && (
@@ -97,7 +103,7 @@ export default function ClubReservation() {
   );
 }
 
-// ============ ONGLET NOUVELLE DEMANDE ============
+// ============ ONGLET NOUVELLE DEMANDE avec vérification de disponibilité ============
 interface NewRequestTabProps {
   clubId: string;
   requestedBy: string;
@@ -105,8 +111,11 @@ interface NewRequestTabProps {
 }
 
 function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProps) {
-  const { items } = useEquipmentItems(associationId);
-  const { createRequest } = useReservationRequests({ clubId });
+  const { 
+    items, 
+    createRequest, 
+    checkRequestAvailability 
+  } = useClubEquipmentManagement(clubId, associationId);
   
   const [form, setForm] = useState<{
     event_name: string;
@@ -121,15 +130,100 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
     notes: '',
     selectedItems: [],
   });
+  
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  
+  // États pour la vérification de disponibilité
+  const [availabilityChecks, setAvailabilityChecks] = useState<Record<string, RequestItemAvailability>>({});
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [hasValidPeriod, setHasValidPeriod] = useState(false);
 
-  const availableItems = items.filter(item => item.status === 'available');
-  const categorizedItems = availableItems.reduce((acc, item) => {
+  // Vérifier la disponibilité quand les dates ou les items changent
+  useEffect(() => {
+    if (form.start_date && form.end_date && form.selectedItems.length > 0) {
+      const startDate = new Date(form.start_date);
+      const endDate = new Date(form.end_date);
+      
+      if (startDate < endDate) {
+        setHasValidPeriod(true);
+        checkAvailabilityForSelectedItems();
+      } else {
+        setHasValidPeriod(false);
+        setAvailabilityChecks({});
+      }
+    } else {
+      setHasValidPeriod(false);
+      setAvailabilityChecks({});
+    }
+  }, [form.start_date, form.end_date, form.selectedItems]);
+
+  const checkAvailabilityForSelectedItems = async () => {
+    if (!hasValidPeriod) return;
+
+    setLoadingAvailability(true);
+    try {
+      const results = await checkRequestAvailability(
+        form.selectedItems,
+        new Date(form.start_date),
+        new Date(form.end_date)
+      );
+
+      const availabilityMap: Record<string, RequestItemAvailability> = {};
+      results.forEach(result => {
+        availabilityMap[result.equipment_item_id] = result;
+      });
+      
+      setAvailabilityChecks(availabilityMap);
+    } catch (error) {
+      console.error('Erreur lors de la vérification de disponibilité:', error);
+    } finally {
+      setLoadingAvailability(false);
+    }
+  };
+
+  // Filtrer les items disponibles selon le statut et la période sélectionnée
+  const getFilteredItems = () => {
+    const availableItems = items.filter(item => item.status === 'available');
+    
+    if (!hasValidPeriod) {
+      return availableItems;
+    }
+
+    // Séparer les items selon leur disponibilité
+    const fullyAvailable: EquipmentItem[] = [];
+    const partiallyAvailable: EquipmentItem[] = [];
+    const unavailable: EquipmentItem[] = [];
+
+    availableItems.forEach(item => {
+      // Vérifier si cet item est sélectionné
+      const selectedItem = form.selectedItems.find(si => si.equipment_item_id === item.id);
+      if (selectedItem) {
+        const availability = availabilityChecks[item.id];
+        if (availability) {
+          if (availability.is_available) {
+            fullyAvailable.push(item);
+          } else if (availability.available_quantity > 0) {
+            partiallyAvailable.push(item);
+          } else {
+            unavailable.push(item);
+          }
+        } else {
+          fullyAvailable.push(item); // Par défaut, si pas de vérification encore
+        }
+      } else {
+        fullyAvailable.push(item); // Items non sélectionnés, disponibles par défaut
+      }
+    });
+
+    return [...fullyAvailable, ...partiallyAvailable, ...unavailable];
+  };
+
+  const categorizedItems = getFilteredItems().reduce((acc, item) => {
     if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
     return acc;
-  }, {} as Record<string, typeof items>);
+  }, {} as Record<string, EquipmentItem[]>);
 
   const addItem = (itemId: string) => {
     const existing = form.selectedItems.find(si => si.equipment_item_id === itemId);
@@ -147,10 +241,14 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
       return;
     }
 
+    const item = items.find(i => i.id === itemId);
+    const maxQuantity = item?.quantity || 1;
+    const finalQuantity = Math.min(quantity, maxQuantity);
+
     setForm(prev => ({
       ...prev,
       selectedItems: prev.selectedItems.map(si =>
-        si.equipment_item_id === itemId ? { ...si, quantity_requested: quantity } : si
+        si.equipment_item_id === itemId ? { ...si, quantity_requested: finalQuantity } : si
       )
     }));
   };
@@ -162,11 +260,27 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
     }));
   };
 
+  const canSubmit = () => {
+    if (!form.event_name || !form.start_date || !form.end_date || form.selectedItems.length === 0) {
+      return false;
+    }
+
+    if (!hasValidPeriod) {
+      return false;
+    }
+
+    // Vérifier qu'au moins un item est disponible
+    return form.selectedItems.some(si => {
+      const availability = availabilityChecks[si.equipment_item_id];
+      return !availability || availability.is_available;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (form.selectedItems.length === 0) {
-      alert('Veuillez sélectionner au moins un élément de matériel');
+    if (!canSubmit()) {
+      alert('Veuillez vérifier votre demande. Certains équipements ne sont pas disponibles sur cette période.');
       return;
     }
 
@@ -191,6 +305,7 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
         notes: '',
         selectedItems: [],
       });
+      setAvailabilityChecks({});
 
       setTimeout(() => setSuccess(false), 5000);
     } catch (error: any) {
@@ -202,7 +317,7 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {success && (
         <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center">
@@ -217,11 +332,11 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Informations de l'événement */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Informations de l'événement</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Informations de l'événement</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nom de l'événement *
               </label>
               <input
@@ -229,102 +344,236 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
                 required
                 value={form.event_name}
                 onChange={(e) => setForm({ ...form, event_name: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="Ex: Tournoi de football, Concert de fin d'année..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ex: Soirée dansante, Assemblée générale..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date de début *
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Notes (optionnel)
+              </label>
+              <input
+                type="text"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Informations complémentaires..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date et heure de début *
               </label>
               <input
                 type="datetime-local"
                 required
                 value={form.start_date}
                 onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date de fin *
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date et heure de fin *
               </label>
               <input
                 type="datetime-local"
                 required
                 value={form.end_date}
                 onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes / Besoins spécifiques
-              </label>
-              <textarea
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-                placeholder="Décrivez vos besoins spécifiques, contraintes de livraison, etc."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
+
+          {/* Validation des dates */}
+          {form.start_date && form.end_date && (
+            <div className="mt-4">
+              {new Date(form.start_date) >= new Date(form.end_date) ? (
+                <div className="flex items-center text-red-600 text-sm">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  La date de fin doit être postérieure à la date de début
+                </div>
+              ) : (
+                <div className="flex items-center text-green-600 text-sm">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Période valide : {Math.ceil((new Date(form.end_date).getTime() - new Date(form.start_date).getTime()) / (1000 * 60 * 60 * 24))} jour(s)
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sélection du matériel */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Matériel demandé</h3>
-          
-          {/* Matériel sélectionné */}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Sélection du matériel</h3>
+            {loadingAvailability && (
+              <div className="flex items-center text-sm text-blue-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                Vérification de la disponibilité...
+              </div>
+            )}
+          </div>
+
+          {!hasValidPeriod && form.start_date && form.end_date && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center text-yellow-800">
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Veuillez sélectionner une période valide pour voir la disponibilité du matériel
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {Object.entries(categorizedItems).map(([category, categoryItems]) => (
+              <div key={category} className="border rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-3">{category}</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categoryItems.map((item) => {
+                    const selectedItem = form.selectedItems.find(si => si.equipment_item_id === item.id);
+                    const isSelected = !!selectedItem;
+                    const availability = availabilityChecks[item.id];
+                    
+                    // Déterminer le statut de disponibilité
+                    let availabilityStatus = 'available';
+                    let availabilityMessage = '';
+                    
+                    if (hasValidPeriod && availability) {
+                      if (!availability.is_available) {
+                        if (availability.available_quantity === 0) {
+                          availabilityStatus = 'unavailable';
+                          availabilityMessage = `Indisponible (${availability.conflicts.length} conflit(s))`;
+                        } else {
+                          availabilityStatus = 'partially_available';
+                          availabilityMessage = `${availability.available_quantity}/${availability.total_quantity} disponible(s)`;
+                        }
+                      } else {
+                        availabilityMessage = `${availability.available_quantity}/${availability.total_quantity} disponible(s)`;
+                      }
+                    }
+
+                    return (
+                      <div 
+                        key={item.id} 
+                        className={`border rounded-lg p-4 transition-all ${
+                          isSelected 
+                            ? availabilityStatus === 'unavailable' 
+                              ? 'border-red-300 bg-red-50' 
+                              : availabilityStatus === 'partially_available'
+                              ? 'border-yellow-300 bg-yellow-50'
+                              : 'border-blue-300 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <h5 className="font-medium text-gray-900">{item.name}</h5>
+                            {item.description && (
+                              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                            )}
+                            <p className="text-sm text-gray-500 mt-1">
+                              Quantité totale : {item.quantity}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Statut de disponibilité */}
+                        {hasValidPeriod && availability && (
+                          <div className="mb-3">
+                            <div className={`flex items-center text-xs px-2 py-1 rounded ${
+                              availabilityStatus === 'available' ? 'bg-green-100 text-green-800' :
+                              availabilityStatus === 'partially_available' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {availabilityStatus === 'available' && <CheckCircle className="h-3 w-3 mr-1" />}
+                              {availabilityStatus === 'partially_available' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                              {availabilityStatus === 'unavailable' && <XCircle className="h-3 w-3 mr-1" />}
+                              {availabilityMessage}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contrôles de sélection */}
+                        {isSelected ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">Quantité :</span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQuantity(item.id, selectedItem.quantity_requested - 1)}
+                                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </button>
+                                <span className="w-8 text-center font-medium">
+                                  {selectedItem.quantity_requested}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQuantity(item.id, selectedItem.quantity_requested + 1)}
+                                  disabled={selectedItem.quantity_requested >= (availability?.available_quantity || item.quantity)}
+                                  className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(item.id)}
+                              className="w-full py-2 px-3 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm"
+                            >
+                              Retirer de la sélection
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => addItem(item.id)}
+                            disabled={hasValidPeriod && availability && !availability.is_available && availability.available_quantity === 0}
+                            className="w-full py-2 px-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 text-sm"
+                          >
+                            {hasValidPeriod && availability && !availability.is_available && availability.available_quantity === 0 
+                              ? 'Non disponible' 
+                              : 'Ajouter à la sélection'
+                            }
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Résumé de la sélection */}
           {form.selectedItems.length > 0 && (
-            <div className="mb-6">
-              <h4 className="text-md font-medium text-gray-900 mb-3">Matériel sélectionné :</h4>
-              <div className="space-y-3">
-                {form.selectedItems.map((selectedItem) => {
-                  const item = items.find(i => i.id === selectedItem.equipment_item_id);
-                  if (!item) return null;
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-3">Résumé de votre sélection</h4>
+              <div className="space-y-2">
+                {form.selectedItems.map((si) => {
+                  const item = items.find(i => i.id === si.equipment_item_id);
+                  const availability = availabilityChecks[si.equipment_item_id];
                   
                   return (
-                    <div key={selectedItem.equipment_item_id} className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
-                      <div className="flex items-center">
-                        <Package className="h-5 w-5 text-blue-600 mr-3" />
-                        <div>
-                          <p className="font-medium text-gray-900">{item.name}</p>
-                          <p className="text-sm text-gray-600">{item.category}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => updateItemQuantity(selectedItem.equipment_item_id, selectedItem.quantity_requested - 1)}
-                            className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </button>
-                          <span className="w-12 text-center font-medium">{selectedItem.quantity_requested}</span>
-                          <button
-                            type="button"
-                            onClick={() => updateItemQuantity(selectedItem.equipment_item_id, selectedItem.quantity_requested + 1)}
-                            disabled={selectedItem.quantity_requested >= item.quantity}
-                            className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-                        <span className="text-sm text-gray-500">/ {item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(selectedItem.equipment_item_id)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                        >
-                          <XCircle className="h-5 w-5" />
-                        </button>
+                    <div key={si.equipment_item_id} className="flex justify-between items-center text-sm">
+                      <span>{item?.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span>Quantité: {si.quantity_requested}</span>
+                        {hasValidPeriod && availability && (
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            availability.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {availability.is_available ? 'Disponible' : 'Conflit'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
@@ -332,71 +581,26 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
               </div>
             </div>
           )}
-
-          {/* Catalogue de matériel */}
-          <div>
-            <h4 className="text-md font-medium text-gray-900 mb-3">Matériel disponible :</h4>
-            
-            {Object.keys(categorizedItems).length === 0 ? (
-              <div className="text-center py-8">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Aucun matériel disponible</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {Object.entries(categorizedItems).map(([category, categoryItems]) => (
-                  <div key={category}>
-                    <h5 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">{category}</h5>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {categoryItems.map((item) => {
-                        const isSelected = form.selectedItems.some(si => si.equipment_item_id === item.id);
-                        
-                        return (
-                          <div
-                            key={item.id}
-                            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                              isSelected 
-                                ? 'border-blue-500 bg-blue-50' 
-                                : 'border-gray-200 hover:border-gray-300 bg-white'
-                            }`}
-                            onClick={() => !isSelected && addItem(item.id)}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h6 className="font-medium text-gray-900">{item.name}</h6>
-                                {item.description && (
-                                  <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                                )}
-                                <div className="flex items-center mt-2">
-                                  <span className="text-sm text-gray-500">Quantité disponible: </span>
-                                  <span className="text-sm font-medium text-gray-900 ml-1">{item.quantity}</span>
-                                </div>
-                              </div>
-                              
-                              {isSelected && (
-                                <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 ml-2" />
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Bouton de soumission */}
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={loading || form.selectedItems.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 text-sm font-medium"
+            disabled={loading || !canSubmit()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 flex items-center gap-2"
           >
-            <Send className="h-4 w-4" />
-            {loading ? 'Envoi en cours...' : 'Envoyer la demande'}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Envoi en cours...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Envoyer la demande
+              </>
+            )}
           </button>
         </div>
       </form>
@@ -405,42 +609,44 @@ function NewRequestTab({ clubId, requestedBy, associationId }: NewRequestTabProp
 }
 
 // ============ ONGLET HISTORIQUE DES DEMANDES ============
-function RequestHistoryTab({ clubId }: { clubId: string }) {
-  const { requests, loading } = useReservationRequests({ clubId });
+function RequestHistoryTab({ clubId, associationId }: { clubId: string; associationId: string }) {
+  const { requests, isLoading } = useClubEquipmentManagement(clubId, associationId);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Chargement des demandes...</span>
+        <span className="ml-2 text-gray-600">Chargement de vos demandes...</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-900">Mes demandes de réservation</h3>
+        <span className="text-sm text-gray-500">{requests.length} demande(s) au total</span>
+      </div>
+
       {requests.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
           <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">Aucune demande de réservation</p>
+          <p className="text-gray-500">Aucune demande de réservation envoyée</p>
         </div>
       ) : (
-        requests.map((request) => (
+        requests.map((request: any) => (
           <div key={request.id} className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{request.event_name}</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h4 className="text-lg font-semibold text-gray-900">{request.event_name}</h4>
+                <p className="text-sm text-gray-600">
                   Du {new Date(request.start_date).toLocaleDateString('fr-FR', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                  })}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Au {new Date(request.end_date).toLocaleDateString('fr-FR', {
+                  })} au {new Date(request.end_date).toLocaleDateString('fr-FR', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -448,14 +654,21 @@ function RequestHistoryTab({ clubId }: { clubId: string }) {
                     minute: '2-digit'
                   })}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-1">
                   Demandé le {new Date(request.created_at).toLocaleDateString('fr-FR')}
                 </p>
               </div>
               
-              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${STATUS_COLORS.request[request.status]}`}>
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${
+              request.status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+              request.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' :
+              request.status === 'partially_approved' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+              'bg-red-100 text-red-800 border-red-200'
+            }`}>
                 {request.status === 'pending' ? 'En attente' :
-                 request.status === 'approved' ? 'Approuvée' : 'Rejetée'}
+                request.status === 'approved' ? 'Approuvée' :
+                request.status === 'partially_approved' ? 'Partiellement approuvée' :
+                'Rejetée'}
               </span>
             </div>
 
@@ -488,7 +701,9 @@ function RequestHistoryTab({ clubId }: { clubId: string }) {
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Réponse de l'administrateur :</h4>
                 <div className={`p-3 rounded-lg ${
                   request.status === 'approved' ? 'bg-green-50 border border-green-200' : 
-                  request.status === 'rejected' ? 'bg-red-50 border border-red-200' : 'bg-gray-50'
+                  request.status === 'rejected' ? 'bg-red-50 border border-red-200' : 
+                  request.status === 'partially_approved' ? 'bg-blue-50 border border-blue-200' :
+                  'bg-gray-50'
                 }`}>
                   <p className="text-sm text-gray-700">
                     {request.admin_notes || request.rejected_reason}
@@ -505,9 +720,9 @@ function RequestHistoryTab({ clubId }: { clubId: string }) {
 
 // ============ ONGLET VUE CALENDRIER ============
 function CalendarViewTab({ associationId, clubId }: { associationId: string; clubId: string }) {
-  const { reservations, loading } = useEquipmentReservations(associationId);
+  const { reservations, isLoading } = useClubEquipmentManagement(clubId, associationId);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -527,7 +742,7 @@ function CalendarViewTab({ associationId, clubId }: { associationId: string; clu
         {myClubReservations.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Aucune réservation approuvée pour votre club</p>
+            <p className="text-gray-500">Aucune réservation approuvée</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -543,10 +758,7 @@ function CalendarViewTab({ associationId, clubId }: { associationId: string; clu
                         day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit'
-                      })}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Au {new Date(reservation.end_date).toLocaleDateString('fr-FR', {
+                      })} au {new Date(reservation.end_date).toLocaleDateString('fr-FR', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -564,18 +776,20 @@ function CalendarViewTab({ associationId, clubId }: { associationId: string; clu
                 {reservation.reservation_items && reservation.reservation_items.length > 0 && (
                   <div className="mt-4">
                     <h5 className="text-sm font-medium text-gray-900 mb-2">Matériel réservé :</h5>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {reservation.reservation_items.map((ri: any) => (
-                        <span key={ri.id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {ri.equipment_item?.name} (x{ri.quantity_reserved})
-                        </span>
+                        <div key={ri.id} className="bg-blue-50 rounded p-2 text-sm">
+                          <div className="font-medium text-gray-900">{ri.equipment_item?.name}</div>
+                          <div className="text-gray-600">Quantité : {ri.quantity_reserved}</div>
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {reservation.notes && (
-                  <div className="mt-3">
+                  <div className="mt-4">
+                    <h5 className="text-sm font-medium text-gray-900 mb-1">Notes :</h5>
                     <p className="text-sm text-gray-600">{reservation.notes}</p>
                   </div>
                 )}
@@ -585,9 +799,9 @@ function CalendarViewTab({ associationId, clubId }: { associationId: string; clu
         )}
       </div>
 
-      {/* Autres réservations */}
+      {/* Autres réservations dans l'association */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Autres réservations de l'association</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Autres réservations dans l'association</h3>
         {otherReservations.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
             <Eye className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -626,7 +840,9 @@ function CalendarViewTab({ associationId, clubId }: { associationId: string; clu
                 {reservation.reservation_items && reservation.reservation_items.length > 0 && (
                   <div className="mt-4">
                     <p className="text-sm text-gray-600">
-                      {reservation.reservation_items.length} type(s) de matériel réservé
+                      {reservation.reservation_items.length} type(s) de matériel réservé : {
+                        reservation.reservation_items.map((ri: any) => ri.equipment_item?.name).join(', ')
+                      }
                     </p>
                   </div>
                 )}
