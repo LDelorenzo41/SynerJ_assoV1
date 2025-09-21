@@ -20,7 +20,9 @@ import {
   ChevronUp,
   Building,
   CalendarPlus,
-  CalendarX
+  CalendarX,
+  Wand2,     // Ajouté
+  RefreshCw, // Ajouté
 } from 'lucide-react';
 
 interface Event {
@@ -93,6 +95,11 @@ export default function Events() {
   // États pour le calendrier personnel
   const [userCalendarEvents, setUserCalendarEvents] = useState<string[]>([]);
   const [addingToCalendarId, setAddingToCalendarId] = useState<string | null>(null);
+
+  // États pour la réécriture IA
+  const [rewritingDescription, setRewritingDescription] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
+  const [showAiSuggestion, setShowAiSuggestion] = useState(false);
   
   const [eventForm, setEventForm] = useState<EventForm>({
     name: '',
@@ -294,20 +301,96 @@ if (clubId) {
   const handleGenerateImage = async () => {
     try {
       setGeneratingImage(true);
-      
-      const prompt = `${eventForm.name} ${eventForm.description}`.trim();
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const placeholderUrl = `https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=${encodeURIComponent(eventForm.name || 'Événement')}`;
-      
-      setEventForm({ ...eventForm, image_url: placeholderUrl });
-      
+  
+      const res = await fetch('/.netlify/functions/generate-event-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: eventForm.name,
+          description: eventForm.description,
+        }),
+      });
+  
+      // Toujours lire d'abord en texte (car en cas d'erreur, Netlify Dev renvoie du texte)
+      const raw = await res.text();
+  
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        // Pas du JSON => lever une erreur lisible
+        throw new Error(raw || `HTTP ${res.status}`);
+      }
+  
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
+      }
+  
+      // URL si dispo, sinon base64 (data URL)
+      const imageToUse: string | null = data.imageUrl || data.imageBase64 || null;
+      if (!imageToUse) throw new Error('Aucune image n\'a été retournée par l\'API.');
+  
+      // Remplir le champ + ouvrir la modale d’aperçu
+      setEventForm(prev => ({ ...prev, image_url: imageToUse }));
+      setSelectedImage(imageToUse);
     } catch (error: any) {
       console.error('Error generating image:', error);
-      alert('Erreur lors de la génération de l\'image: ' + error.message);
+      alert(`Erreur lors de la génération de l'image: ${error?.message || String(error)}`);
     } finally {
       setGeneratingImage(false);
     }
+  };
+
+  // Fonction pour appeler l'API de réécriture
+  const handleRewriteDescription = async () => {
+    if (!eventForm.name || !eventForm.description) {
+      alert("Veuillez d'abord entrer un nom et une description pour l'événement");
+      return;
+    }
+
+    try {
+      setRewritingDescription(true);
+      
+      const response = await fetch('/.netlify/functions/rewrite-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventName: eventForm.name,
+          description: eventForm.description,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.rewrittenDescription) {
+        setAiSuggestion(data.rewrittenDescription);
+        setShowAiSuggestion(true);
+      } else {
+        throw new Error(data.error || 'Erreur lors de la réécriture');
+      }
+    } catch (error: any) {
+      console.error('Error rewriting description:', error);
+      alert('Erreur lors de la réécriture: ' + error.message);
+    } finally {
+      setRewritingDescription(false);
+    }
+  };
+
+  // Fonction pour accepter la suggestion IA
+  const acceptAiSuggestion = () => {
+    if (aiSuggestion) {
+      setEventForm({ ...eventForm, description: aiSuggestion });
+      setShowAiSuggestion(false);
+      setAiSuggestion(null);
+    }
+  };
+
+  // Fonction pour rejeter la suggestion IA
+  const rejectAiSuggestion = () => {
+    setShowAiSuggestion(false);
+    setAiSuggestion(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -670,17 +753,24 @@ if (clubId) {
                     </div>
                   </label>
 
+                  {/* === MODIFICATION AVEC ANIMATION === */}
                   <button
                     type="button"
                     onClick={handleGenerateImage}
                     disabled={generatingImage || !eventForm.name}
                     className="flex-1 p-3 border-2 border-dashed border-purple-300 rounded-lg text-center hover:border-purple-400 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500" />
+                    {generatingImage ? (
+                      <RefreshCw className="h-5 w-5 mx-auto mb-1 text-purple-500 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500" />
+                    )}
                     <span className="text-sm text-purple-600">
                       {generatingImage ? 'Génération...' : 'Générer IA'}
                     </span>
                   </button>
+                  {/* === FIN DE LA MODIFICATION === */}
+
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-2">
@@ -688,10 +778,77 @@ if (clubId) {
                 </p>
               </div>
               
+              {/* Section Description avec IA */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleRewriteDescription}
+                    disabled={rewritingDescription || !eventForm.name || !eventForm.description}
+                    className="flex items-center space-x-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Utiliser l'IA pour améliorer la description"
+                  >
+                    {rewritingDescription ? (
+                      <>
+                        <RefreshCw className="h-3 w-3 animate-spin" />
+                        <span>Réécriture...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-3 w-3" />
+                        <span>Améliorer avec l'IA</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Suggestion IA si disponible */}
+                {showAiSuggestion && aiSuggestion && (
+                  <div className="mb-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center">
+                        <Sparkles className="h-4 w-4 text-purple-600 mr-2" />
+                        <span className="text-sm font-medium text-purple-900">
+                          Suggestion de l'IA
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={rejectAiSuggestion}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="bg-white p-2 rounded border border-purple-100 mb-3">
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{aiSuggestion}</p>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={acceptAiSuggestion}
+                        className="flex-1 px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+                      >
+                        Utiliser cette description
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          acceptAiSuggestion();
+                        }}
+                        className="flex-1 px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded hover:bg-purple-200 transition-colors"
+                      >
+                        Utiliser et modifier
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <textarea
                   rows={4}
                   value={eventForm.description}
@@ -699,6 +856,10 @@ if (clubId) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Décrivez votre événement, les détails importants, les instructions pour les participants..."
                 />
+                
+                <p className="text-xs text-gray-500 mt-1">
+                  Astuce : Écrivez d'abord votre description, puis utilisez l'IA pour l'améliorer
+                </p>
               </div>
               
               <div className="flex space-x-3 pt-4">
