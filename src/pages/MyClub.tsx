@@ -44,13 +44,19 @@ interface ClubStats {
   totalMembers: number;
   totalEvents: number;
   upcomingEvents: number;
+  totalSponsors: number; // AJOUTÉ
 }
 
 export default function MyClub() {
   const { profile, isAuthenticated } = useAuthNew();
   const [clubData, setClubData] = useState<ClubData | null>(null);
   const [clubMembers, setClubMembers] = useState<ClubMember[]>([]);
-  const [clubStats, setClubStats] = useState<ClubStats>({ totalMembers: 0, totalEvents: 0, upcomingEvents: 0 });
+  const [clubStats, setClubStats] = useState<ClubStats>({ 
+    totalMembers: 0, 
+    totalEvents: 0, 
+    upcomingEvents: 0,
+    totalSponsors: 0 // AJOUTÉ
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -109,7 +115,7 @@ export default function MyClub() {
       setClubMembers(allMembers || []);
 
       // Récupérer les statistiques du club
-      const [eventsResult, upcomingEventsResult] = await Promise.all([
+      const [eventsResult, upcomingEventsResult, sponsorsResult] = await Promise.all([
         supabase
           .from('events')
           .select('id')
@@ -118,13 +124,18 @@ export default function MyClub() {
           .from('events')
           .select('id')
           .eq('club_id', profile?.club_id)
-          .gte('date', new Date().toISOString())
+          .gte('date', new Date().toISOString()),
+        supabase
+          .from('sponsors')
+          .select('id')
+          .eq('club_id', profile?.club_id)
       ]);
 
       setClubStats({
         totalMembers: allMembers?.length || 0,
         totalEvents: eventsResult.data?.length || 0,
-        upcomingEvents: upcomingEventsResult.data?.length || 0
+        upcomingEvents: upcomingEventsResult.data?.length || 0,
+        totalSponsors: sponsorsResult.data?.length || 0 // AJOUTÉ
       });
 
     } catch (err: any) {
@@ -306,7 +317,7 @@ export default function MyClub() {
 
         {/* Statistiques rapides */}
         <div className="p-6">
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center">
                 <Users className="h-8 w-8 text-blue-600 mr-3" />
@@ -333,6 +344,16 @@ export default function MyClub() {
                 <div>
                   <p className="text-sm text-gray-600">Total événements</p>
                   <p className="text-2xl font-bold text-gray-900">{clubStats.totalEvents}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <div className="flex items-center">
+                <Building2 className="h-8 w-8 text-orange-600 mr-3" />
+                <div>
+                  <p className="text-sm text-gray-600">Sponsors</p>
+                  <p className="text-2xl font-bold text-gray-900">{clubStats.totalSponsors}</p>
                 </div>
               </div>
             </div>
@@ -482,7 +503,7 @@ export default function MyClub() {
           </h2>
         </div>
         <div className="p-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             <a 
               href="/events" 
               className="block p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
@@ -490,6 +511,15 @@ export default function MyClub() {
               <Calendar className="h-6 w-6 text-purple-600 mb-2" />
               <p className="font-medium text-gray-900">Gérer les Événements</p>
               <p className="text-sm text-gray-600">Créer et organiser</p>
+            </a>
+            
+            <a 
+              href="/sponsors" 
+              className="block p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+            >
+              <Building2 className="h-6 w-6 text-orange-600 mb-2" />
+              <p className="font-medium text-gray-900">Gérer les Sponsors</p>
+              <p className="text-sm text-gray-600">Partenaires du club</p>
             </a>
             
             <a 
