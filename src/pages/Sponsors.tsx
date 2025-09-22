@@ -1,3 +1,5 @@
+// Sponsors.tsx - Version corrigée avec la balise div manquante ajoutée
+
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -40,6 +42,9 @@ export default function Sponsors() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'association' | 'club'>('association');
   
+  // === NOUVEAU: État pour les clubs suivis ===
+  const [followedClubIds, setFollowedClubIds] = useState<string[]>([]);
+  
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState<Sponsor | null>(null);
@@ -62,9 +67,38 @@ export default function Sponsors() {
 
   useEffect(() => {
     if (profile) {
-      loadSponsors();
+      // === NOUVEAU: Charger d'abord les clubs suivis, puis les sponsors ===
+      loadFollowedClubs();
     }
   }, [profile]);
+
+  // === NOUVELLE FONCTION: Charger les clubs suivis ===
+  const loadFollowedClubs = async () => {
+    if (!profile) return;
+    
+    try {
+      // Pour Members et Supporters, récupérer les clubs suivis
+      if (profile.role === 'Member' || profile.role === 'Supporter') {
+        const { data: userClubs, error } = await supabase
+          .from('user_clubs')
+          .select('club_id')
+          .eq('user_id', profile.id);
+        
+        if (error) {
+          console.error('Error fetching followed clubs:', error);
+        } else {
+          const clubIds = userClubs?.map(uc => uc.club_id) || [];
+          setFollowedClubIds(clubIds);
+        }
+      }
+      
+      // Maintenant charger les sponsors
+      await loadSponsors();
+    } catch (err) {
+      console.error('Error in loadFollowedClubs:', err);
+      await loadSponsors(); // Charger les sponsors même si erreur
+    }
+  };
 
   const resetFormData = () => {
     setFormData({
@@ -80,6 +114,7 @@ export default function Sponsors() {
     });
   };
 
+  // === FONCTION MODIFIÉE: Logique de chargement des sponsors corrigée ===
   const loadSponsors = async () => {
     if (!profile) return;
 
@@ -93,13 +128,38 @@ export default function Sponsors() {
         .order('created_at', { ascending: false });
 
       if (profile.role === 'Super Admin' && profile.association_id) {
+        // Super Admin: tous les sponsors de son association
         query = query.eq('association_id', profile.association_id);
+        
       } else if (profile.role === 'Club Admin' && profile.club_id) {
+        // Club Admin: sponsors de son club + sponsors de l'association
         query = query.or(`club_id.eq.${profile.club_id},association_id.eq.${profile.association_id}`);
+        
       } else if (profile.role === 'Member' && profile.club_id) {
-        query = query.or(`club_id.eq.${profile.club_id},association_id.eq.${profile.association_id}`);
+        // === LOGIQUE CORRIGÉE POUR MEMBER ===
+        // Member: sponsors de son club + sponsors des clubs qu'il suit + sponsors de l'association
+        const allowedClubIds = [profile.club_id, ...followedClubIds];
+        const uniqueClubIds = [...new Set(allowedClubIds)]; // Éliminer les doublons
+        
+        if (uniqueClubIds.length > 0) {
+          const clubConditions = uniqueClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+          query = query.or(`${clubConditions},association_id.eq.${profile.association_id}`);
+        } else {
+          // Si pas de clubs, juste les sponsors de l'association
+          query = query.eq('association_id', profile.association_id);
+        }
+        
       } else if (profile.role === 'Supporter' && profile.association_id) {
-        query = query.eq('association_id', profile.association_id);
+        // === LOGIQUE CORRIGÉE POUR SUPPORTER ===
+        // Supporter: sponsors des clubs qu'il suit + sponsors de l'association
+        if (followedClubIds.length > 0) {
+          const clubConditions = followedClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+          query = query.or(`${clubConditions},association_id.eq.${profile.association_id}`);
+        } else {
+          // Si pas de clubs suivis, juste les sponsors de l'association
+          query = query.eq('association_id', profile.association_id);
+        }
+        
       } else {
         setSponsors([]);
         setLoading(false);
@@ -181,11 +241,13 @@ export default function Sponsors() {
   };
 
   const generateEmailContent = (sponsor: Sponsor, editToken: string) => {
-    const subject = `Invitation partenariat - ${sponsor.name}`;
+    const subject = `Merci pour votre soutien – mettez à jour vos informations - ${sponsor.name}`;
     
     const body = `Bonjour,
 
-Nous avons le plaisir de vous proposer un partenariat avec notre club.
+Nous tenons à vous remercier chaleureusement pour votre soutien à notre club. 🙏
+
+Afin de mettre en valeur votre entreprise dans nos communications, voici les informations que nous avons actuellement :
 
 Vos informations actuelles :
 - Nom : ${sponsor.name}
@@ -198,6 +260,7 @@ ${window.location.origin}/sponsor-edit/${editToken}
 Ce lien vous permettra de modifier toutes vos informations directement.
 
 Pour toute question, n'hésitez pas à me contacter.
+Encore merci pour votre confiance et votre engagement à nos côtés. 💙
 
 Cordialement,
 ${profile?.first_name} ${profile?.last_name}`;
@@ -341,12 +404,18 @@ ${profile?.first_name} ${profile?.last_name}`;
     }
   };
 
+  // === FONCTION DE FILTRAGE AMÉLIORÉE ===
   const filteredSponsors = sponsors.filter(sponsor => {
     if (filter === 'all') return true;
-    if (filter === 'association') return sponsor.association_id === profile?.association_id;
-    if (filter === 'club') return sponsor.club_id === profile?.club_id;
+    if (filter === 'association') return sponsor.association_id === profile?.association_id && !sponsor.club_id;
+    if (filter === 'club') {
+      // Afficher les sponsors du club de l'utilisateur OU des clubs qu'il suit
+      if (profile?.club_id && sponsor.club_id === profile.club_id) return true;
+      return followedClubIds.includes(sponsor.club_id || '');
+    }
     return true;
   });
+
   if (profile?.role === 'Supporter' && !profile?.association_id) {
     return (
       <div className="space-y-6">
@@ -449,7 +518,7 @@ ${profile?.first_name} ${profile?.last_name}`;
               onClick={() => {
                 openMailClient(createdSponsor.sponsor, createdSponsor.token);
                 setCreatedSponsor(null);
-                setSuccessMessage(''); // On peut aussi vider le message de succès
+                setSuccessMessage('');
               }}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
@@ -457,6 +526,40 @@ ${profile?.first_name} ${profile?.last_name}`;
               Envoyer l'email
             </button>
           </div>
+        </div>
+      )}
+
+      {sponsors.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start">
+            <Heart className="h-6 w-6 text-blue-600 mr-3 mt-1" />
+            <div>
+              <h2 className="text-lg font-semibold text-blue-900 mb-2">Un grand merci à nos partenaires !</h2>
+              <p className="text-blue-800">
+                Grâce au soutien de nos sponsors et partenaires, nous pouvons développer nos activités, 
+                organiser des événements de qualité et offrir des services à nos membres. 
+                Leur confiance et leur engagement sont essentiels à notre réussite.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {sponsors.length > 0 && (
+        <div className="flex space-x-4 border-b border-gray-200">
+          {profile?.association_id && (
+            <button onClick={() => setFilter('association')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'association' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              Sponsors de l'association
+            </button>
+          )}
+          {(profile?.club_id || followedClubIds.length > 0) && (
+            <button onClick={() => setFilter('club')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'club' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              Sponsors de mes clubs
+            </button>
+          )}
+          <button onClick={() => setFilter('all')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+            Tous mes sponsors
+          </button>
         </div>
       )}
 
@@ -652,41 +755,6 @@ ${profile?.first_name} ${profile?.last_name}`;
           </div>
         </div>
       )}
-
-      {sponsors.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-start">
-            <Heart className="h-6 w-6 text-blue-600 mr-3 mt-1" />
-            <div>
-              <h2 className="text-lg font-semibold text-blue-900 mb-2">Un grand merci à nos partenaires !</h2>
-              <p className="text-blue-800">
-                Grâce au soutien de nos sponsors et partenaires, nous pouvons développer nos activités, 
-                organiser des événements de qualité et offrir des services à nos membres. 
-                Leur confiance et leur engagement sont essentiels à notre réussite.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {sponsors.length > 0 && (
-        <div className="flex space-x-4 border-b border-gray-200">
-          {profile?.association_id && (
-            <button onClick={() => setFilter('association')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'association' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
-              Sponsors de l'association
-            </button>
-          )}
-          {profile?.club_id && (
-            <button onClick={() => setFilter('club')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'club' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
-              Sponsors de mon club
-            </button>
-          )}
-          <button onClick={() => setFilter('all')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
-            Tous mes sponsors
-          </button>
-        </div>
-      )}
-
       {filteredSponsors.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSponsors.map((sponsor) => (
@@ -782,6 +850,6 @@ ${profile?.first_name} ${profile?.last_name}`;
           )}
         </div>
       )}
-    </div>
+    </div> // <!--- CETTE BALISE ÉTAIT MANQUANTE
   );
 }

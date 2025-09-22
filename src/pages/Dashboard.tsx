@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { SponsorCarousel } from '../components/SponsorCarousel';
 
 interface AssociationInfo {
   id: string;
@@ -763,6 +764,10 @@ export default function Dashboard() {
                 {renderClubSection()}
                 
                 {renderAssociationSection()}
+                
+                {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+                  <SponsorCarousel />
+                )}
               </div>
             </div>
 
