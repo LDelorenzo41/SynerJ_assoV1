@@ -1,4 +1,4 @@
-// Layout.tsx - Version mise à jour avec sidebar responsive et navigation équipement
+// Layout.tsx - Version mise à jour avec sidebar responsive et navigation équipement + sponsors
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -10,10 +10,12 @@ import {
   Settings,
   CalendarDays,
   Package,    // NOUVEAU: icône pour le matériel
-  Clipboard   // NOUVEAU: icône pour les demandes
+  Clipboard,  // NOUVEAU: icône pour les demandes
+  Heart       // NOUVEAU: icône pour les sponsors
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { MobileTopBar } from './MobileTopBar';
+import { SponsorBanner } from './SponsorBanner';
 
 interface AssociationInfo {
   id: string;
@@ -93,8 +95,9 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/associations', label: 'Association', icon: Building },
         { path: '/clubs', label: 'Clubs', icon: Users },
-        // ============ NOUVEAU: Navigation pour Super Admin ============
+        // Navigation pour Super Admin
         { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
+        { path: '/sponsors', label: 'Sponsors', icon: Heart },
       );
     }
 
@@ -102,8 +105,9 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/my-club', label: 'Mon Club', icon: Users },
         { path: '/events', label: 'Événements', icon: Calendar },
-        // ============ NOUVEAU: Navigation pour Club Admin ============
+        // Navigation pour Club Admin
         { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
+        { path: '/sponsors', label: 'Sponsors', icon: Heart },
       );
     }
 
@@ -112,6 +116,7 @@ export default function Layout({ children }: LayoutProps) {
         { path: '/events', label: 'Événements', icon: Calendar },
         { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
         { path: '/clubs', label: 'Clubs', icon: Users },
+        { path: '/sponsors', label: 'Sponsors', icon: Heart },
       );
     }
 
@@ -165,13 +170,18 @@ export default function Layout({ children }: LayoutProps) {
         {/* Content avec marge adaptative */}
         <main className={`
           flex-1 p-4 sm:p-6 
-          pt-20 lg:pt-6
+          pt-20 lg:pt-6 pb-16
           transition-all duration-300
         `}>
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>
+
+        {/* Footer fixe avec bandeau sponsors */}
+        <footer className="fixed bottom-0 left-0 right-0 z-30">
+          <SponsorBanner />
+        </footer>
       </div>
     </div>
   );

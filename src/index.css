@@ -19,7 +19,6 @@
   }
 }
 
-
 /* Amélioration des scrollbars pour la sidebar */
 .sidebar-nav::-webkit-scrollbar {
   width: 4px;
@@ -36,4 +35,18 @@
 
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
   background: #d1d5db;
+}
+
+/* Animation pour le bandeau sponsors */
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
 }
