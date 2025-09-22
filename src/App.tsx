@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
+import SponsorEdit from './pages/SponsorEdit';
 
 // Import des nouveaux composants de réservation
 import EquipmentManagement from './components/equipment/EquipmentManagement';
@@ -51,6 +52,15 @@ function App() {
             <>
               <PublicHeader />
               <Login />
+            </>
+          } 
+        />
+        <Route 
+          path="/sponsor-edit/:token" 
+          element={
+            <>
+              <PublicHeader />
+              <SponsorEdit />
             </>
           } 
         />

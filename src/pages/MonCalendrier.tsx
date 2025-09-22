@@ -1,6 +1,6 @@
 // src/pages/MonCalendrier.tsx
-import React, { useEffect } from 'react';
-import { Calendar, Clock, MapPin, Trash2, Eye, EyeOff, Download, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Calendar, Clock, MapPin, Trash2, Eye, EyeOff, Download, RefreshCw, X } from 'lucide-react';
 import { useCalendar } from '../hooks/useCalendar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -15,6 +15,9 @@ export default function MonCalendrier() {
     exportCalendarToICS,
     calendarEventsCount
   } = useCalendar();
+
+  // État pour la modale d'image
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const formatEventDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -107,71 +110,116 @@ export default function MonCalendrier() {
                   isEventPast(event.date) ? 'opacity-60' : ''
                 }`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {event.name}
-                      </h3>
-                      
-                      <div className="flex items-center space-x-2">
-                        {event.visibility === 'Public' ? (
-                          <Eye className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <EyeOff className="h-4 w-4 text-orange-600" />
-                        )}
-                        
-                        {isEventPast(event.date) && (
-                          <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                            Passé
-                          </span>
-                        )}
-                      </div>
+                {/* Nouveau layout avec image */}
+                <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                  
+                  {/* Image de l'événement (si disponible) */}
+                  {event.image_url && (
+                    <div className="lg:w-80 lg:flex-shrink-0">
+                      <img 
+                        src={event.image_url} 
+                        alt={event.name}
+                        className="w-full h-48 lg:h-40 object-contain bg-gray-50 rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setSelectedImage(event.image_url)}
+                      />
                     </div>
+                  )}
+                  
+                  {/* Contenu de l'événement */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        {/* Titre et badges */}
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {event.name}
+                          </h3>
+                          
+                          <div className="flex items-center space-x-2">
+                            {event.visibility === 'Public' ? (
+                              <Eye className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <EyeOff className="h-4 w-4 text-orange-600" />
+                            )}
+                            
+                            {isEventPast(event.date) && (
+                              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                                Passé
+                              </span>
+                            )}
+                          </div>
+                        </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center text-gray-600">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span className="capitalize">{formatEventDate(event.date)}</span>
+                        {/* Informations de l'événement */}
+                        <div className="space-y-2">
+                          <div className="flex items-center text-gray-600">
+                            <Clock className="h-4 w-4 mr-2" />
+                            <span className="capitalize">{formatEventDate(event.date)}</span>
+                          </div>
+
+                          {event.location && (
+                            <div className="flex items-center text-gray-600">
+                              <MapPin className="h-4 w-4 mr-2" />
+                              <span>{event.location}</span>
+                            </div>
+                          )}
+
+                          {event.club && (
+                            <div className="flex items-center text-gray-600">
+                              <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                {event.club.name}
+                              </span>
+                            </div>
+                          )}
+
+                          {event.description && (
+                            <p className="text-gray-700 text-sm mt-2">
+                              {event.description}
+                            </p>
+                          )}
+
+                          <p className="text-xs text-gray-500">
+                            Ajouté le {format(new Date(event.added_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                          </p>
+                        </div>
                       </div>
 
-                      {event.location && (
-                        <div className="flex items-center text-gray-600">
-                          <MapPin className="h-4 w-4 mr-2" />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
-
-                      {event.club && (
-                        <div className="flex items-center text-gray-600">
-                          <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                            {event.club.name}
-                          </span>
-                        </div>
-                      )}
-
-                      {event.description && (
-                        <p className="text-gray-700 text-sm mt-2">
-                          {event.description}
-                        </p>
-                      )}
-
-                      <p className="text-xs text-gray-500">
-                        Ajouté le {format(new Date(event.added_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
-                      </p>
+                      {/* Bouton de suppression */}
+                      <button
+                        onClick={() => removeEventFromCalendar(event.id)}
+                        className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Retirer de mon calendrier"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => removeEventFromCalendar(event.id)}
-                    className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Retirer de mon calendrier"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modale pour afficher l'image en plein écran */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
+            <img 
+              src={selectedImage} 
+              alt="Événement en plein écran"
+              className="w-full h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
         </div>
       )}
