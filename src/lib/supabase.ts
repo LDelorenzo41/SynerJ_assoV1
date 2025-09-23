@@ -54,6 +54,7 @@ export type Database = {
           club_email: string;
           association_id: string;
           club_code: string;
+          website_url: string | null; // Ligne ajoutée
           created_at: string;
         };
         Insert: {
@@ -63,6 +64,7 @@ export type Database = {
           club_email: string;
           association_id: string;
           club_code?: string;
+          website_url?: string | null; // Ligne ajoutée
           created_at?: string;
         };
         Update: {
@@ -72,6 +74,7 @@ export type Database = {
           club_email?: string;
           association_id?: string;
           club_code?: string;
+          website_url?: string | null; // Ligne ajoutée
           created_at?: string;
         };
       };

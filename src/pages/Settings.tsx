@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Camera, Lock, Save, User, AlertCircle, Building2, Mail } from 'lucide-react';
+import { Camera, Lock, Save, User, AlertCircle, Building2, Mail, Globe } from 'lucide-react';
 
 interface Message {
   type: 'success' | 'error';
@@ -12,6 +12,7 @@ interface ClubData {
   id: string;
   name: string;
   contact_email: string | null;
+  website_url: string | null;
   logo_url: string | null;
 }
 
@@ -57,6 +58,7 @@ export default function Settings() {
   // État pour les informations du club
   const [clubForm, setClubForm] = useState({
     contact_email: '',
+    website_url: '',
   });
 
   // Charger les données du club si l'utilisateur est Club Admin
@@ -75,7 +77,7 @@ export default function Settings() {
     try {
       const { data, error } = await supabase
         .from('clubs')
-        .select('id, name, contact_email, logo_url')
+        .select('id, name, contact_email, website_url, logo_url')
         .eq('id', profile.club_id)
         .single();
 
@@ -84,6 +86,7 @@ export default function Settings() {
       setClubData(data);
       setClubForm({
         contact_email: data.contact_email || '',
+        website_url: data.website_url || '',
       });
     } catch (err: any) {
       console.error('Erreur lors du chargement des données du club:', err);
@@ -434,6 +437,7 @@ export default function Settings() {
         .from('clubs')
         .update({
           contact_email: clubForm.contact_email.trim() || null,
+          website_url: clubForm.website_url.trim() || null,
         })
         .eq('id', clubData.id);
 
@@ -443,11 +447,12 @@ export default function Settings() {
       setClubData({
         ...clubData,
         contact_email: clubForm.contact_email.trim() || null,
+        website_url: clubForm.website_url.trim() || null,
       });
 
       setMessage({
         type: 'success',
-        text: 'Email de contact du club mis à jour avec succès !',
+        text: 'Informations du club mises à jour avec succès !',
       });
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
@@ -685,13 +690,32 @@ export default function Settings() {
                   </p>
                 </div>
                 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Site web du club
+                  </label>
+                  <input
+                    type="url"
+                    value={clubForm.website_url}
+                    onChange={(e) => setClubForm({
+                      ...clubForm,
+                      website_url: e.target.value
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="https://www.monclub.com"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    URL complète du site web du club (optionnel). Sera affichée aux membres et followers.
+                  </p>
+                </div>
+                
                 <button
                   type="submit"
                   disabled={clubLoading}
                   className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center"
                 >
-                  <Mail className="h-4 w-4 mr-2" />
-                  {clubLoading ? 'Sauvegarde...' : 'Mettre à jour l\'email de contact'}
+                  <Globe className="h-4 w-4 mr-2" />
+                  {clubLoading ? 'Sauvegarde...' : 'Mettre à jour les informations'}
                 </button>
               </form>
             </div>
