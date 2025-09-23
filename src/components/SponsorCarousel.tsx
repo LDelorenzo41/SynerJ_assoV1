@@ -81,16 +81,16 @@ export const SponsorCarousel: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200 transition-all duration-500">
+    <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700 transition-all duration-500">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-gray-700">Nos Sponsors</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-orange-200">Nos Sponsors</h3>
         {sponsors.length > 1 && (
           <div className="flex space-x-1">
             {sponsors.map((_, index) => (
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentIndex ? 'bg-orange-500' : 'bg-orange-300'
+                  index === currentIndex ? 'bg-orange-500 dark:bg-orange-400' : 'bg-orange-300 dark:bg-orange-600'
                 }`}
               />
             ))}
@@ -100,7 +100,7 @@ export const SponsorCarousel: React.FC = () => {
       
       <div 
         onClick={handleSponsorClick}
-        className={`${currentSponsor.website ? 'cursor-pointer hover:bg-orange-100' : ''} p-3 rounded-lg transition-colors`}
+        className={`${currentSponsor.website ? 'cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30' : ''} p-3 rounded-lg transition-colors`}
       >
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0">
@@ -108,26 +108,26 @@ export const SponsorCarousel: React.FC = () => {
               <img 
                 src={currentSponsor.logo_url} 
                 alt={currentSponsor.name}
-                className="h-12 w-12 object-contain rounded bg-white p-1"
+                className="h-12 w-12 object-contain rounded bg-white dark:bg-slate-100 p-1"
               />
             ) : (
-              <div className="h-12 w-12 bg-white rounded flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-gray-400" />
+              <div className="h-12 w-12 bg-white dark:bg-slate-100 rounded flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-600" />
               </div>
             )}
           </div>
           
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-orange-100 mb-1">
               {currentSponsor.name}
             </h4>
             {currentSponsor.description && (
-              <p className="text-xs text-gray-600 line-clamp-2">
+              <p className="text-xs text-gray-600 dark:text-orange-200 line-clamp-2">
                 {currentSponsor.description}
               </p>
             )}
             {currentSponsor.website && (
-              <div className="flex items-center mt-2 text-xs text-orange-600">
+              <div className="flex items-center mt-2 text-xs text-orange-600 dark:text-orange-300">
                 <ExternalLink className="h-3 w-3 mr-1" />
                 Visiter le site
               </div>
