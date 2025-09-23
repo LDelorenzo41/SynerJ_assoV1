@@ -82,7 +82,7 @@ export default function Associations() {
   if (!isSuperAdmin) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Access denied. Super Admin role required.</p>
+        <p className="dark-text-muted">Access denied. Super Admin role required.</p>
       </div>
     );
   }
@@ -90,7 +90,7 @@ export default function Associations() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -98,7 +98,7 @@ export default function Associations() {
   if (!association) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">No association found.</p>
+        <p className="dark-text-muted">No association found.</p>
       </div>
     );
   }
@@ -106,13 +106,13 @@ export default function Associations() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Gestion de l'Association</h1>
+        <h1 className="text-3xl font-bold dark-text">Gestion de l'Association</h1>
       </div>
 
       {/* Association Details */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+          <h2 className="text-xl font-semibold dark-text flex items-center">
             <Building className="h-5 w-5 mr-2" />
             Détails de l'Association
           </h2>
@@ -121,7 +121,7 @@ export default function Associations() {
               <>
                 <button
                   onClick={handleSave}
-                  className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                  className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
                   title="Save Changes"
                 >
                   <Save className="h-4 w-4" />
@@ -137,7 +137,7 @@ export default function Associations() {
                       description: association.description || '',
                     });
                   }}
-                  className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                   title="Annuler"
                 >
                   <X className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default function Associations() {
             ) : (
               <button
                 onClick={() => setEditing(true)}
-                className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                 title="Modifier l'Association"
               >
                 <Edit className="h-4 w-4" />
@@ -157,7 +157,7 @@ export default function Associations() {
         <div className="p-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Nom de l'Association
               </label>
               {editing ? (
@@ -165,15 +165,15 @@ export default function Associations() {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               ) : (
-                <p className="text-lg text-gray-900">{association.name}</p>
+                <p className="text-lg dark-text">{association.name}</p>
               )}
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Courriel
               </label>
               {editing ? (
@@ -181,15 +181,15 @@ export default function Associations() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               ) : (
-                <p className="text-lg text-gray-900">{association.email}</p>
+                <p className="text-lg dark-text">{association.email}</p>
               )}
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Ville
               </label>
               {editing ? (
@@ -197,15 +197,15 @@ export default function Associations() {
                   type="text"
                   value={editForm.city}
                   onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               ) : (
-                <p className="text-lg text-gray-900">{association.city || 'Non spécifié'}</p>
+                <p className="text-lg dark-text">{association.city || 'Non spécifié'}</p>
               )}
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Téléphone
               </label>
               {editing ? (
@@ -213,27 +213,27 @@ export default function Associations() {
                   type="tel"
                   value={editForm.phone}
                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               ) : (
-                <p className="text-lg text-gray-900">{association.phone || 'Non spécifié'}</p>
+                <p className="text-lg dark-text">{association.phone || 'Non spécifié'}</p>
               )}
             </div>
             
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Code d'Association
               </label>
-              <p className="text-lg font-mono bg-gray-100 px-3 py-2 rounded">
+              <p className="text-lg font-mono bg-gray-100 dark:bg-slate-700 px-3 py-2 rounded dark-text">
                 {association.association_code}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm dark-text-muted mt-1">
                 Partagez ce code avec les clubs pour rejoindre votre association
               </p>
             </div>
             
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text mb-2">
                 Description
               </label>
               {editing ? (
@@ -241,10 +241,10 @@ export default function Associations() {
                   rows={3}
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               ) : (
-                <p className="text-lg text-gray-900">{association.description || 'Aucune description'}</p>
+                <p className="text-lg dark-text">{association.description || 'Aucune description'}</p>
               )}
             </div>
           </div>
@@ -252,25 +252,25 @@ export default function Associations() {
       </div>
 
       {/* Clubs List */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 className="text-xl font-semibold dark-text">
             Clubs ({clubs.length})
           </h2>
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-600">
           {clubs.map((club) => (
-            <div key={club.id} className="px-6 py-4">
+            <div key={club.id} className="px-6 py-4 dark-hover">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{club.name}</h3>
-                  <p className="text-sm text-gray-600">{club.club_email}</p>
-                  <p className="text-sm text-gray-500 font-mono mt-1">{club.club_code}</p>
+                  <h3 className="text-lg font-semibold dark-text">{club.name}</h3>
+                  <p className="text-sm dark-text-muted">{club.club_email}</p>
+                  <p className="text-sm dark-text-muted font-mono mt-1">{club.club_code}</p>
                   {club.description && (
-                    <p className="text-sm text-gray-600 mt-2">{club.description}</p>
+                    <p className="text-sm dark-text-muted mt-2">{club.description}</p>
                   )}
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm dark-text-muted">
                   Créé le : {new Date(club.created_at).toLocaleDateString('fr-FR')}
                 </div>
               </div>
@@ -278,7 +278,7 @@ export default function Associations() {
           ))}
           {clubs.length === 0 && (
             <div className="px-6 py-12 text-center">
-              <p className="text-gray-500">Aucun club enregistré pour le moment</p>
+              <p className="dark-text-muted">Aucun club enregistré pour le moment</p>
             </div>
           )}
         </div>

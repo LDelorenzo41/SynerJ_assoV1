@@ -1,4 +1,4 @@
-// Layout.tsx - Version mise à jour avec sidebar responsive et navigation équipement + sponsors
+// Layout.tsx - Version mise à jour avec dark mode
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -16,6 +16,7 @@ import {
 import { Sidebar } from './Sidebar';
 import { MobileTopBar } from './MobileTopBar';
 import { SponsorBanner } from './SponsorBanner';
+import DarkModeToggle from './DarkModeToggle'; // NOUVEAU: Import du dark mode
 
 interface AssociationInfo {
   id: string;
@@ -139,14 +140,14 @@ export default function Layout({ children }: LayoutProps) {
   // Pour les utilisateurs non connectés ou les pages publiques
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen dark-bg">
         {children}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen dark-bg flex">
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen || !sidebarCollapsed}
@@ -160,12 +161,18 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile TopBar */}
-        <MobileTopBar 
-          onMenuToggle={() => setSidebarOpen(true)}
-          associationInfo={associationInfo}
-          loading={loading}
-        />
+        {/* Mobile TopBar avec Dark Mode Toggle */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-40">
+          <MobileTopBar 
+            onMenuToggle={() => setSidebarOpen(true)}
+            associationInfo={associationInfo}
+            loading={loading}
+          />
+          {/* NOUVEAU: Dark Mode Toggle pour mobile */}
+          <div className="absolute top-4 right-16">
+            <DarkModeToggle />
+          </div>
+        </div>
 
         {/* Content avec marge adaptative */}
         <main className={`

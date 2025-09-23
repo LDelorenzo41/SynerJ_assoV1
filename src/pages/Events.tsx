@@ -57,11 +57,11 @@ interface LogoDisplayProps {
   iconColor?: string;
 }
 
-const LogoDisplay: React.FC<LogoDisplayProps> = ({ src, alt, size = 'w-8 h-8', fallbackIcon: FallbackIcon, iconColor = 'text-gray-400' }) => {
+const LogoDisplay: React.FC<LogoDisplayProps> = ({ src, alt, size = 'w-8 h-8', fallbackIcon: FallbackIcon, iconColor = 'text-gray-400 dark:text-slate-500' }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+    <div className={`${size} rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
       {src && !imageError ? (
         <img 
           src={src} 
@@ -330,7 +330,7 @@ if (clubId) {
       const imageToUse: string | null = data.imageUrl || data.imageBase64 || null;
       if (!imageToUse) throw new Error('Aucune image n\'a été retournée par l\'API.');
   
-      // Remplir le champ + ouvrir la modale d’aperçu
+      // Remplir le champ + ouvrir la modale d'aperçu
       setEventForm(prev => ({ ...prev, image_url: imageToUse }));
       setSelectedImage(imageToUse);
     } catch (error: any) {
@@ -519,21 +519,21 @@ if (clubId) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Événements</h1>
+          <h1 className="text-3xl font-bold dark-text">Événements</h1>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-6 w-6 text-yellow-600 mr-3 mt-1" />
+            <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-yellow-900 mb-2">Association requise</h2>
-              <p className="text-yellow-800 mb-4">
+              <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Association requise</h2>
+              <p className="text-yellow-800 dark:text-yellow-300 mb-4">
                 Pour voir les événements, vous devez d'abord rejoindre une association. 
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
               <a
                 href="/dashboard"
-                className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Aller au tableau de bord
@@ -548,7 +548,7 @@ if (clubId) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -558,12 +558,12 @@ if (clubId) {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{getPageTitle()}</h1>
+            <h1 className="text-3xl font-bold dark-text">{getPageTitle()}</h1>
             {clubId && clubInfo && (
               <div className="mt-2 flex items-center space-x-2">
                 <a 
                   href="/events" 
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                 >
                   ← Retour à tous les événements
                 </a>
@@ -572,13 +572,13 @@ if (clubId) {
           </div>
           
           {!clubId && (
-            <div className="flex rounded-lg border border-gray-300 bg-white">
+            <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 dark-card">
               <button
                 onClick={() => setShowHistory(false)}
                 className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
                   !showHistory 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white' 
+                    : 'dark-text-muted dark-hover'
                 }`}
               >
                 À venir
@@ -587,8 +587,8 @@ if (clubId) {
                 onClick={() => setShowHistory(true)}
                 className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
                   showHistory 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white' 
+                    : 'dark-text-muted dark-hover'
                 }`}
               >
                 Historique
@@ -611,7 +611,7 @@ if (clubId) {
                 visibility: 'Public',
               });
             }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="dark-btn-primary px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
           >
             <Plus className="h-4 w-4" />
             <span>Créer un Événement</span>
@@ -619,16 +619,16 @@ if (clubId) {
         )}
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 p-4 rounded-lg">
         <div className="flex items-start">
           <div className="flex-shrink-0">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
               {getPageDescription()}
             </h3>
-            <div className="mt-1 text-sm text-blue-700">
+            <div className="mt-1 text-sm text-blue-700 dark:text-blue-300">
               {getPageSubDescription()}
             </div>
           </div>
@@ -637,22 +637,22 @@ if (clubId) {
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="dark-card p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold dark-text">
                 {editingEvent ? 'Modifier l\'Événement' : 'Créer un Nouvel Événement'}
               </h2>
               <button 
                 onClick={() => setShowForm(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 dark-hover rounded-lg"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 dark-text" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text mb-2">
                   Nom de l'Événement *
                 </label>
                 <input
@@ -660,13 +660,13 @@ if (clubId) {
                   required
                   value={eventForm.name}
                   onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                   placeholder="Ex: Tournoi de tennis annuel"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text mb-2">
                   Date et Heure *
                 </label>
                 <input
@@ -674,37 +674,37 @@ if (clubId) {
                   required
                   value={eventForm.date}
                   onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text mb-2">
                   Lieu de l'Événement
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                   <input
                     type="text"
                     value={eventForm.location}
                     onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                     placeholder="Ex: 123 Rue de la Paix, 75001 Paris"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs dark-text-muted mt-1">
                   L'adresse sera utilisée pour afficher une carte interactive (bientôt disponible)
                 </p>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text mb-2">
                   Visibilité *
                 </label>
                 <select
                   value={eventForm.visibility}
                   onChange={(e) => setEventForm({ ...eventForm, visibility: e.target.value as 'Public' | 'Members Only' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                 >
                   <option value="Public">Public</option>
                   <option value="Members Only">Membres Seulement</option>
@@ -712,7 +712,7 @@ if (clubId) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text mb-2">
                   Visuel de l'Événement
                 </label>
                 
@@ -721,7 +721,7 @@ if (clubId) {
                     <img 
                       src={eventForm.image_url} 
                       alt="Aperçu" 
-                      className="w-full h-48 object-cover rounded-lg border"
+                      className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
                     />
                     <button
                       type="button"
@@ -745,35 +745,32 @@ if (clubId) {
                       className="hidden"
                       disabled={uploadingImage}
                     />
-                    <div className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                      <Upload className="h-5 w-5 mx-auto mb-1 text-gray-400" />
-                      <span className="text-sm text-gray-600">
+                    <div className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                      <Upload className="h-5 w-5 mx-auto mb-1 text-gray-400 dark:text-slate-500" />
+                      <span className="text-sm dark-text-muted">
                         {uploadingImage ? 'Upload...' : 'Télécharger'}
                       </span>
                     </div>
                   </label>
 
-                  {/* === MODIFICATION AVEC ANIMATION === */}
                   <button
                     type="button"
                     onClick={handleGenerateImage}
                     disabled={generatingImage || !eventForm.name}
-                    className="flex-1 p-3 border-2 border-dashed border-purple-300 rounded-lg text-center hover:border-purple-400 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 p-3 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {generatingImage ? (
-                      <RefreshCw className="h-5 w-5 mx-auto mb-1 text-purple-500 animate-spin" />
+                      <RefreshCw className="h-5 w-5 mx-auto mb-1 text-purple-500 dark:text-purple-400 animate-spin" />
                     ) : (
-                      <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500" />
+                      <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500 dark:text-purple-400" />
                     )}
-                    <span className="text-sm text-purple-600">
+                    <span className="text-sm text-purple-600 dark:text-purple-400">
                       {generatingImage ? 'Génération...' : 'Générer IA'}
                     </span>
                   </button>
-                  {/* === FIN DE LA MODIFICATION === */}
-
                 </div>
                 
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs dark-text-muted mt-2">
                   Téléchargez une image ou laissez l'IA en créer une basée sur le nom et la description
                 </p>
               </div>
@@ -781,14 +778,14 @@ if (clubId) {
               {/* Section Description avec IA */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium dark-text">
                     Description
                   </label>
                   <button
                     type="button"
                     onClick={handleRewriteDescription}
                     disabled={rewritingDescription || !eventForm.name || !eventForm.description}
-                    className="flex items-center space-x-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center space-x-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Utiliser l'IA pour améliorer la description"
                   >
                     {rewritingDescription ? (
@@ -807,32 +804,32 @@ if (clubId) {
 
                 {/* Suggestion IA si disponible */}
                 {showAiSuggestion && aiSuggestion && (
-                  <div className="mb-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div className="mb-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center">
-                        <Sparkles className="h-4 w-4 text-purple-600 mr-2" />
-                        <span className="text-sm font-medium text-purple-900">
+                        <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 mr-2" />
+                        <span className="text-sm font-medium text-purple-900 dark:text-purple-200">
                           Suggestion de l'IA
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={rejectAiSuggestion}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                     
-                    <div className="bg-white p-2 rounded border border-purple-100 mb-3">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{aiSuggestion}</p>
+                    <div className="dark-card p-2 rounded border border-purple-100 dark:border-purple-600 mb-3">
+                      <p className="text-sm dark-text whitespace-pre-wrap">{aiSuggestion}</p>
                     </div>
                     
                     <div className="flex space-x-2">
                       <button
                         type="button"
                         onClick={acceptAiSuggestion}
-                        className="flex-1 px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+                        className="flex-1 px-3 py-1 bg-purple-600 dark:bg-purple-700 text-white text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
                       >
                         Utiliser cette description
                       </button>
@@ -841,7 +838,7 @@ if (clubId) {
                         onClick={() => {
                           acceptAiSuggestion();
                         }}
-                        className="flex-1 px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded hover:bg-purple-200 transition-colors"
+                        className="flex-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
                       >
                         Utiliser et modifier
                       </button>
@@ -853,11 +850,11 @@ if (clubId) {
                   rows={4}
                   value={eventForm.description}
                   onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                   placeholder="Décrivez votre événement, les détails importants, les instructions pour les participants..."
                 />
                 
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs dark-text-muted mt-1">
                   Astuce : Écrivez d'abord votre description, puis utilisez l'IA pour l'améliorer
                 </p>
               </div>
@@ -866,14 +863,14 @@ if (clubId) {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={uploadingImage || generatingImage}
-                  className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {editingEvent ? 'Mettre à jour' : 'Créer'}
                 </button>
@@ -883,44 +880,44 @@ if (clubId) {
         </div>
       )}
 
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 className="text-lg font-semibold dark-text flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
             {getListTitle()} ({events.length})
           </h2>
           {showHistory && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm dark-text-muted mt-1">
               Événements passés triés du plus récent au plus ancien
             </p>
           )}
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-600">
           {events.map((event) => {
             const isExpanded = expandedEvents.has(event.id);
             return (
-              <div key={event.id} className="px-6 py-6 hover:bg-gray-50">
+              <div key={event.id} className="px-6 py-6 dark-hover">
                 {/* En-tête avec logo et nom du club (même en mode filtrage) */}
-                <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100">
+                <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-600">
                   <LogoDisplay 
                     src={event.clubs.logo_url} 
                     alt={`Logo ${event.clubs.name}`} 
                     size="w-10 h-10"
                     fallbackIcon={Building}
-                    iconColor="text-blue-600"
+                    iconColor="text-blue-600 dark:text-blue-400"
                   />
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">{event.clubs.name}</h4>
+                    <h4 className="text-sm font-medium dark-text">{event.clubs.name}</h4>
                     <div className="flex items-center space-x-2 mt-1">
                       {event.visibility === 'Public' ? (
-                        <Eye className="h-3 w-3 text-green-600" />
+                        <Eye className="h-3 w-3 text-green-600 dark:text-green-400" />
                       ) : (
-                        <EyeOff className="h-3 w-3 text-orange-600" />
+                        <EyeOff className="h-3 w-3 text-orange-600 dark:text-orange-400" />
                       )}
                       <span className={`px-2 py-0.5 text-xs rounded-full ${
                         event.visibility === 'Public'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-orange-100 text-orange-800'
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                          : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
                       }`}>
                         {event.visibility}
                       </span>
@@ -935,7 +932,7 @@ if (clubId) {
                       <img 
                         src={event.image_url} 
                         alt={event.name}
-                        className="w-full h-48 lg:h-32 object-contain bg-gray-50 rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                        className="w-full h-48 lg:h-32 object-contain bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setSelectedImage(event.image_url)}
                       />
                     </div>
@@ -945,11 +942,11 @@ if (clubId) {
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         {/* Titre de l'événement */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">{event.name}</h3>
+                        <h3 className="text-xl font-bold dark-text mb-3">{event.name}</h3>
                         
                         {/* Informations date et lieu */}
                         <div className="space-y-2 mb-4">
-                          <div className="flex items-center text-gray-600">
+                          <div className="flex items-center dark-text-muted">
                             <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
                             <span className="text-sm">
                               {new Date(event.date).toLocaleDateString('fr-FR', {
@@ -964,11 +961,11 @@ if (clubId) {
                           </div>
                           
                           {event.location && (
-                            <div className="flex items-center text-gray-600">
+                            <div className="flex items-center dark-text-muted">
                               <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                               <span className="text-sm flex-1">{event.location}</span>
                               <button 
-                                className="ml-2 text-xs text-blue-600 hover:text-blue-700 underline"
+                                className="ml-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
                                 onClick={() => {
                                   // TODO: Ouvrir modal Google Maps
                                   alert('Fonctionnalité "Voir sur la carte" à venir !');
@@ -983,13 +980,13 @@ if (clubId) {
                         {/* Description avec expansion */}
                         {event.description && (
                           <div className="mb-4">
-                            <p className={`text-gray-700 ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                            <p className={`dark-text ${!isExpanded ? 'line-clamp-2' : ''}`}>
                               {event.description}
                             </p>
                             {event.description.length > 150 && (
                               <button
                                 onClick={() => toggleEventExpansion(event.id)}
-                                className="mt-2 text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                                className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center"
                               >
                                 {isExpanded ? (
                                   <>
@@ -1013,14 +1010,14 @@ if (clubId) {
                             <>
                               <button
                                 onClick={() => handleEdit(event)}
-                                className="flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm transition-colors"
+                                className="flex items-center space-x-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 text-sm transition-colors"
                               >
                                 <Edit className="h-4 w-4" />
                                 <span>Modifier</span>
                               </button>
                               <button
                                 onClick={() => handleDelete(event.id)}
-                                className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm transition-colors"
+                                className="flex items-center space-x-1 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 text-sm transition-colors"
                               >
                                 <Trash2 className="h-4 w-4" />
                                 <span>Supprimer</span>
@@ -1034,8 +1031,8 @@ if (clubId) {
                               disabled={addingToCalendarId === event.id}
                               className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${
                                 userCalendarEvents.includes(event.id)
-                                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                  : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
+                                  : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50'
                               } disabled:opacity-50`}
                               title={
                                 userCalendarEvents.includes(event.id) 
@@ -1068,14 +1065,14 @@ if (clubId) {
           })}
           {events.length === 0 && (
             <div className="px-6 py-12 text-center">
-              <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-500">
+              <Calendar className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 mb-4" />
+              <p className="dark-text-muted">
                 {clubId && clubInfo ? 
                   (showHistory ? `Aucun événement passé pour ${clubInfo.name}` : `Aucun événement à venir pour ${clubInfo.name}`) :
                   (showHistory ? 'Aucun événement dans l\'historique' : 'Aucun événement à venir')
                 }
               </p>
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm dark-text-muted mt-2">
                 {clubId && clubInfo ? (
                   `Ce club n'a ${showHistory ? 'organisé aucun événement par le passé' : 'aucun événement programmé'}.`
                 ) : showHistory ? (
