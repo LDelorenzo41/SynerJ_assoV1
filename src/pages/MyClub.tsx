@@ -13,7 +13,8 @@ import {
   UserPlus,
   Edit,
   Save,
-  X
+  X,
+  Globe // Ajout de l'icône Globe pour le site web
 } from 'lucide-react';
 
 interface ClubData {
@@ -22,6 +23,7 @@ interface ClubData {
   description: string;
   club_email: string;
   contact_email: string | null;
+  website_url: string | null; // AJOUTÉ : Champ website_url
   club_code: string;
   logo_url?: string;
   created_at: string;
@@ -44,7 +46,7 @@ interface ClubStats {
   totalMembers: number;
   totalEvents: number;
   upcomingEvents: number;
-  totalSponsors: number; // AJOUTÉ
+  totalSponsors: number;
 }
 
 export default function MyClub() {
@@ -55,7 +57,7 @@ export default function MyClub() {
     totalMembers: 0, 
     totalEvents: 0, 
     upcomingEvents: 0,
-    totalSponsors: 0 // AJOUTÉ
+    totalSponsors: 0 
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,8 @@ export default function MyClub() {
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
-    contact_email: ''
+    contact_email: '',
+    website_url: '' // AJOUTÉ : Champ website_url dans l'état du formulaire d'édition
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -102,7 +105,8 @@ export default function MyClub() {
       setEditForm({
         name: club.name || '',
         description: club.description || '',
-        contact_email: club.contact_email || ''
+        contact_email: club.contact_email || '',
+        website_url: club.website_url || '' // AJOUTÉ : Initialisation de website_url
       });
 
       // Récupérer les membres du club - Solution sécurisée au niveau applicatif
@@ -135,7 +139,7 @@ export default function MyClub() {
         totalMembers: allMembers?.length || 0,
         totalEvents: eventsResult.data?.length || 0,
         upcomingEvents: upcomingEventsResult.data?.length || 0,
-        totalSponsors: sponsorsResult.data?.length || 0 // AJOUTÉ
+        totalSponsors: sponsorsResult.data?.length || 0 
       });
 
     } catch (err: any) {
@@ -171,7 +175,8 @@ export default function MyClub() {
         .update({
           name: editForm.name.trim(),
           description: editForm.description.trim() || null,
-          contact_email: editForm.contact_email.trim() || null
+          contact_email: editForm.contact_email.trim() || null,
+          website_url: editForm.website_url.trim() || null // AJOUTÉ : Mise à jour de website_url
         })
         .eq('id', clubData.id);
 
@@ -182,7 +187,8 @@ export default function MyClub() {
         ...clubData,
         name: editForm.name.trim(),
         description: editForm.description.trim(),
-        contact_email: editForm.contact_email.trim() || null
+        contact_email: editForm.contact_email.trim() || null,
+        website_url: editForm.website_url.trim() || null // AJOUTÉ : Mise à jour locale de website_url
       });
 
       setIsEditing(false);
@@ -210,7 +216,8 @@ export default function MyClub() {
     setEditForm({
       name: clubData?.name || '',
       description: clubData?.description || '',
-      contact_email: clubData?.contact_email || ''
+      contact_email: clubData?.contact_email || '',
+      website_url: clubData?.website_url || '' // AJOUTÉ : Restauration de website_url
     });
   };
 
@@ -402,6 +409,23 @@ export default function MyClub() {
                 </p>
               </div>
 
+              {/* AJOUTÉ : Champ Site web du club */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Site web du club
+                </label>
+                <input
+                  type="url"
+                  value={editForm.website_url || ''}
+                  onChange={(e) => setEditForm({ ...editForm, website_url: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="https://www.monclub.com"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  URL complète du site web (optionnel)
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
@@ -534,7 +558,7 @@ export default function MyClub() {
             <div className="p-4 bg-green-50 rounded-lg space-y-2">
               <Mail className="h-6 w-6 text-green-600 mb-2" />
               <div>
-                <p className="font-medium text-gray-900">Emails du Club</p>
+                <p className="font-medium text-gray-900">Contact du Club</p> {/* Titre ajusté */}
                 <p className="text-xs text-gray-600 truncate">
                   <strong>Connexion :</strong> {clubData.club_email}
                 </p>
@@ -546,6 +570,26 @@ export default function MyClub() {
                 {!clubData.contact_email && (
                   <p className="text-xs text-gray-500 italic">
                     Aucun email de contact défini
+                  </p>
+                )}
+                {/* AJOUTÉ : Affichage du site web */}
+                {clubData.website_url && (
+                  <p className="text-xs text-gray-600 truncate flex items-center mt-1">
+                    <Globe className="h-3 w-3 mr-1 text-gray-500" /> {/* Icône Globe */}
+                    <strong>Site web :</strong> 
+                    <a 
+                      href={clubData.website_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-green-700 hover:underline ml-1"
+                    >
+                      {clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]} {/* Affiche une version simplifiée de l'URL */}
+                    </a>
+                  </p>
+                )}
+                {!clubData.website_url && (
+                  <p className="text-xs text-gray-500 italic mt-1">
+                    Aucun site web défini
                   </p>
                 )}
               </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Building2, Upload, Save, CheckCircle, AlertCircle, X } from 'lucide-react';
+import Footer from '../components/Footer';
 
 interface Sponsor {
   id: string;
@@ -411,6 +412,7 @@ export default function SponsorEdit() {
           </form>
         </div>
       </div>
+      <Footer variant="app" />
     </div>
   );
 }

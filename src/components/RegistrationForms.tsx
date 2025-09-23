@@ -33,7 +33,8 @@ interface ClubForm {
   name: string;
   description: string;
   club_email: string;
-  contact_email: string; // Ajout du champ contact_email
+  contact_email: string;
+  website_url?: string; // Ajout du champ website_url
   association_code: string;
   logo_url: string;
   password: string;
@@ -145,7 +146,8 @@ export default function RegistrationForms() {
     name: '',
     description: '',
     club_email: '',
-    contact_email: '', // Ajout du champ contact_email dans l'état initial
+    contact_email: '',
+    website_url: '', // Ajout du champ website_url dans l'état initial
     association_code: '',
     logo_url: '',
     password: '',
@@ -448,6 +450,7 @@ export default function RegistrationForms() {
           description: clubForm.description,
           club_email: clubForm.club_email,
           contact_email: clubForm.contact_email || null,
+          website_url: clubForm.website_url || null, // Ajout de website_url
           association_id: association.id,
           logo_url: null
         }])
@@ -521,7 +524,8 @@ export default function RegistrationForms() {
         name: '', 
         description: '', 
         club_email: '', 
-        contact_email: '', // Ajout dans la réinitialisation
+        contact_email: '',
+        website_url: '', // Ajout dans la réinitialisation
         association_code: '', 
         logo_url: '', 
         password: '' 
@@ -1309,6 +1313,24 @@ export default function RegistrationForms() {
                   Demandez le code d'association au super admin de votre organisation
                 </p>
               </div>
+
+              {/* CHAMP AJOUTÉ */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Site web du club
+                </label>
+                <input
+                  type="url"
+                  value={clubForm.website_url || ''}
+                  onChange={(e) => setClubForm({ ...clubForm, website_url: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="https://www.monclub.com"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  URL complète du site web (optionnel)
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
