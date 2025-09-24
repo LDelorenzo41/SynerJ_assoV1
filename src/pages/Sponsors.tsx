@@ -420,18 +420,18 @@ ${profile?.first_name} ${profile?.last_name}`;
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Nos Sponsors</h1>
+          <h1 className="text-3xl font-bold dark-text">Nos Sponsors</h1>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-6 w-6 text-yellow-600 mr-3 mt-1" />
+            <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-yellow-900 mb-2">Association requise</h2>
-              <p className="text-yellow-800 mb-4">
+              <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-2">Association requise</h2>
+              <p className="text-yellow-800 dark:text-yellow-200 mb-4">
                 Pour voir les sponsors, vous devez d'abord rejoindre une association. 
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
-              <a href="/dashboard" className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+              <a href="/dashboard" className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600 transition-colors">
                 <Users className="h-4 w-4 mr-2" />
                 Aller au tableau de bord
               </a>
@@ -445,7 +445,7 @@ ${profile?.first_name} ${profile?.last_name}`;
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -453,14 +453,14 @@ ${profile?.first_name} ${profile?.last_name}`;
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-gray-900">Nos Sponsors</h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h1 className="text-3xl font-bold dark-text">Nos Sponsors</h1>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-6 w-6 text-red-600 mr-3 mt-1" />
+            <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400 mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-red-900 mb-2">Erreur de chargement</h2>
-              <p className="text-red-800 mb-4">{error}</p>
-              <button onClick={loadSponsors} className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              <h2 className="text-lg font-semibold text-red-900 dark:text-red-300 mb-2">Erreur de chargement</h2>
+              <p className="text-red-800 dark:text-red-200 mb-4">{error}</p>
+              <button onClick={loadSponsors} className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition-colors">
                 Réessayer
               </button>
             </div>
@@ -473,13 +473,13 @@ ${profile?.first_name} ${profile?.last_name}`;
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Nos Sponsors</h1>
+        <h1 className="text-3xl font-bold dark-text">Nos Sponsors</h1>
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm dark-text-muted">
             {filteredSponsors.length} sponsor{filteredSponsors.length > 1 ? 's' : ''}
           </div>
           {(isSuperAdmin || isClubAdmin) && (
-            <button onClick={openCreateForm} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button onClick={openCreateForm} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors">
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un sponsor
             </button>
@@ -488,7 +488,7 @@ ${profile?.first_name} ${profile?.last_name}`;
       </div>
 
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
@@ -496,10 +496,10 @@ ${profile?.first_name} ${profile?.last_name}`;
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-green-800">{successMessage}</p>
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">{successMessage}</p>
             </div>
             <div className="ml-auto pl-3">
-              <button onClick={() => setSuccessMessage('')} className="inline-flex rounded-md bg-green-50 p-1.5 text-green-500 hover:bg-green-100">
+              <button onClick={() => setSuccessMessage('')} className="inline-flex rounded-md bg-green-50 dark:bg-green-900/20 p-1.5 text-green-500 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -508,11 +508,11 @@ ${profile?.first_name} ${profile?.last_name}`;
       )}
 
       {createdSponsor && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-green-900">Sponsor créé !</h3>
-              <p className="text-sm text-green-700">Cliquez pour envoyer l'email d'invitation à {createdSponsor.sponsor.name}</p>
+              <h3 className="font-medium text-green-900 dark:text-green-300">Sponsor créé !</h3>
+              <p className="text-sm text-green-700 dark:text-green-300">Cliquez pour envoyer l'email d'invitation à {createdSponsor.sponsor.name}</p>
             </div>
             <button
               onClick={() => {
@@ -520,7 +520,7 @@ ${profile?.first_name} ${profile?.last_name}`;
                 setCreatedSponsor(null);
                 setSuccessMessage('');
               }}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
             >
               <Send className="h-4 w-4 mr-2" />
               Envoyer l'email
@@ -530,12 +530,12 @@ ${profile?.first_name} ${profile?.last_name}`;
       )}
 
       {sponsors.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
           <div className="flex items-start">
-            <Heart className="h-6 w-6 text-blue-600 mr-3 mt-1" />
+            <Heart className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-blue-900 mb-2">Un grand merci à nos partenaires !</h2>
-              <p className="text-blue-800">
+              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">Un grand merci à nos partenaires !</h2>
+              <p className="text-blue-800 dark:text-blue-200">
                 Grâce au soutien de nos sponsors et partenaires, nous pouvons développer nos activités, 
                 organiser des événements de qualité et offrir des services à nos membres. 
                 Leur confiance et leur engagement sont essentiels à notre réussite.
@@ -546,18 +546,18 @@ ${profile?.first_name} ${profile?.last_name}`;
       )}
 
       {sponsors.length > 0 && (
-        <div className="flex space-x-4 border-b border-gray-200">
+        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-600">
           {profile?.association_id && (
-            <button onClick={() => setFilter('association')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'association' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+            <button onClick={() => setFilter('association')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'association' ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' : 'dark-text-muted hover:text-gray-700 dark:hover:text-gray-300'}`}>
               Sponsors de l'association
             </button>
           )}
           {(profile?.club_id || followedClubIds.length > 0) && (
-            <button onClick={() => setFilter('club')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'club' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+            <button onClick={() => setFilter('club')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'club' ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' : 'dark-text-muted hover:text-gray-700 dark:hover:text-gray-300'}`}>
               Sponsors de mes clubs
             </button>
           )}
-          <button onClick={() => setFilter('all')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => setFilter('all')} className={`pb-2 px-1 text-sm font-medium transition-colors ${filter === 'all' ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' : 'dark-text-muted hover:text-gray-700 dark:hover:text-gray-300'}`}>
             Tous mes sponsors
           </button>
         </div>
@@ -565,91 +565,91 @@ ${profile?.first_name} ${profile?.last_name}`;
 
       {/* Formulaire de création */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="dark-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Ajouter un nouveau sponsor</h2>
-                <button onClick={() => setShowCreateForm(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <h2 className="text-xl font-bold dark-text">Ajouter un nouveau sponsor</h2>
+                <button onClick={() => setShowCreateForm(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
               <form onSubmit={handleSubmitSponsor} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nom de l'entreprise *</label>
-                  <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: Restaurant Le Gourmet" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Nom de l'entreprise *</label>
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="Ex: Restaurant Le Gourmet" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email de contact *</label>
-                  <input type="email" required value={formData.contact_email} onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="contact@entreprise.com" />
-                  <p className="text-xs text-gray-500 mt-1">Un email sera envoyé à cette adresse pour permettre au sponsor de valider et compléter ses informations</p>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Email de contact *</label>
+                  <input type="email" required value={formData.contact_email} onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="contact@entreprise.com" />
+                  <p className="text-xs dark-text-muted mt-1">Un email sera envoyé à cette adresse pour permettre au sponsor de valider et compléter ses informations</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de l'entreprise</label>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Logo de l'entreprise</label>
                   {formData.logo_url && (
                     <div className="mb-4 relative">
-                      <img src={formData.logo_url} alt="Logo" className="w-32 h-32 object-contain border rounded-lg bg-gray-50" />
-                      <button type="button" onClick={() => setFormData({ ...formData, logo_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                      <img src={formData.logo_url} alt="Logo" className="w-32 h-32 object-contain border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600" />
+                      <button type="button" onClick={() => setFormData({ ...formData, logo_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   )}
                   <label className="block">
                     <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleLogoUpload(file); }} className="hidden" disabled={uploadingLogo} />
-                    <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">{uploadingLogo ? 'Upload du logo...' : 'Télécharger un logo'}</span>
+                    <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 transition-colors">
+                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm dark-text-muted">{uploadingLogo ? 'Upload du logo...' : 'Télécharger un logo'}</span>
                     </div>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Visuel promotionnel</label>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Visuel promotionnel</label>
                   {formData.visual_url && (
                     <div className="mb-4 relative">
-                      <img src={formData.visual_url} alt="Visuel" className="w-full h-32 object-cover border rounded-lg bg-gray-50" />
-                      <button type="button" onClick={() => setFormData({ ...formData, visual_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                      <img src={formData.visual_url} alt="Visuel" className="w-full h-32 object-cover border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600" />
+                      <button type="button" onClick={() => setFormData({ ...formData, visual_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   )}
                   <label className="block">
                     <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleVisualUpload(file); }} className="hidden" disabled={uploadingVisual} />
-                    <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors">
-                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">{uploadingVisual ? 'Upload du visuel...' : 'Télécharger un visuel'}</span>
+                    <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:border-green-500 dark:hover:bg-green-900/20 transition-colors">
+                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm dark-text-muted">{uploadingVisual ? 'Upload du visuel...' : 'Télécharger un visuel'}</span>
                     </div>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description rapide</label>
-                  <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Description de l'entreprise et de son activité..." />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Description rapide</label>
+                  <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="Description de l'entreprise et de son activité..." />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Site web (optionnel)</label>
-                  <input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="www.entreprise.com" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Site web (optionnel)</label>
+                  <input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="www.entreprise.com" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone (optionnel)</label>
-                  <input type="tel" value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="01 23 45 67 89" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Téléphone (optionnel)</label>
+                  <input type="tel" value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="01 23 45 67 89" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Adresse (optionnelle)</label>
-                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Adresse (optionnelle)</label>
+                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
                 </div>
 
-                <div className="flex justify-end space-x-3 pt-4 border-t">
-                  <button type="button" onClick={() => setShowCreateForm(false)} className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <button type="button" onClick={() => setShowCreateForm(false)} className="px-4 py-2 dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
                     Annuler
                   </button>
-                  <button type="submit" disabled={submitting || !formData.name || !formData.contact_email} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <button type="submit" disabled={submitting || !formData.name || !formData.contact_email} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {submitting ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div> : <Send className="h-4 w-4 mr-2" />}
                     {submitting ? 'Ajout en cours...' : 'Ajouter le sponsor'}
                   </button>
@@ -662,90 +662,90 @@ ${profile?.first_name} ${profile?.last_name}`;
 
       {/* Formulaire d'édition */}
       {showEditForm && editingSponsor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="dark-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Modifier le sponsor</h2>
-                <button onClick={() => { setShowEditForm(false); setEditingSponsor(null); }} className="p-2 hover:bg-gray-100 rounded-lg">
+                <h2 className="text-xl font-bold dark-text">Modifier le sponsor</h2>
+                <button onClick={() => { setShowEditForm(false); setEditingSponsor(null); }} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
               <form onSubmit={handleUpdateSponsor} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nom de l'entreprise *</label>
-                  <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Nom de l'entreprise *</label>
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email de contact *</label>
-                  <input type="email" required value={formData.contact_email} onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Email de contact *</label>
+                  <input type="email" required value={formData.contact_email} onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de l'entreprise</label>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Logo de l'entreprise</label>
                   {formData.logo_url && (
                     <div className="mb-4 relative">
-                      <img src={formData.logo_url} alt="Logo" className="w-32 h-32 object-contain border rounded-lg bg-gray-50" />
-                      <button type="button" onClick={() => setFormData({ ...formData, logo_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                      <img src={formData.logo_url} alt="Logo" className="w-32 h-32 object-contain border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600" />
+                      <button type="button" onClick={() => setFormData({ ...formData, logo_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   )}
                   <label className="block">
                     <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleLogoUpload(file); }} className="hidden" disabled={uploadingLogo} />
-                    <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">{uploadingLogo ? 'Upload du logo...' : 'Modifier le logo'}</span>
+                    <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 transition-colors">
+                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm dark-text-muted">{uploadingLogo ? 'Upload du logo...' : 'Modifier le logo'}</span>
                     </div>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Visuel promotionnel</label>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Visuel promotionnel</label>
                   {formData.visual_url && (
                     <div className="mb-4 relative">
-                      <img src={formData.visual_url} alt="Visuel" className="w-full h-32 object-cover border rounded-lg bg-gray-50" />
-                      <button type="button" onClick={() => setFormData({ ...formData, visual_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                      <img src={formData.visual_url} alt="Visuel" className="w-full h-32 object-cover border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600" />
+                      <button type="button" onClick={() => setFormData({ ...formData, visual_url: '' })} className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   )}
                   <label className="block">
                     <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleVisualUpload(file); }} className="hidden" disabled={uploadingVisual} />
-                    <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors">
-                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-600">{uploadingVisual ? 'Upload du visuel...' : 'Modifier le visuel'}</span>
+                    <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:border-green-500 dark:hover:bg-green-900/20 transition-colors">
+                      <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm dark-text-muted">{uploadingVisual ? 'Upload du visuel...' : 'Modifier le visuel'}</span>
                     </div>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description rapide</label>
-                  <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Description de l'entreprise et de son activité..." />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Description rapide</label>
+                  <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="Description de l'entreprise et de son activité..." />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Site web (optionnel)</label>
-                  <input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="www.entreprise.com" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Site web (optionnel)</label>
+                  <input type="url" value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="www.entreprise.com" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone (optionnel)</label>
-                  <input type="tel" value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="01 23 45 67 89" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Téléphone (optionnel)</label>
+                  <input type="tel" value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="01 23 45 67 89" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Adresse (optionnelle)</label>
-                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Adresse (optionnelle)</label>
+                  <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
                 </div>
 
-                <div className="flex justify-end space-x-3 pt-4 border-t">
-                  <button type="button" onClick={() => { setShowEditForm(false); setEditingSponsor(null); }} className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <button type="button" onClick={() => { setShowEditForm(false); setEditingSponsor(null); }} className="px-4 py-2 dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
                     Annuler
                   </button>
-                  <button type="submit" disabled={submitting || !formData.name || !formData.contact_email} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <button type="submit" disabled={submitting || !formData.name || !formData.contact_email} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {submitting ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div> : <Send className="h-4 w-4 mr-2" />}
                     {submitting ? 'Mise à jour...' : 'Mettre à jour'}
                   </button>
@@ -758,28 +758,28 @@ ${profile?.first_name} ${profile?.last_name}`;
       {filteredSponsors.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSponsors.map((sponsor) => (
-            <div key={sponsor.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div key={sponsor.id} className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-md transition-shadow">
               {sponsor.visual_url && (
                 <div className="h-48 overflow-hidden">
                   <img src={sponsor.visual_url} alt={`Visuel ${sponsor.name}`} className="w-full h-full object-cover" />
                 </div>
               )}
               
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6 border-b border-gray-100 dark:border-gray-600">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     {sponsor.logo_url ? (
                       <img src={sponsor.logo_url} alt={`Logo ${sponsor.name}`} className="h-12 w-12 object-contain rounded" />
                     ) : (
-                      <div className="h-12 w-12 bg-gray-100 rounded flex items-center justify-center">
-                        <Building2 className="h-6 w-6 text-gray-400" />
+                      <div className="h-12 w-12 bg-gray-100 dark:bg-slate-700 rounded flex items-center justify-center">
+                        <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <h3 className="text-lg font-semibold dark-text flex items-center">
                         {sponsor.name}
                         {!sponsor.is_confirmed && (
-                          <span className="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-600 rounded-full">En attente</span>
+                          <span className="ml-2 px-2 py-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full">En attente</span>
                         )}
                       </h3>
                     </div>
@@ -787,10 +787,10 @@ ${profile?.first_name} ${profile?.last_name}`;
                   
                   {(isSuperAdmin || isClubAdmin) && (
                     <div className="flex space-x-2">
-                      <button onClick={() => openEditForm(sponsor)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Modifier">
+                      <button onClick={() => openEditForm(sponsor)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Modifier">
                         <Edit className="h-4 w-4" />
                       </button>
-                      <button onClick={() => deleteSponsor(sponsor.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
+                      <button onClick={() => deleteSponsor(sponsor.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Supprimer">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -800,34 +800,34 @@ ${profile?.first_name} ${profile?.last_name}`;
 
               <div className="p-6 space-y-4">
                 {sponsor.description && (
-                  <p className="text-gray-600 text-sm leading-relaxed">{sponsor.description}</p>
+                  <p className="dark-text-muted text-sm leading-relaxed">{sponsor.description}</p>
                 )}
 
                 <div className="space-y-2">
                   {sponsor.website && (
-                    <a href={sponsor.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:text-blue-700 text-sm transition-colors">
+                    <a href={sponsor.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm transition-colors">
                       <ExternalLink className="h-4 w-4 mr-2" />Site web
                     </a>
                   )}
                   {sponsor.contact_email && (
-                    <a href={`mailto:${sponsor.contact_email}`} className="flex items-center text-gray-600 hover:text-gray-800 text-sm transition-colors">
+                    <a href={`mailto:${sponsor.contact_email}`} className="flex items-center dark-text-muted hover:text-gray-800 dark:hover:text-gray-300 text-sm transition-colors">
                       <Mail className="h-4 w-4 mr-2" />{sponsor.contact_email}
                     </a>
                   )}
                   {sponsor.contact_phone && (
-                    <a href={`tel:${sponsor.contact_phone}`} className="flex items-center text-gray-600 hover:text-gray-800 text-sm transition-colors">
+                    <a href={`tel:${sponsor.contact_phone}`} className="flex items-center dark-text-muted hover:text-gray-800 dark:hover:text-gray-300 text-sm transition-colors">
                       <Phone className="h-4 w-4 mr-2" />{sponsor.contact_phone}
                     </a>
                   )}
                   {sponsor.address && (
-                    <div className="flex items-center text-gray-600 text-sm">
+                    <div className="flex items-center dark-text-muted text-sm">
                       <MapPin className="h-4 w-4 mr-2" />{sponsor.address}
                     </div>
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-600">
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                     <span>{sponsor.club_id ? 'Sponsor de club' : 'Sponsor d\'association'}</span>
                     <span>Depuis {new Date(sponsor.created_at).getFullYear()}</span>
                   </div>
@@ -838,18 +838,18 @@ ${profile?.first_name} ${profile?.last_name}`;
         </div>
       ) : (
         <div className="text-center py-12">
-          <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Aucun sponsor pour le moment</h2>
-          <p className="text-gray-500 mb-6">
+          <Building2 className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h2 className="text-lg font-semibold dark-text mb-2">Aucun sponsor pour le moment</h2>
+          <p className="dark-text-muted mb-6">
             {(isSuperAdmin || isClubAdmin) ? 'Commencez par ajouter vos premiers sponsors et partenaires.' : 'Aucun sponsor n\'est encore référencé pour votre association.'}
           </p>
           {(isSuperAdmin || isClubAdmin) && (
-            <button onClick={openCreateForm} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button onClick={openCreateForm} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors">
               <Plus className="h-4 w-4 mr-2" />Ajouter le premier sponsor
             </button>
           )}
         </div>
       )}
-    </div> // <!--- CETTE BALISE ÉTAIT MANQUANTE
+    </div>
   );
 }

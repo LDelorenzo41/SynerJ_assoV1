@@ -92,8 +92,8 @@ export default function EquipmentManagement() {
   if (!profile || profile.role !== 'Super Admin') {
     return (
       <div className="text-center py-12">
-        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <p className="text-gray-500">Accès refusé. Seuls les Super Admins peuvent gérer le matériel.</p>
+        <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
+        <p className="dark-text-muted">Accès refusé. Seuls les Super Admins peuvent gérer le matériel.</p>
       </div>
     );
   }
@@ -101,8 +101,8 @@ export default function EquipmentManagement() {
   if (isLoading && items.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Chargement du matériel...</span>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <span className="ml-2 dark-text-muted">Chargement du matériel...</span>
       </div>
     );
   }
@@ -110,49 +110,49 @@ export default function EquipmentManagement() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestion du Matériel</h1>
-        <p className="text-gray-600">Gérez l'inventaire et les réservations de votre association</p>
+        <h1 className="text-3xl font-bold dark-text mb-2">Gestion du Matériel</h1>
+        <p className="dark-text-muted">Gérez l'inventaire et les réservations de votre association</p>
       </div>
 
       {/* Statistiques rapides */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border">
+          <div className="dark-card rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center">
-              <Package className="h-8 w-8 text-blue-600" />
+              <Package className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Items</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total_items}</p>
+                <p className="text-sm font-medium dark-text-muted">Total Items</p>
+                <p className="text-2xl font-bold dark-text">{stats.total_items}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border">
+          <div className="dark-card rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-600" />
+              <Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Demandes en attente</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pending_requests}</p>
+                <p className="text-sm font-medium dark-text-muted">Demandes en attente</p>
+                <p className="text-2xl font-bold dark-text">{stats.pending_requests}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border">
+          <div className="dark-card rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center">
-              <Calendar className="h-8 w-8 text-green-600" />
+              <Calendar className="h-8 w-8 text-green-600 dark:text-green-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Réservations à venir</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.upcoming_reservations}</p>
+                <p className="text-sm font-medium dark-text-muted">Réservations à venir</p>
+                <p className="text-2xl font-bold dark-text">{stats.upcoming_reservations}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border">
+          <div className="dark-card rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-center">
-              <Settings className="h-8 w-8 text-purple-600" />
+              <Settings className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Quantité totale</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total_quantity}</p>
+                <p className="text-sm font-medium dark-text-muted">Quantité totale</p>
+                <p className="text-2xl font-bold dark-text">{stats.total_quantity}</p>
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function EquipmentManagement() {
       )}
 
       {/* Navigation par onglets */}
-      <div className="border-b border-gray-200 mb-8">
+      <div className="border-b border-gray-200 dark:border-gray-600 mb-8">
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'inventory', label: 'Inventaire', icon: Package },
@@ -174,15 +174,15 @@ export default function EquipmentManagement() {
               className={`
                 group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm
                 ${activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent dark-text-muted hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
                 }
               `}
             >
-              <tab.icon className={`mr-2 h-5 w-5 ${activeTab === tab.id ? 'text-blue-500' : 'text-gray-400'}`} />
+              <tab.icon className={`mr-2 h-5 w-5 ${activeTab === tab.id ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
               {tab.label}
               {tab.badge && tab.badge > 0 && (
-                <span className="ml-2 bg-red-100 text-red-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                <span className="ml-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium px-2.5 py-0.5 rounded-full">
                   {tab.badge}
                 </span>
               )}
@@ -282,7 +282,7 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            className="dark-input border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm"
           >
             <option value="all">Toutes les catégories</option>
             {categories.map(category => (
@@ -293,7 +293,7 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            className="dark-input border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm"
           >
             <option value="all">Tous les statuts</option>
             <option value="available">Disponible</option>
@@ -304,7 +304,7 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
 
         <button
           onClick={onAddItem}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Ajouter du matériel
@@ -312,47 +312,51 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
       </div>
 
       {/* Liste du matériel */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="dark-card rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+            <thead className="bg-gray-50 dark:bg-slate-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                   Matériel
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                   Catégorie
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                   Quantité
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                   Statut
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium dark-text-muted uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-700 divide-y divide-gray-200 dark:divide-gray-600">
               {filteredItems.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-slate-600">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                      <div className="text-sm font-medium dark-text">{item.name}</div>
                       {item.description && (
-                        <div className="text-sm text-gray-500">{item.description}</div>
+                        <div className="text-sm dark-text-muted">{item.description}</div>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
                     {item.category}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
                     {item.quantity}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${STATUS_COLORS.equipment[item.status]}`}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      item.status === 'available' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                      item.status === 'maintenance' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                      'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                    }`}>
                       {item.status === 'available' ? 'Disponible' :
                        item.status === 'maintenance' ? 'Maintenance' : 'Cassé'}
                     </span>
@@ -360,13 +364,13 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <button
                       onClick={() => onEditItem(item)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                     >
                       <Edit3 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(item.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -379,30 +383,30 @@ function InventoryTab({ items, onAddItem, onEditItem, onDeleteItem }: InventoryT
 
         {filteredItems.length === 0 && (
           <div className="text-center py-12">
-            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Aucun matériel trouvé</p>
+            <Package className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <p className="dark-text-muted">Aucun matériel trouvé</p>
           </div>
         )}
       </div>
 
       {/* Modal de confirmation de suppression */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirmer la suppression</h3>
-            <p className="text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="dark-card rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold dark-text mb-4">Confirmer la suppression</h3>
+            <p className="dark-text-muted mb-6">
               Êtes-vous sûr de vouloir supprimer cet équipement ? Cette action est irréversible.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-md"
+                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md"
+                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 rounded-md"
               >
                 Supprimer
               </button>
@@ -564,7 +568,7 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
         <select
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          className="dark-input border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm"
         >
           <option value="all">Toutes les demandes</option>
           <option value="pending">En attente</option>
@@ -573,7 +577,7 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
         </select>
         
         {selectedStatus === 'pending' && (
-          <span className="text-sm text-gray-600">
+          <span className="text-sm dark-text-muted">
             {filteredRequests.length} demande(s) en attente de validation
           </span>
         )}
@@ -583,27 +587,27 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
       <div className="space-y-6">
         {filteredRequests.length === 0 ? (
           <div className="text-center py-12">
-            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
+            <Clock className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <p className="dark-text-muted">
               {selectedStatus === 'pending' ? 'Aucune demande en attente' : 'Aucune demande trouvée'}
             </p>
           </div>
         ) : (
           filteredRequests.map((request: any) => (
-            <div key={request.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div key={request.id} className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden">
               {/* En-tête de la demande */}
-              <div className="p-6 border-b bg-gray-50">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-slate-800">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{request.event_name}</h3>
+                    <h3 className="text-xl font-semibold dark-text">{request.event_name}</h3>
                     <div className="mt-2 space-y-1">
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <p className="text-sm dark-text-muted flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         <span className="font-medium">{request.club?.name}</span>
                         <span>•</span>
                         <span>{request.requester?.first_name} {request.requester?.last_name}</span>
                       </p>
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <p className="text-sm dark-text-muted flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
                         Du {new Date(request.start_date).toLocaleDateString('fr-FR', {
                           year: 'numeric',
@@ -613,7 +617,7 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                           minute: '2-digit'
                         })}
                       </p>
-                      <p className="text-sm text-gray-600 ml-6">
+                      <p className="text-sm dark-text-muted ml-6">
                         Au {new Date(request.end_date).toLocaleDateString('fr-FR', {
                           year: 'numeric',
                           month: 'long',
@@ -622,16 +626,16 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                           minute: '2-digit'
                         })}
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         Demandé le {new Date(request.created_at).toLocaleDateString('fr-FR')}
                       </p>
                     </div>
                   </div>
                   
                   <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
-                    request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    request.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                    'bg-red-100 text-red-800'
+                    request.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                    request.status === 'approved' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 
+                    'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                   }`}>
                     {request.status === 'pending' ? 'En attente' :
                      request.status === 'approved' ? 'Approuvée' : 'Rejetée'}
@@ -641,8 +645,8 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
 
               {/* Matériel demandé */}
               {request.request_items && request.request_items.length > 0 && (
-                <div className="p-6 border-b">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-600">
+                  <h4 className="text-lg font-medium dark-text mb-4 flex items-center gap-2">
                     <Package className="h-5 w-5" />
                     Matériel demandé
                   </h4>
@@ -657,32 +661,32 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                           key={ri.id} 
                           className={`flex items-center justify-between p-4 rounded-lg border-2 ${
                             availability?.is_available 
-                              ? 'border-green-200 bg-green-50' 
-                              : availability ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50'
+                              ? 'border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20' 
+                              : availability ? 'border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-slate-800'
                           }`}
                         >
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
                               <div className="flex-1">
-                                <h5 className="font-medium text-gray-900">
+                                <h5 className="font-medium dark-text">
                                   {ri.equipment_item?.name || 'Matériel supprimé'}
                                 </h5>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm dark-text-muted">
                                   {ri.equipment_item?.category}
                                 </p>
                                 {ri.equipment_item?.description && (
-                                  <p className="text-sm text-gray-500 mt-1">
+                                  <p className="text-sm dark-text-muted mt-1">
                                     {ri.equipment_item.description}
                                   </p>
                                 )}
                               </div>
                               
                               <div className="text-right">
-                                <div className="text-lg font-semibold text-gray-900">
+                                <div className="text-lg font-semibold dark-text">
                                   {ri.quantity_requested} demandé(s)
                                 </div>
                                 {availability && (
-                                  <div className={`text-sm ${availability.is_available ? 'text-green-600' : 'text-red-600'}`}>
+                                  <div className={`text-sm ${availability.is_available ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     {availability.available_quantity}/{availability.total_quantity} disponible(s)
                                   </div>
                                 )}
@@ -692,26 +696,26 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                             <div className="mt-3 flex items-center gap-2">
                               {isLoadingThisItem ? (
                                 <>
-                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                  <span className="text-sm text-gray-600">Vérification...</span>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                                  <span className="text-sm dark-text-muted">Vérification...</span>
                                 </>
                               ) : availability ? (
                                 availability.is_available ? (
                                   <>
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm text-green-700 font-medium">Disponible</span>
+                                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    <span className="text-sm text-green-700 dark:text-green-300 font-medium">Disponible</span>
                                   </>
                                 ) : (
                                   <>
-                                    <AlertCircle className="h-4 w-4 text-red-600" />
-                                    <span className="text-sm text-red-700 font-medium">
+                                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                    <span className="text-sm text-red-700 dark:text-red-300 font-medium">
                                       {availability.equipment_status !== 'available' 
                                         ? `Indisponible (${STATUS_LABELS.equipment[availability.equipment_status as keyof typeof STATUS_LABELS.equipment]})`
                                         : 'Quantité insuffisante'
                                       }
                                     </span>
                                     {availability.conflicts.length > 0 && (
-                                      <span className="text-xs text-red-600 ml-2">
+                                      <span className="text-xs text-red-600 dark:text-red-400 ml-2">
                                         (Conflit avec {availability.conflicts.length} réservation(s))
                                       </span>
                                     )}
@@ -726,26 +730,26 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   </div>
                   
                   {request.status === 'pending' && availabilityChecks[request.id] && (
-                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="mt-4 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-center gap-2">
                         {availabilityChecks[request.id].every((item: any) => item.is_available) ? (
                           <>
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="text-sm font-medium text-green-700">
+                            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-medium text-green-700 dark:text-green-300">
                               Tous les équipements sont disponibles
                             </span>
                           </>
                         ) : availabilityChecks[request.id].some((item: any) => item.is_available) ? (
                           <>
-                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                            <span className="text-sm font-medium text-yellow-700">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                            <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
                               Certains équipements sont disponibles (approbation partielle possible)
                             </span>
                           </>
                         ) : (
                           <>
-                            <XCircle className="h-5 w-5 text-red-600" />
-                            <span className="text-sm font-medium text-red-700">
+                            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            <span className="text-sm font-medium text-red-700 dark:text-red-300">
                               Aucun équipement disponible sur cette période
                             </span>
                           </>
@@ -758,18 +762,18 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
               )}
 
               {request.notes && (
-                <div className="p-6 border-b bg-blue-50">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Notes du club :</h4>
-                  <p className="text-sm text-gray-700 italic">"{request.notes}"</p>
+                <div className="p-6 border-b border-gray-200 dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20">
+                  <h4 className="text-sm font-medium dark-text mb-2">Notes du club :</h4>
+                  <p className="text-sm text-gray-700 dark:text-blue-200 italic">"{request.notes}"</p>
                 </div>
               )}
 
               {request.status === 'pending' && (
-                <div className="p-6 bg-gray-50 flex flex-wrap gap-3">
+                <div className="p-6 bg-gray-50 dark:bg-slate-800 flex flex-wrap gap-3">
                   <button
                     onClick={() => handleFullApprove(request)}
                     disabled={processingRequest === request.id}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
                   >
                     <CheckCircle className="h-4 w-4" />
                     {processingRequest === request.id ? 'Approbation...' : 'Approuver tout'}
@@ -778,7 +782,7 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   <button
                     onClick={() => openPartialApproval(request)}
                     disabled={processingRequest === request.id}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
                   >
                     <Edit3 className="h-4 w-4" />
                     Approbation partielle
@@ -787,7 +791,7 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   <button
                     onClick={() => setRejectingRequest(request.id)}
                     disabled={processingRequest === request.id}
-                    className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
+                    className="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 text-white px-6 py-3 rounded-md flex items-center gap-2 font-medium"
                   >
                     <AlertCircle className="h-4 w-4" />
                     Rejeter la demande
@@ -796,9 +800,9 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
               )}
 
               {(request.admin_notes || request.rejected_reason) && (
-                <div className="p-6 border-t bg-yellow-50">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Réponse de l'administrateur :</h4>
-                  <p className="text-sm text-gray-700 italic">
+                <div className="p-6 border-t border-gray-200 dark:border-gray-600 bg-yellow-50 dark:bg-yellow-900/20">
+                  <h4 className="text-sm font-medium dark-text mb-2">Réponse de l'administrateur :</h4>
+                  <p className="text-sm text-gray-700 dark:text-yellow-200 italic">
                     "{request.admin_notes || request.rejected_reason}"
                   </p>
                 </div>
@@ -809,10 +813,10 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
       </div>
 
       {approvingRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Approbation partielle</h3>
-            <p className="text-gray-600 mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="dark-card rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold dark-text mb-4">Approbation partielle</h3>
+            <p className="dark-text-muted mb-4">
               Ajustez les quantités à approuver pour chaque item (0 = non approuvé) :
             </p>
             
@@ -825,26 +829,26 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                 const maxApprovalQuantity = itemAvailability ? Math.min(ri.quantity_requested, itemAvailability.available_quantity) : 0;
                 
                 return (
-                  <div key={ri.id} className="mb-4 p-4 border rounded-lg">
+                  <div key={ri.id} className="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h5 className="font-medium text-gray-900">{ri.equipment_item?.name}</h5>
-                        <p className="text-sm text-gray-600">{ri.equipment_item?.category}</p>
+                        <h5 className="font-medium dark-text">{ri.equipment_item?.name}</h5>
+                        <p className="text-sm dark-text-muted">{ri.equipment_item?.category}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm dark-text-muted">
                           Demandé: {ri.quantity_requested} | Disponible: {itemAvailability?.available_quantity || 0}
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <label className="text-sm font-medium text-gray-700">Quantité à approuver:</label>
+                      <label className="text-sm font-medium dark-text-muted">Quantité à approuver:</label>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => updateApprovalQuantity(ri.equipment_item_id, (approvalItems[ri.equipment_item_id] || 0) - 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 flex items-center justify-center"
                         >
                           <Minus className="h-4 w-4" />
                         </button>
@@ -854,18 +858,18 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                           max={maxApprovalQuantity}
                           value={approvalItems[ri.equipment_item_id] || 0}
                           onChange={(e) => updateApprovalQuantity(ri.equipment_item_id, parseInt(e.target.value) || 0)}
-                          className="w-16 text-center border border-gray-300 rounded px-2 py-1"
+                          className="dark-input w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
                         />
                         <button
                           type="button"
                           onClick={() => updateApprovalQuantity(ri.equipment_item_id, (approvalItems[ri.equipment_item_id] || 0) + 1)}
                           disabled={(approvalItems[ri.equipment_item_id] || 0) >= maxApprovalQuantity}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 disabled:opacity-50 flex items-center justify-center"
                         >
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>
-                      <span className="text-sm text-gray-500">max: {maxApprovalQuantity}</span>
+                      <span className="text-sm dark-text-muted">max: {maxApprovalQuantity}</span>
                     </div>
                   </div>
                 );
@@ -878,14 +882,14 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   setApprovingRequest(null);
                   setApprovalItems({});
                 }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-md"
+                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handlePartialApprove(approvingRequest)}
                 disabled={processingRequest === approvingRequest}
-                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 rounded-md"
+                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 rounded-md"
               >
                 {processingRequest === approvingRequest ? 'Approbation...' : 'Approuver'}
               </button>
@@ -895,17 +899,17 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
       )}
 
       {rejectingRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Rejeter la demande</h3>
-            <p className="text-gray-600 mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="dark-card rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold dark-text mb-4">Rejeter la demande</h3>
+            <p className="dark-text-muted mb-4">
               Veuillez indiquer la raison du rejet de cette demande :
             </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 mb-4"
               placeholder="Raison du rejet..."
             />
             <div className="flex justify-end gap-3">
@@ -914,14 +918,14 @@ function RequestsTab({ requests, onApproveRequest, onRejectRequest, currentUserI
                   setRejectingRequest(null);
                   setRejectReason('');
                 }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-md"
+                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleReject(rejectingRequest)}
                 disabled={!rejectReason.trim() || processingRequest === rejectingRequest}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 rounded-md"
+                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 rounded-md"
               >
                 {processingRequest === rejectingRequest ? 'Rejet...' : 'Confirmer le rejet'}
               </button>
@@ -993,13 +997,13 @@ function CalendarTab({ reservations }: any) {
     const status = getReservationStatus(reservation);
     switch (status) {
       case 'ongoing':
-        return 'border-green-500 bg-green-50';
+        return 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/20';
       case 'upcoming':
-        return 'border-blue-500 bg-blue-50';
+        return 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20';
       case 'past':
-        return 'border-gray-400 bg-gray-50';
+        return 'border-gray-400 dark:border-gray-500 bg-gray-50 dark:bg-slate-800';
       default:
-        return 'border-gray-400 bg-white';
+        return 'border-gray-400 dark:border-gray-500 bg-white dark:bg-slate-700';
     }
   };
 
@@ -1009,19 +1013,19 @@ function CalendarTab({ reservations }: any) {
     switch (status) {
       case 'ongoing':
         return (
-          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
             En cours
           </span>
         );
       case 'upcoming':
         return (
-          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
             À venir
           </span>
         );
       case 'past':
         return (
-          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
             Terminée
           </span>
         );
@@ -1033,17 +1037,17 @@ function CalendarTab({ reservations }: any) {
   return (
     <div className="space-y-6">
       {/* Filtres */}
-      <div className="bg-white rounded-lg shadow-sm border p-4">
+      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <h3 className="text-lg font-semibold text-gray-900">Calendrier des réservations</h3>
+          <h3 className="text-lg font-semibold dark-text">Calendrier des réservations</h3>
           
           <div className="flex gap-2 ml-auto">
             <button
               onClick={() => setFilterStatus('all')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 filterStatus === 'all' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white' 
+                  : 'bg-gray-100 dark:bg-slate-700 dark-text-muted hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Toutes ({reservations.length})
@@ -1052,8 +1056,8 @@ function CalendarTab({ reservations }: any) {
               onClick={() => setFilterStatus('upcoming')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 filterStatus === 'upcoming' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white' 
+                  : 'bg-gray-100 dark:bg-slate-700 dark-text-muted hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               À venir ({reservations.filter((r: any) => getReservationStatus(r) === 'upcoming').length})
@@ -1062,8 +1066,8 @@ function CalendarTab({ reservations }: any) {
               onClick={() => setFilterStatus('ongoing')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 filterStatus === 'ongoing' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white' 
+                  : 'bg-gray-100 dark:bg-slate-700 dark-text-muted hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               En cours ({reservations.filter((r: any) => getReservationStatus(r) === 'ongoing').length})
@@ -1072,8 +1076,8 @@ function CalendarTab({ reservations }: any) {
               onClick={() => setFilterStatus('past')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 filterStatus === 'past' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white' 
+                  : 'bg-gray-100 dark:bg-slate-700 dark-text-muted hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Passées ({reservations.filter((r: any) => getReservationStatus(r) === 'past').length})
@@ -1084,9 +1088,9 @@ function CalendarTab({ reservations }: any) {
 
       {/* Liste des réservations */}
       {sortedReservations.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border p-8">
-          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 text-center">
+        <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-8">
+          <Calendar className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="dark-text-muted text-center">
             {filterStatus === 'all' ? 'Aucune réservation' : `Aucune réservation ${
               filterStatus === 'upcoming' ? 'à venir' : 
               filterStatus === 'ongoing' ? 'en cours' : 
@@ -1113,13 +1117,13 @@ function CalendarTab({ reservations }: any) {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h4 className="text-lg font-semibold text-gray-900">
+                        <h4 className="text-lg font-semibold dark-text">
                           {reservation.event_name}
                         </h4>
                         {getStatusBadge(reservation)}
                       </div>
                       
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-4 text-sm dark-text-muted">
                         <div className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
                           <span>{reservation.club?.name || 'Club non spécifié'}</span>
@@ -1140,7 +1144,7 @@ function CalendarTab({ reservations }: any) {
                               year: 'numeric'
                             })}
                           </span>
-                          <span className="text-gray-500">
+                          <span className="text-gray-500 dark:text-gray-400">
                             ({formatDuration(reservation.start_date, reservation.end_date)})
                           </span>
                         </div>
@@ -1148,7 +1152,7 @@ function CalendarTab({ reservations }: any) {
 
                       {/* Aperçu du matériel réservé */}
                       {reservation.reservation_items && reservation.reservation_items.length > 0 && (
-                        <div className="mt-2 text-sm text-gray-600">
+                        <div className="mt-2 text-sm dark-text-muted">
                           <span className="font-medium">Matériel : </span>
                           {!isExpanded && (
                             <span>
@@ -1169,7 +1173,7 @@ function CalendarTab({ reservations }: any) {
                     
                     <div className="ml-4">
                       <svg 
-                        className={`h-5 w-5 text-gray-500 transform transition-transform duration-200 ${
+                        className={`h-5 w-5 text-gray-500 dark:text-gray-400 transform transition-transform duration-200 ${
                           isExpanded ? 'rotate-180' : ''
                         }`}
                         fill="none" 
@@ -1184,12 +1188,12 @@ function CalendarTab({ reservations }: any) {
 
                 {/* Détails expansibles */}
                 {isExpanded && (
-                  <div className="border-t bg-white p-4 space-y-4">
+                  <div className="border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-700 p-4 space-y-4">
                     {/* Informations temporelles détaillées */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h5 className="text-sm font-medium text-gray-700 mb-1">Date de début</h5>
-                        <p className="text-sm text-gray-900">
+                        <h5 className="text-sm font-medium dark-text-muted mb-1">Date de début</h5>
+                        <p className="text-sm dark-text">
                           {new Date(reservation.start_date).toLocaleDateString('fr-FR', {
                             weekday: 'long',
                             day: 'numeric',
@@ -1205,8 +1209,8 @@ function CalendarTab({ reservations }: any) {
                       </div>
                       
                       <div>
-                        <h5 className="text-sm font-medium text-gray-700 mb-1">Date de fin</h5>
-                        <p className="text-sm text-gray-900">
+                        <h5 className="text-sm font-medium dark-text-muted mb-1">Date de fin</h5>
+                        <p className="text-sm dark-text">
                           {new Date(reservation.end_date).toLocaleDateString('fr-FR', {
                             weekday: 'long',
                             day: 'numeric',
@@ -1225,26 +1229,26 @@ function CalendarTab({ reservations }: any) {
                     {/* Détails du matériel réservé */}
                     {reservation.reservation_items && reservation.reservation_items.length > 0 && (
                       <div>
-                        <h5 className="text-sm font-medium text-gray-700 mb-2">Matériel réservé</h5>
-                        <div className="bg-gray-50 rounded-md p-3">
+                        <h5 className="text-sm font-medium dark-text-muted mb-2">Matériel réservé</h5>
+                        <div className="bg-gray-50 dark:bg-slate-800 rounded-md p-3">
                           <table className="w-full text-sm">
                             <thead>
-                              <tr className="text-left text-gray-600">
+                              <tr className="text-left dark-text-muted">
                                 <th className="pb-2">Équipement</th>
                                 <th className="pb-2">Catégorie</th>
                                 <th className="pb-2 text-right">Quantité</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
                               {reservation.reservation_items.map((item: any) => (
                                 <tr key={item.id}>
-                                  <td className="py-2 font-medium text-gray-900">
+                                  <td className="py-2 font-medium dark-text">
                                     {item.equipment_item?.name || 'Équipement supprimé'}
                                   </td>
-                                  <td className="py-2 text-gray-600">
+                                  <td className="py-2 dark-text-muted">
                                     {item.equipment_item?.category || '-'}
                                   </td>
-                                  <td className="py-2 text-right text-gray-900">
+                                  <td className="py-2 text-right dark-text">
                                     {item.quantity_reserved}
                                   </td>
                                 </tr>
@@ -1258,8 +1262,8 @@ function CalendarTab({ reservations }: any) {
                     {/* Notes */}
                     {reservation.notes && (
                       <div>
-                        <h5 className="text-sm font-medium text-gray-700 mb-1">Notes</h5>
-                        <p className="text-sm text-gray-600 bg-gray-50 rounded-md p-3">
+                        <h5 className="text-sm font-medium dark-text-muted mb-1">Notes</h5>
+                        <p className="text-sm dark-text-muted bg-gray-50 dark:bg-slate-800 rounded-md p-3">
                           {reservation.notes}
                         </p>
                       </div>
@@ -1267,7 +1271,7 @@ function CalendarTab({ reservations }: any) {
 
                     {/* Informations sur l'approbation */}
                     {reservation.approved_by && (
-                      <div className="text-xs text-gray-500 pt-2 border-t">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-600">
                         Approuvée le {new Date(reservation.approved_at).toLocaleDateString('fr-FR')}
                         {reservation.admin_notes && (
                           <p className="mt-1 italic">Note admin : {reservation.admin_notes}</p>
@@ -1287,28 +1291,28 @@ function CalendarTab({ reservations }: any) {
 
 
 function StatsTab({ stats }: any) {
-  if (!stats) return <div>Chargement...</div>;
+  if (!stats) return <div className="dark-text-muted">Chargement...</div>;
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Répartition par statut</h3>
+      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Répartition par statut</h3>
         <div className="space-y-2">
           {Object.entries(stats.items_by_status).map(([status, count]) => (
             <div key={status} className="flex justify-between">
-              <span className="capitalize">{status === 'available' ? 'Disponible' : status}</span>
-              <span>{count as number}</span>
+              <span className="capitalize dark-text-muted">{status === 'available' ? 'Disponible' : status}</span>
+              <span className="dark-text">{count as number}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Répartition par catégorie</h3>
+      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Répartition par catégorie</h3>
         <div className="space-y-2">
           {Object.entries(stats.items_by_category).map(([category, count]) => (
             <div key={category} className="flex justify-between">
-              <span>{category}</span>
-              <span>{count as number}</span>
+              <span className="dark-text-muted">{category}</span>
+              <span className="dark-text">{count as number}</span>
             </div>
           ))}
         </div>
@@ -1349,29 +1353,29 @@ function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Ajouter du matériel</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
+      <div className="dark-card rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold dark-text mb-4">Ajouter du matériel</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom du matériel *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Nom du matériel *</label>
             <input
               type="text"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Catégorie *</label>
             <select
               required
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             >
               <option value="">Sélectionner une catégorie</option>
               {EQUIPMENT_CATEGORIES.map(category => (
@@ -1381,24 +1385,24 @@ function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantité *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Quantité *</label>
             <input
               type="number"
               required
               min="1"
               value={form.quantity}
               onChange={(e) => setForm({ ...form, quantity: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
@@ -1406,14 +1410,14 @@ function AddEquipmentModal({ onClose, onAdd, refresh }: AddEquipmentModalProps) 
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-md"
+              className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 rounded-md"
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 rounded-md"
             >
               {loading ? 'Ajout...' : 'Ajouter'}
             </button>
@@ -1456,29 +1460,29 @@ function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentM
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Modifier le matériel</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
+      <div className="dark-card rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold dark-text mb-4">Modifier le matériel</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom du matériel *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Nom du matériel *</label>
             <input
               type="text"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Catégorie *</label>
             <select
               required
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             >
               {EQUIPMENT_CATEGORIES.map(category => (
                 <option key={category} value={category}>{category}</option>
@@ -1487,24 +1491,24 @@ function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentM
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantité *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Quantité *</label>
             <input
               type="number"
               required
               min="1"
               value={form.quantity}
               onChange={(e) => setForm({ ...form, quantity: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Statut *</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Statut *</label>
             <select
               required
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as any })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             >
               <option value="available">Disponible</option>
               <option value="maintenance">Maintenance</option>
@@ -1513,12 +1517,12 @@ function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentM
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium dark-text-muted mb-1">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
 
@@ -1526,14 +1530,14 @@ function EditEquipmentModal({ item, onClose, onUpdate, refresh }: EditEquipmentM
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-md"
+              className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 rounded-md"
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 rounded-md"
             >
               {loading ? 'Mise à jour...' : 'Mettre à jour'}
             </button>
