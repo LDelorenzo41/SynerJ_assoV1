@@ -467,10 +467,10 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="bg-white shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-900">Paramètres du compte</h1>
-          <p className="text-gray-600 mt-2">
+      <div className="dark-card shadow-sm rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h1 className="text-3xl font-bold dark-text">Paramètres du compte</h1>
+          <p className="dark-text-muted mt-2">
             Gérez vos informations personnelles et paramètres de sécurité
           </p>
         </div>
@@ -478,8 +478,8 @@ export default function Settings() {
         {message && (
           <div className={`mx-6 mt-4 p-4 rounded-lg ${
             message.type === 'success' 
-              ? 'bg-green-100 text-green-700 border border-green-200' 
-              : 'bg-red-100 text-red-700 border border-red-200'
+              ? 'bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
+              : 'bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
           }`}>
             <div className="flex items-center">
               <AlertCircle className="h-5 w-5 mr-2" />
@@ -490,8 +490,8 @@ export default function Settings() {
 
         <div className="p-6 space-y-8">
           {/* Section Photo de Profil */}
-          <div className="border-b border-gray-200 pb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
+            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
               <Camera className="h-5 w-5 mr-2" />
               Photo de profil
             </h2>
@@ -502,35 +502,35 @@ export default function Settings() {
                   <img
                     src={profilePicture}
                     alt="Photo de profil"
-                    className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-200">
-                    <User className="h-8 w-8 text-gray-400" />
+                  <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
+                    <User className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                   </div>
                 )}
                 <button
                   onClick={triggerFileInput}
                   disabled={loading}
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-lg"
                 >
                   <Camera className="h-4 w-4" />
                 </button>
               </div>
               
               <div>
-                <h3 className="font-medium text-gray-900">
+                <h3 className="font-medium dark-text">
                   {profile?.first_name} {profile?.last_name}
                 </h3>
-                <p className="text-sm text-gray-500 mb-2">{profile?.role}</p>
+                <p className="text-sm dark-text-muted mb-2">{profile?.role}</p>
                 <button
                   onClick={triggerFileInput}
                   disabled={loading}
-                  className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                 >
                   {loading ? 'Chargement...' : 'Changer la photo'}
                 </button>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs dark-text-muted mt-1">
                   Formats acceptés: JPG, PNG (max 2MB)
                 </p>
               </div>
@@ -546,15 +546,15 @@ export default function Settings() {
           </div>
 
           {/* Section Informations Personnelles */}
-          <div className="border-b border-gray-200 pb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
+            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
               <User className="h-5 w-5 mr-2" />
               Informations personnelles
             </h2>
             
             <form onSubmit={handleProfileUpdate} className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text-muted mb-2">
                   Prénom
                 </label>
                 <input
@@ -564,13 +564,13 @@ export default function Settings() {
                     ...profileForm,
                     first_name: e.target.value
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Votre prénom"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text-muted mb-2">
                   Nom
                 </label>
                 <input
@@ -580,7 +580,7 @@ export default function Settings() {
                     ...profileForm,
                     last_name: e.target.value
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Votre nom"
                 />
               </div>
@@ -589,7 +589,7 @@ export default function Settings() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center"
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {loading ? 'Sauvegarde...' : 'Sauvegarder les informations'}
@@ -600,22 +600,22 @@ export default function Settings() {
 
           {/* Section Club (uniquement pour les Club Admins) */}
           {profile?.role === 'Club Admin' && clubData && (
-            <div className="border-b border-gray-200 pb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
+              <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
                 <Building2 className="h-5 w-5 mr-2" />
                 Paramètres du club
               </h2>
               
-              <div className="bg-green-50 p-4 rounded-lg mb-6">
-                <h3 className="font-medium text-green-900 mb-2">{clubData.name}</h3>
-                <p className="text-sm text-green-700">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-green-900 dark:text-green-400 mb-2">{clubData.name}</h3>
+                <p className="text-sm text-green-700 dark:text-green-300">
                   Vous êtes administrateur de ce club. Vous pouvez modifier les informations de contact et le logo.
                 </p>
               </div>
 
               {/* Logo du club */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-lg font-semibold dark-text mb-4 flex items-center">
                   <Camera className="h-5 w-5 mr-2" />
                   Logo du club
                 </h3>
@@ -626,35 +626,35 @@ export default function Settings() {
                       <img
                         src={clubData.logo_url}
                         alt={`Logo ${clubData.name}`}
-                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200"
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200 dark:border-gray-600"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center border-4 border-gray-200">
-                        <Building2 className="h-8 w-8 text-gray-400" />
+                      <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
+                        <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <button
                       onClick={() => clubLogoInputRef.current?.click()}
                       disabled={clubLoading}
-                      className="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors shadow-lg"
+                      className="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors shadow-lg"
                     >
                       <Camera className="h-4 w-4" />
                     </button>
                   </div>
                   
                   <div>
-                    <h4 className="font-medium text-gray-900">Logo du club</h4>
-                    <p className="text-sm text-gray-500 mb-2">
+                    <h4 className="font-medium dark-text">Logo du club</h4>
+                    <p className="text-sm dark-text-muted mb-2">
                       {clubData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
                     </p>
                     <button
                       onClick={() => clubLogoInputRef.current?.click()}
                       disabled={clubLoading}
-                      className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                     >
                       {clubLoading ? 'Chargement...' : 'Changer le logo'}
                     </button>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs dark-text-muted mt-1">
                       Formats acceptés: JPG, PNG (max 2MB)
                     </p>
                   </div>
@@ -671,7 +671,7 @@ export default function Settings() {
               
               <form onSubmit={handleClubUpdate} className="space-y-6 max-w-md">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium dark-text-muted mb-2">
                     Email de contact du club
                   </label>
                   <input
@@ -681,17 +681,17 @@ export default function Settings() {
                       ...clubForm,
                       contact_email: e.target.value
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
                     placeholder="contact@club.com"
                   />
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm dark-text-muted">
                     Cet email sera affiché aux membres et followers pour vous contacter. 
                     Laissez vide si vous ne souhaitez pas afficher d'email de contact.
                   </p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium dark-text-muted mb-2">
                     Site web du club
                   </label>
                   <input
@@ -701,10 +701,10 @@ export default function Settings() {
                       ...clubForm,
                       website_url: e.target.value
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
                     placeholder="https://www.monclub.com"
                   />
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm dark-text-muted">
                     URL complète du site web du club (optionnel). Sera affichée aux membres et followers.
                   </p>
                 </div>
@@ -712,7 +712,7 @@ export default function Settings() {
                 <button
                   type="submit"
                   disabled={clubLoading}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center"
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 transition-colors flex items-center"
                 >
                   <Globe className="h-4 w-4 mr-2" />
                   {clubLoading ? 'Sauvegarde...' : 'Mettre à jour les informations'}
@@ -723,22 +723,22 @@ export default function Settings() {
 
           {/* Section Association (uniquement pour les Super Admins) */}
           {profile?.role === 'Super Admin' && associationData && (
-            <div className="border-b border-gray-200 pb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
+              <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
                 <Building2 className="h-5 w-5 mr-2" />
                 Paramètres de l'association
               </h2>
               
-              <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <h3 className="font-medium text-blue-900 mb-2">{associationData.name}</h3>
-                <p className="text-sm text-blue-700">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-blue-900 dark:text-blue-400 mb-2">{associationData.name}</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
                   Vous êtes super administrateur de cette association. Vous pouvez modifier le logo.
                 </p>
               </div>
 
               {/* Logo de l'association */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="text-lg font-semibold dark-text mb-4 flex items-center">
                   <Camera className="h-5 w-5 mr-2" />
                   Logo de l'association
                 </h3>
@@ -749,35 +749,35 @@ export default function Settings() {
                       <img
                         src={associationData.logo_url}
                         alt={`Logo ${associationData.name}`}
-                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200"
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200 dark:border-gray-600"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center border-4 border-gray-200">
-                        <Building2 className="h-8 w-8 text-gray-400" />
+                      <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
+                        <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <button
                       onClick={() => associationLogoInputRef.current?.click()}
                       disabled={associationLoading}
-                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-lg"
                     >
                       <Camera className="h-4 w-4" />
                     </button>
                   </div>
                   
                   <div>
-                    <h4 className="font-medium text-gray-900">Logo de l'association</h4>
-                    <p className="text-sm text-gray-500 mb-2">
+                    <h4 className="font-medium dark-text">Logo de l'association</h4>
+                    <p className="text-sm dark-text-muted mb-2">
                       {associationData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
                     </p>
                     <button
                       onClick={() => associationLogoInputRef.current?.click()}
                       disabled={associationLoading}
-                      className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                     >
                       {associationLoading ? 'Chargement...' : 'Changer le logo'}
                     </button>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs dark-text-muted mt-1">
                       Formats acceptés: JPG, PNG (max 2MB)
                     </p>
                   </div>
@@ -796,14 +796,14 @@ export default function Settings() {
 
           {/* Section Changement de Mot de Passe */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
               <Lock className="h-5 w-5 mr-2" />
               Changer le mot de passe
             </h2>
             
             <form onSubmit={handlePasswordChange} className="space-y-6 max-w-md">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text-muted mb-2">
                   Nouveau mot de passe
                 </label>
                 <input
@@ -814,13 +814,13 @@ export default function Settings() {
                     ...passwordForm,
                     newPassword: e.target.value
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Nouveau mot de passe"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark-text-muted mb-2">
                   Confirmer le nouveau mot de passe
                 </label>
                 <input
@@ -831,7 +831,7 @@ export default function Settings() {
                     ...passwordForm,
                     confirmPassword: e.target.value
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Confirmer le mot de passe"
                 />
               </div>
@@ -839,13 +839,13 @@ export default function Settings() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
               >
                 <Lock className="h-4 w-4 mr-2" />
                 {loading ? 'Changement...' : 'Changer le mot de passe'}
               </button>
               
-              <div className="text-sm text-gray-500">
+              <div className="text-sm dark-text-muted">
                 <p>Le mot de passe doit contenir au moins :</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
                   <li>8 caractères minimum</li>

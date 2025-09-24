@@ -181,21 +181,21 @@ export default function SponsorEdit() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen dark-bg flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+      <div className="min-h-screen dark-bg flex items-center justify-center">
+        <div className="max-w-md w-full dark-card rounded-lg shadow-md p-8">
           <div className="flex items-center justify-center mb-4">
-            <AlertCircle className="h-16 w-16 text-red-500" />
+            <AlertCircle className="h-16 w-16 text-red-500 dark:text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-900 mb-4">Lien invalide</h1>
-          <p className="text-gray-600 text-center">{error}</p>
+          <h1 className="text-2xl font-bold text-center dark-text mb-4">Lien invalide</h1>
+          <p className="dark-text-muted text-center">{error}</p>
         </div>
       </div>
     );
@@ -203,17 +203,17 @@ export default function SponsorEdit() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+      <div className="min-h-screen dark-bg flex items-center justify-center">
+        <div className="max-w-md w-full dark-card rounded-lg shadow-md p-8">
           <div className="flex items-center justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-green-500" />
+            <CheckCircle className="h-16 w-16 text-green-500 dark:text-green-400" />
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-900 mb-4">Profil mis à jour !</h1>
-          <p className="text-gray-600 text-center mb-6">
+          <h1 className="text-2xl font-bold text-center dark-text mb-4">Profil mis à jour !</h1>
+          <p className="dark-text-muted text-center mb-6">
             Vos informations ont été mises à jour avec succès. Merci pour votre partenariat !
           </p>
           <div className="text-center">
-            <p className="text-sm text-gray-500">Vous pouvez fermer cette page.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Vous pouvez fermer cette page.</p>
           </div>
         </div>
       </div>
@@ -221,16 +221,16 @@ export default function SponsorEdit() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen dark-bg py-8">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="dark-card rounded-lg shadow-md overflow-hidden">
           {/* Header */}
-          <div className="bg-blue-600 px-6 py-4">
+          <div className="bg-blue-600 dark:bg-blue-700 px-6 py-4">
             <h1 className="text-2xl font-bold text-white flex items-center">
               <Building2 className="h-6 w-6 mr-2" />
               Compléter mon profil sponsor
             </h1>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
               Mettez à jour vos informations pour finaliser votre profil
             </p>
           </div>
@@ -238,7 +238,7 @@ export default function SponsorEdit() {
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Nom de l'entreprise *
               </label>
               <input
@@ -246,12 +246,12 @@ export default function SponsorEdit() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Email de contact *
               </label>
               <input
@@ -259,12 +259,12 @@ export default function SponsorEdit() {
                 required
                 value={formData.contact_email}
                 onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Logo de l'entreprise
               </label>
               {formData.logo_url && (
@@ -272,12 +272,12 @@ export default function SponsorEdit() {
                   <img 
                     src={formData.logo_url} 
                     alt="Logo" 
-                    className="w-32 h-32 object-contain border rounded-lg bg-gray-50"
+                    className="w-32 h-32 object-contain border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600"
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, logo_url: '' })}
-                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -294,9 +294,9 @@ export default function SponsorEdit() {
                   className="hidden"
                   disabled={uploadingLogo}
                 />
-                <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 transition-colors">
+                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm dark-text-muted">
                     {uploadingLogo ? 'Upload du logo...' : 'Télécharger un logo'}
                   </span>
                 </div>
@@ -304,7 +304,7 @@ export default function SponsorEdit() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Visuel promotionnel
               </label>
               {formData.visual_url && (
@@ -312,12 +312,12 @@ export default function SponsorEdit() {
                   <img 
                     src={formData.visual_url} 
                     alt="Visuel" 
-                    className="w-full h-32 object-cover border rounded-lg bg-gray-50"
+                    className="w-full h-32 object-cover border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600"
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, visual_url: '' })}
-                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -334,9 +334,9 @@ export default function SponsorEdit() {
                   className="hidden"
                   disabled={uploadingVisual}
                 />
-                <div className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors">
-                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:border-green-500 dark:hover:bg-green-900/20 transition-colors">
+                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm dark-text-muted">
                     {uploadingVisual ? 'Upload du visuel...' : 'Télécharger un visuel'}
                   </span>
                 </div>
@@ -344,62 +344,62 @@ export default function SponsorEdit() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Description de l'entreprise
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="Décrivez votre entreprise et vos services..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Site web
               </label>
               <input
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="https://www.votre-site.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Téléphone
               </label>
               <input
                 type="tel"
                 value={formData.contact_phone}
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="01 23 45 67 89"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium dark-text-muted mb-2">
                 Adresse
               </label>
               <input
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="123 Rue de la Paix, 75001 Paris"
               />
             </div>
 
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
