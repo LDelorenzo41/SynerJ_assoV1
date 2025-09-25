@@ -14,6 +14,7 @@
     "@netlify/functions": "^4.2.5",
     "@supabase/supabase-js": "^2.57.2",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.21",
     "google-auth-library": "^10.3.0",
     "lucide-react": "^0.344.0",
     "openai": "^5.22.0",

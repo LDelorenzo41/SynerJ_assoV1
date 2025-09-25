@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
+// ============================================
+// IMPORT AJOUTÉ
+// ============================================
+import { NotificationService } from '../services/notificationService';
 import { 
   Calendar, 
   Plus, 
@@ -393,6 +397,9 @@ if (clubId) {
     setAiSuggestion(null);
   };
 
+  // ============================================
+  // FONCTION handleSubmit MODIFIÉE
+  // ============================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -400,28 +407,99 @@ if (clubId) {
       alert('You must be associated with a club to create events');
       return;
     }
-
+  
     try {
       const eventData = {
         ...eventForm,
         club_id: profile!.club_id,
       };
-
+  
+      let createdEventId: string | null = null;
+  
       if (editingEvent) {
         const { error } = await supabase
           .from('events')
           .update(eventData)
           .eq('id', editingEvent.id);
-
+  
         if (error) throw error;
+        createdEventId = editingEvent.id;
       } else {
-        const { error } = await supabase
+        // ========== MODIFICATION ICI : Récupérer l'ID de l'événement créé ==========
+        const { data: newEvent, error } = await supabase
           .from('events')
-          .insert([eventData]);
-
+          .insert([eventData])
+          .select()
+          .single();
+  
         if (error) throw error;
+        createdEventId = newEvent.id;
+  
+        // ========== NOUVEAU : Notifier selon la visibilité de l'événement ==========
+        if (createdEventId && profile?.club_id) {
+          try {
+            let recipientIds: string[] = [];
+  
+            if (eventData.visibility === 'Public') {
+              // ÉVÉNEMENT PUBLIC : Notifier tous les followers du club
+              const { data: followers, error: followersError } = await supabase
+                .from('user_clubs')
+                .select('user_id')
+                .eq('club_id', profile.club_id);
+  
+              if (followersError) {
+                console.error('Error fetching followers:', followersError);
+              } else if (followers && followers.length > 0) {
+                recipientIds = followers.map(f => f.user_id);
+                console.log(`📢 Événement PUBLIC : ${recipientIds.length} follower(s) seront notifiés`);
+              }
+            } else {
+              // ÉVÉNEMENT PRIVÉ : Notifier seulement les membres effectifs du club
+              const { data: members, error: membersError } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('club_id', profile.club_id)
+                .in('role', ['Member', 'Club Admin']);
+  
+              if (membersError) {
+                console.error('Error fetching club members:', membersError);
+              } else if (members && members.length > 0) {
+                recipientIds = members.map(m => m.id);
+                console.log(`🔒 Événement PRIVÉ : ${recipientIds.length} membre(s) seront notifiés`);
+              }
+            }
+  
+            // Envoyer les notifications si on a des destinataires
+            if (recipientIds.length > 0) {
+              // Récupérer les infos du club pour le message
+              const { data: clubInfo, error: clubError } = await supabase
+                .from('clubs')
+                .select('name')
+                .eq('id', profile.club_id)
+                .single();
+  
+              if (!clubError && clubInfo) {
+                await NotificationService.notifyNewEvent(
+                  recipientIds,
+                  eventData.name,
+                  createdEventId,
+                  eventData.date,
+                  clubInfo.name
+                );
+  
+                console.log(`✅ Notifications envoyées pour l'événement "${eventData.name}" (${eventData.visibility})`);
+              }
+            } else {
+              console.log(`ℹ️ Aucun destinataire trouvé pour l'événement "${eventData.name}"`);
+            }
+          } catch (notificationError) {
+            console.error('Error sending notifications:', notificationError);
+            // Ne pas faire échouer la création d'événement si les notifications échouent
+          }
+        }
+        // ============================================================================
       }
-
+  
       setEventForm({
         name: '',
         description: '',
@@ -433,6 +511,12 @@ if (clubId) {
       setShowForm(false);
       setEditingEvent(null);
       fetchEvents();
+      
+      // Message de confirmation avec info notifications
+      if (!editingEvent && createdEventId) {
+        console.log('✅ Événement créé et notifications envoyées !');
+      }
+      
     } catch (error: any) {
       console.error('Error saving event:', error);
       alert('Error saving event: ' + error.message);
