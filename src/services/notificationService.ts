@@ -162,17 +162,10 @@ export class NotificationService {
     };
 
     data?.forEach(notification => {
-      // ======================= CORRECTION APPLIQUÉE ICI =======================
-      // On ajoute la condition `isValidNotificationType(notification.type)`.
-      // 1. Elle garantit que nous n'exécutons le code que pour des types valides.
-      // 2. Elle informe TypeScript qu'à l'intérieur de ce `if`, `notification.type`
-      //    est bien de type `NotificationType`, ce qui résout l'erreur.
       if (!notification.is_read && isValidNotificationType(notification.type)) {
         counts.total++;
-        // Cette ligne est maintenant considérée comme sûre par TypeScript.
         counts.by_type[notification.type] = (counts.by_type[notification.type] || 0) + 1;
       }
-      // ========================================================================
     });
 
     return counts;
@@ -267,6 +260,49 @@ export class NotificationService {
     if (error) {
       console.error('Error deleting old notifications:', error);
       throw new Error(`Impossible de supprimer les anciennes notifications: ${error.message}`);
+    }
+
+    return data?.length || 0;
+  }
+  
+  // ============================================
+  // MÉTHODES AJOUTÉES
+  // ============================================
+
+  /**
+   * Supprimer toutes les notifications d'un type pour un utilisateur
+   */
+  static async deleteNotificationsByType(userId: string, type: NotificationType): Promise<number> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId)
+      .eq('type', type)
+      .eq('is_read', false) // Note: La consigne indique `is_read`, mais logiquement on supprime aussi les lues. A adapter si besoin.
+      .select('id');
+
+    if (error) {
+      console.error('Error deleting notifications by type:', error);
+      throw new Error(`Impossible de supprimer les notifications: ${error.message}`);
+    }
+
+    return data?.length || 0;
+  }
+
+  /**
+   * Nettoyer les notifications d'un événement supprimé
+   */
+  static async cleanupEventNotifications(eventId: string): Promise<number> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('type', 'nouvel_event')
+      .eq('metadata->>event_id', eventId)
+      .select('id');
+
+    if (error) {
+      console.error('Error cleaning up event notifications:', error);
+      return 0; // Retourne 0 en cas d'erreur pour ne pas bloquer le flux
     }
 
     return data?.length || 0;
