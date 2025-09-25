@@ -324,17 +324,22 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
     return () => clearInterval(interval);
   }, [loadBadges]);
 
+  // ============================================
+  // FONCTION markTypeAsRead MODIFIÉE
+  // ============================================
   const markTypeAsRead = useCallback(async (type: NotificationType) => {
     if (!profile?.id) return;
     
     try {
-      await NotificationService.markAllAsReadByType(profile.id, type);
+      await NotificationService.deleteNotificationsByType(profile.id, type);
       
-      // Mise à jour optimiste
+      // Mise à jour immédiate de l'interface
+      const currentCount = badges[type];
       setBadges(prev => ({ ...prev, [type]: 0 }));
-      setTotalUnread(prev => Math.max(0, prev - badges[type]));
+      setTotalUnread(prev => Math.max(0, prev - currentCount));
+      
     } catch (err) {
-      console.error('Error marking type as read:', err);
+      console.error('Error deleting notifications:', err);
     }
   }, [profile?.id, badges]);
 

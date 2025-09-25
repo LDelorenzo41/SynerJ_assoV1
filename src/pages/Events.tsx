@@ -397,9 +397,6 @@ if (clubId) {
     setAiSuggestion(null);
   };
 
-  // ============================================
-  // FONCTION handleSubmit MODIFIÉE
-  // ============================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -425,7 +422,6 @@ if (clubId) {
         if (error) throw error;
         createdEventId = editingEvent.id;
       } else {
-        // ========== MODIFICATION ICI : Récupérer l'ID de l'événement créé ==========
         const { data: newEvent, error } = await supabase
           .from('events')
           .insert([eventData])
@@ -435,13 +431,11 @@ if (clubId) {
         if (error) throw error;
         createdEventId = newEvent.id;
   
-        // ========== NOUVEAU : Notifier selon la visibilité de l'événement ==========
         if (createdEventId && profile?.club_id) {
           try {
             let recipientIds: string[] = [];
   
             if (eventData.visibility === 'Public') {
-              // ÉVÉNEMENT PUBLIC : Notifier tous les followers du club
               const { data: followers, error: followersError } = await supabase
                 .from('user_clubs')
                 .select('user_id')
@@ -454,7 +448,6 @@ if (clubId) {
                 console.log(`📢 Événement PUBLIC : ${recipientIds.length} follower(s) seront notifiés`);
               }
             } else {
-              // ÉVÉNEMENT PRIVÉ : Notifier seulement les membres effectifs du club
               const { data: members, error: membersError } = await supabase
                 .from('profiles')
                 .select('id')
@@ -469,9 +462,7 @@ if (clubId) {
               }
             }
   
-            // Envoyer les notifications si on a des destinataires
             if (recipientIds.length > 0) {
-              // Récupérer les infos du club pour le message
               const { data: clubInfo, error: clubError } = await supabase
                 .from('clubs')
                 .select('name')
@@ -494,10 +485,8 @@ if (clubId) {
             }
           } catch (notificationError) {
             console.error('Error sending notifications:', notificationError);
-            // Ne pas faire échouer la création d'événement si les notifications échouent
           }
         }
-        // ============================================================================
       }
   
       setEventForm({
@@ -512,7 +501,6 @@ if (clubId) {
       setEditingEvent(null);
       fetchEvents();
       
-      // Message de confirmation avec info notifications
       if (!editingEvent && createdEventId) {
         console.log('✅ Événement créé et notifications envoyées !');
       }
@@ -536,22 +524,27 @@ if (clubId) {
     setShowForm(true);
   };
 
+  // ============================================
+  // FONCTION handleDelete MODIFIÉE
+  // ============================================
   const handleDelete = async (eventId: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return;
+  if (!confirm('Are you sure you want to delete this event?')) return;
 
-    try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', eventId);
+  try {
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId);
 
-      if (error) throw error;
-      fetchEvents();
-    } catch (error: any) {
-      console.error('Error deleting event:', error);
-      alert('Error deleting event: ' + error.message);
-    }
-  };
+    if (error) throw error;
+    
+    fetchEvents();
+    
+  } catch (error: any) {
+    console.error('Error deleting event:', error);
+    alert('Error deleting event: ' + error.message);
+  }
+};
 
   const canManageEvent = (event: Event) => {
     return isClubAdmin && event.club_id === profile?.club_id;
