@@ -744,7 +744,7 @@ export class EquipmentService {
           reservation_request:reservation_requests!inner(status, created_at),
           equipment_item:equipment_items!inner(name, category)
         `)
-        .neq('reservation_request.club_id', null);
+        .in('reservation_request.club_id', clubIdList);
 
       const equipmentStats: Record<string, {
         equipment_id: string;
@@ -775,7 +775,36 @@ export class EquipmentService {
           equipmentStats[equipId].times_reserved++;
         }
       });
-  
+      // AJOUTEZ LE NOUVEAU BLOC ICI (après la ligne 778)
+      // Récupérer et traiter les réservations approuvées (vos 8 réservations)
+      const { data: reservationItems } = await supabase
+        .from('reservation_items')
+        .select(`
+          equipment_item_id,
+          quantity_reserved,
+          equipment_reservation:equipment_reservations!inner(created_at),
+          equipment_item:equipment_items!inner(name, category)
+        ` )
+        .in('equipment_reservation.club_id', clubIdList);
+
+      reservationItems?.forEach((item: any) => {
+        const equipId = item.equipment_item_id;
+        if (!equipmentStats[equipId]) {
+          equipmentStats[equipId] = {
+            equipment_id: equipId,
+            equipment_name: item.equipment_item.name,
+            category: item.equipment_item.category,
+            times_requested: 0,
+            times_reserved: 0,
+            total_quantity_requested: 0
+      };
+    }
+    
+    // Compter comme demandé ET réservé
+    equipmentStats[equipId].times_requested++;
+    equipmentStats[equipId].times_reserved++;
+    equipmentStats[equipId].total_quantity_requested += item.quantity_reserved;
+  });
       const mostPopular: EquipmentStatData[] = Object.values(equipmentStats)
         .map((item) => ({
           ...item,

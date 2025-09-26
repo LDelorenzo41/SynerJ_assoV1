@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../../hooks/useAuthNew';
 import { useEquipmentManagement } from '../../hooks/useEquipment';
+import { AdvancedStatsTab } from './AdvancedStatsTab';
 import { 
   Plus,
   Minus, 
@@ -220,7 +221,7 @@ export default function EquipmentManagement() {
       )}
 
       {activeTab === 'stats' && (
-        <StatsTab stats={stats} items={items} />
+        <AdvancedStatsTab associationId={profile?.association_id || ''} />
       )}
 
       {/* Modals */}
