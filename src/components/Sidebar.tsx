@@ -71,23 +71,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return relevantTypes.reduce((total, type) => total + badges[type], 0);
   };
 
-  // ============ FONCTION DE GESTION CLIC (NOUVELLE) ============
-  // Marque les notifications comme lues quand on navigue
+  // ============================================
+  // FONCTION handleNavItemClick MODIFIÉE AVEC LOGS
+  // ============================================
   const handleNavItemClick = (itemPath: string) => {
+    console.log('🔍 Navigation vers:', itemPath); // LOG AJOUTÉ
+  
     const pathNotificationMap: Record<string, Array<keyof typeof badges>> = {
       '/clubs': ['nouveau_club'],
       '/events': ['nouvel_event'],
       '/equipment-management': ['demande_materiel'],
       '/equipment-reservation': ['reponse_materiel']
     };
-
+  
     const relevantTypes = pathNotificationMap[itemPath] || [];
+    console.log('🔍 Types de notification concernés:', relevantTypes); // LOG AJOUTÉ
+    console.log('🔍 Badges actuels:', badges); // LOG AJOUTÉ
+  
     relevantTypes.forEach(type => {
       if (badges[type] > 0) {
+        console.log(`🔍 Suppression des notifications de type: ${type}`); // LOG AJOUTÉ
         markTypeAsRead(type);
+      } else {
+        console.log(`🔍 Pas de notification de type ${type} à supprimer`); // LOG AJOUTÉ
       }
     });
-
+  
     // Fermer la sidebar mobile après navigation (LOGIQUE EXISTANTE)
     if (window.innerWidth < 1024) {
       onToggle();

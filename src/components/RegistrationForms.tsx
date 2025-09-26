@@ -14,6 +14,7 @@ import {
   Zap
 } from 'lucide-react';
 import ProfilePictureUpload from './ProfilePictureUpload';
+import { NotificationService } from '../services/notificationService';
 
 type FormType = 'association' | 'club' | 'user' | null;
 type SubscriptionPlan = '1-4' | '5-10' | '11-15' | '16-25' | '25+';
@@ -513,6 +514,73 @@ export default function RegistrationForms() {
       if (profileError) throw profileError;
 
       console.log('=== CRÉATION CLUB TERMINÉE ===');
+
+      // NOUVEAU : Notifier le Super Admin ET tous les followers/supporters de l'association
+      try {
+        console.log('=== DÉBUT NOTIFICATIONS CRÉATION CLUB ===');
+        
+        // 1. Récupérer le Super Admin de l'association
+        const { data: superAdmin, error: superAdminError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('association_id', association.id)
+          .eq('role', 'Super Admin')
+          .single();
+
+        // 2. Récupérer tous les supporters et members de l'association (peu importe leur club)
+        const { data: followers, error: followersError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('association_id', association.id)
+          .in('role', ['Supporter', 'Member']); // TOUS les Supporters et Members de l'association
+
+        console.log('Super Admin trouvé:', superAdmin?.id);
+        console.log('Followers trouvés:', followers?.length || 0);
+
+        // 3. Préparer la liste des destinataires
+        const recipients = [];
+        
+        if (superAdmin && !superAdminError) {
+          recipients.push(superAdmin.id);
+        } else {
+          console.warn('⚠️ Aucun Super Admin trouvé pour l\'association:', association.id);
+        }
+
+        if (followers && !followersError) {
+          recipients.push(...followers.map(f => f.id));
+        } else if (followersError) {
+          console.warn('⚠️ Erreur lors de la récupération des followers:', followersError);
+        }
+
+        console.log('Total destinataires:', recipients.length);
+
+        // 4. Envoyer les notifications à tous les destinataires
+        if (recipients.length > 0) {
+          // Créer les notifications pour tous en une seule fois
+          const notifications = recipients.map(userId => ({
+            user_id: userId,
+            type: 'nouveau_club' as const,
+            title: 'Nouveau club créé',
+            message: `Le club "${club.name}" vient d'être créé dans votre association.`,
+            metadata: {
+              club_id: club.id,
+              club_name: club.name,
+              association_id: association.id
+            }
+          }));
+
+          await NotificationService.createBulkNotifications(notifications);
+          console.log(`✅ ${notifications.length} notifications envoyées pour le club "${club.name}"`);
+        } else {
+          console.warn('⚠️ Aucun destinataire trouvé pour les notifications');
+        }
+        
+      } catch (notificationError) {
+        console.error('Erreur lors de l\'envoi des notifications:', notificationError);
+        // Ne pas faire échouer la création du club si les notifications échouent
+      }
+
+      console.log('=== FIN NOTIFICATIONS CRÉATION CLUB ===');
 
       setMessage({
         type: 'success',

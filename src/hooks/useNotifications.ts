@@ -1,6 +1,4 @@
-// ============================================
-// HOOK REACT - NOTIFICATIONS
-// Fichier : src/hooks/useNotifications.ts
+// src/hooks/useNotifications.ts
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
@@ -325,21 +323,25 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
   }, [loadBadges]);
 
   // ============================================
-  // FONCTION markTypeAsRead MODIFIÉE
+  // FONCTION markTypeAsRead MODIFIÉE AVEC LOGS
   // ============================================
   const markTypeAsRead = useCallback(async (type: NotificationType) => {
     if (!profile?.id) return;
     
+    console.log(`🔍 markTypeAsRead appelé pour type: ${type}, userId: ${profile.id}`); // LOG AJOUTÉ
+    
     try {
-      await NotificationService.deleteNotificationsByType(profile.id, type);
+      const deletedCount = await NotificationService.deleteNotificationsByType(profile.id, type);
+      console.log(`🔍 ${deletedCount} notifications supprimées de type ${type}`); // LOG AJOUTÉ
       
       // Mise à jour immédiate de l'interface
       const currentCount = badges[type];
       setBadges(prev => ({ ...prev, [type]: 0 }));
       setTotalUnread(prev => Math.max(0, prev - currentCount));
+      console.log(`🔍 Badge mis à jour: ${type} -> 0`); // LOG AJOUTÉ
       
     } catch (err) {
-      console.error('Error deleting notifications:', err);
+      console.error(`🔍 Error deleting notifications de type ${type}:`, err); // LOG AMÉLIORÉ
     }
   }, [profile?.id, badges]);
 
