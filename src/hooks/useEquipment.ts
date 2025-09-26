@@ -13,6 +13,8 @@ import type {
   RequestItemAvailability,
   PeriodAvailability,
 } from '../types/equipment';
+import { NotificationService } from '../services/notificationService';
+import { supabase } from '../lib/supabase';
 
 // ============ HOOK POUR LA GESTION DU MATÉRIEL ============
 
@@ -140,25 +142,70 @@ export function useReservationRequests(filters: {
     adminNotes?: string,
     rejectedReason?: string
   ) => {
+    console.log('🔧 updateRequestStatus appelé avec:', { requestId, status, adminNotes, rejectedReason });
     try {
-      await EquipmentService.updateReservationRequestStatus(
+      // 1. Récupérer les informations de la demande AVANT mise à jour
+      const { data: requestInfo, error: requestInfoError } = await supabase
+        .from('reservation_requests')
+        .select(`
+          *,
+          club:clubs(id, name, association_id),
+          requester:profiles(id, first_name, last_name)
+        `)
+        .eq('id', requestId)
+        .single();
+
+      if (requestInfoError) throw requestInfoError;
+
+      // 2. Mettre à jour le statut
+      const updatedRequest = await EquipmentService.updateReservationRequestStatus(
         requestId,
         status,
         adminNotes,
         rejectedReason
       );
-      setRequests(prev =>
-        prev.map(req =>
-          req.id === requestId
-            ? { 
-                ...req, 
-                status, 
-                admin_notes: adminNotes || req.admin_notes, 
-                rejected_reason: rejectedReason || req.rejected_reason 
-              }
-            : req
-        )
-      );
+      
+      // 3. Mettre à jour l'état local
+      setRequests(prev => prev.map(req => 
+        req.id === requestId ? { ...req, ...updatedRequest } : req
+      ));
+
+      // 4. NOUVEAU : Envoyer la notification au Club Admin
+      try {
+        console.log('=== DÉBUT NOTIFICATION RÉPONSE MATÉRIEL ===');
+        
+        if (requestInfo?.club?.association_id) {
+          // Récupérer le Club Admin du club concerné
+          const { data: clubAdmin, error: clubAdminError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('club_id', requestInfo.club.id)
+            .eq('role', 'Club Admin')
+            .single();
+
+          if (!clubAdminError && clubAdmin) {
+            // Envoyer la notification
+            await NotificationService.notifyMaterialResponse(
+              clubAdmin.id,
+              requestId,
+              status,
+              requestInfo.event_name,
+              adminNotes
+            );
+            
+            console.log(`✅ Notification envoyée au Club Admin pour la réponse de matériel (${status})`);
+          } else {
+            console.warn('⚠️ Aucun Club Admin trouvé pour le club:', requestInfo.club.id);
+          }
+        }
+      } catch (notificationError) {
+        console.error('Erreur lors de l\'envoi de la notification:', notificationError);
+        // Ne pas faire échouer la mise à jour si la notification échoue
+      }
+
+      console.log('=== FIN NOTIFICATION RÉPONSE MATÉRIEL ===');
+      
+      return updatedRequest;
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -170,15 +217,86 @@ export function useReservationRequests(filters: {
     approvedBy: string,
     approvalData: ApproveReservationForm
   ) => {
+    console.log('🔧 approveRequest appelé avec:', { requestId, approvedBy, approvalData });
+    
     try {
+      // 1. Récupérer les informations de la demande AVANT approbation
+      const { data: requestInfo, error: requestInfoError } = await supabase
+        .from('reservation_requests')
+        .select(`
+          *,
+          club:clubs(id, name, association_id),
+          requester:profiles(id, first_name, last_name)
+        `)
+        .eq('id', requestId)
+        .single();
+
+      console.log('🔧 Informations de la demande récupérées:', requestInfo);
+
+      if (requestInfoError) throw requestInfoError;
+
+      // 2. Approuver la demande
       const reservation = await EquipmentService.approveReservationRequest(
         requestId,
         approvedBy,
         approvalData
       );
-      await fetchRequests(); // Refresh to update status
+      
+      console.log('🔧 Demande approuvée avec succès');
+
+      // 3. Rafraîchir les données
+      await fetchRequests();
+
+      // 4. NOUVEAU : Envoyer la notification au Club Admin
+      try {
+        console.log('=== DÉBUT NOTIFICATION RÉPONSE MATÉRIEL (APPROVE) ===');
+        
+        if (requestInfo?.club?.association_id) {
+          // Récupérer le Club Admin du club concerné
+          const { data: clubAdmin, error: clubAdminError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('club_id', requestInfo.club.id)
+            .eq('role', 'Club Admin')
+            .single();
+
+          console.log('🔧 Club Admin trouvé:', clubAdmin);
+
+          if (!clubAdminError && clubAdmin) {
+            // Déterminer le statut
+            const { data: originalItems } = await supabase
+              .from('request_items')
+              .select('*')
+              .eq('reservation_request_id', requestId);
+
+            const totalOriginalItems = originalItems?.length || 0;
+            const totalApprovedItems = approvalData.items.length;
+            
+            const status = totalApprovedItems === totalOriginalItems ? 'approved' : 'partially_approved';
+
+            // Envoyer la notification
+            await NotificationService.notifyMaterialResponse(
+              clubAdmin.id,
+              requestId,
+              status,
+              requestInfo.event_name,
+              approvalData.notes
+            );
+            
+            console.log(`✅ Notification envoyée au Club Admin pour l'approbation (${status})`);
+          } else {
+            console.warn('⚠️ Aucun Club Admin trouvé pour le club:', requestInfo.club.id);
+          }
+        }
+      } catch (notificationError) {
+        console.error('Erreur lors de l\'envoi de la notification:', notificationError);
+      }
+
+      console.log('=== FIN NOTIFICATION RÉPONSE MATÉRIEL (APPROVE) ===');
+      
       return reservation;
     } catch (err: any) {
+      console.error('🔧 Erreur dans approveRequest:', err);
       setError(err.message);
       throw err;
     }
@@ -350,7 +468,6 @@ export function useEquipmentStats(associationId: string | null | undefined) {
   return { stats, loading, error, refreshStats };
 }
 
-
 // ============ HOOK COMPOSITE POUR LES PAGES ============
 
 export function useEquipmentManagement(associationId: string | null | undefined) {
@@ -364,7 +481,7 @@ export function useEquipmentManagement(associationId: string | null | undefined)
     equipmentItems.refreshItems();
     reservationRequests.refreshRequests();
     equipmentReservations.refreshReservations();
-    equipmentStats.refreshStats(); // AJOUTER cette ligne
+    equipmentStats.refreshStats();
   };
 
   return {
