@@ -4,11 +4,12 @@
 // SANS MODIFICATION des types Supabase existants
 // ============================================
 
-export type NotificationType = 
-  | 'nouveau_club'      // Super Admin : nouveau club créé
-  | 'nouvel_event'      // Members/Supporters : nouvel événement d'un club suivi
-  | 'demande_materiel'  // Super Admin : nouvelle demande de matériel
-  | 'reponse_materiel'; // Club Admin : réponse à une demande de matériel
+export type NotificationType =
+  | 'nouveau_club'         // Super Admin : nouveau club créé
+  | 'nouvel_event'         // Members/Supporters : nouvel événement d'un club suivi
+  | 'demande_materiel'     // Super Admin : nouvelle demande de matériel
+  | 'reponse_materiel'     // Club Admin : réponse à une demande de matériel
+  | 'nouvelle_communication'; // NOUVEAU : nouvelle communication
 
 export interface Notification {
   id: string;
@@ -37,12 +38,21 @@ export type NotificationMetadata = {
   // Pour demande_materiel
   request_id?: string;
   requester_name?: string;
-  request_event_name?: string;  // Renommé pour éviter le conflit
+  request_event_name?: string;
   
   // Pour reponse_materiel
   status?: 'approved' | 'rejected' | 'partially_approved';
   admin_notes?: string;
-  response_event_name?: string; // Ajouté pour les réponses
+  response_event_name?: string;
+  
+  // NOUVEAU : Pour nouvelle_communication
+  communication_id?: string;
+  communication_title?: string;
+  communication_priority?: 'Low' | 'Normal' | 'High' | 'Urgent';
+  communication_visibility?: 'Public' | 'Private';
+  communication_author?: string;
+  is_association_communication?: boolean; // true si communication d'association
+  source_name?: string; // Nom du club ou association
   
   // Champs communs
   [key: string]: any;
@@ -60,7 +70,7 @@ export interface CreateNotificationInput {
 // Interface pour la réponse de comptage
 export interface NotificationCount {
   total: number;
-  by_type: Partial<Record<NotificationType, number>>; // Retour au type flexible
+  by_type: Partial<Record<NotificationType, number>>;
 }
 
 // Interface pour les paramètres de requête
@@ -110,8 +120,14 @@ export class NotificationError extends Error {
 // HELPERS DE VALIDATION
 // ============================================
 
-export function isValidNotificationType(type: string): type is NotificationType {
-  return ['nouveau_club', 'nouvel_event', 'demande_materiel', 'reponse_materiel'].includes(type);
+export function isValidNotificationType(type: any): type is NotificationType {
+  return [
+    'nouveau_club',
+    'nouvel_event', 
+    'demande_materiel',
+    'reponse_materiel',
+    'nouvelle_communication' // NOUVEAU
+  ].includes(type);
 }
 
 export function validateNotificationInput(input: CreateNotificationInput): boolean {
@@ -131,14 +147,16 @@ export const NOTIFICATION_LABELS: Record<NotificationType, string> = {
   nouveau_club: 'Nouveaux clubs',
   nouvel_event: 'Nouveaux événements',
   demande_materiel: 'Demandes de matériel',
-  reponse_materiel: 'Réponses aux demandes'
+  reponse_materiel: 'Réponses aux demandes',
+  nouvelle_communication: 'Nouvelles communications' // NOUVEAU
 };
 
-export const NOTIFICATION_COLORS: Record<NotificationType, 'red' | 'blue' | 'green' | 'orange'> = {
+export const NOTIFICATION_COLORS: Record<NotificationType, 'red' | 'blue' | 'green' | 'orange' | 'purple'> = {
   nouveau_club: 'blue',
   nouvel_event: 'green', 
   demande_materiel: 'orange',
-  reponse_materiel: 'red'
+  reponse_materiel: 'red',
+  nouvelle_communication: 'purple' // NOUVEAU
 };
 
 // ============================================
@@ -153,7 +171,8 @@ export const NOTIFICATION_TO_PAGE_MAP: Record<NotificationType, string[]> = {
   nouveau_club: ['/clubs', '/dashboard'],
   nouvel_event: ['/events', '/dashboard'],
   demande_materiel: ['/equipment-management'],
-  reponse_materiel: ['/equipment-reservation']
+  reponse_materiel: ['/equipment-reservation'],
+  nouvelle_communication: ['/communications', '/dashboard'] // NOUVEAU
 };
 
 /**
@@ -196,4 +215,76 @@ export function incrementNotificationCount(
   type: NotificationType
 ): void {
   counts.by_type[type] = (counts.by_type[type] || 0) + 1;
+}
+
+// ============================================
+// NOUVELLES FONCTIONS HELPER
+// ============================================
+
+/**
+ * Obtenir l'icône appropriée pour chaque type de notification
+ */
+export function getNotificationIcon(type: NotificationType): string {
+  switch (type) {
+    case 'nouveau_club':
+      return 'Building';
+    case 'nouvel_event':
+      return 'Calendar';
+    case 'demande_materiel':
+      return 'Package';
+    case 'reponse_materiel':
+      return 'CheckCircle';
+    case 'nouvelle_communication':
+      return 'MessageSquare'; // NOUVEAU
+    default:
+      return 'Bell';
+  }
+}
+
+/**
+ * Obtenir la couleur du badge pour chaque type
+ */
+export function getNotificationBadgeColor(type: NotificationType): string {
+  const colors = {
+    nouveau_club: 'bg-blue-500',
+    nouvel_event: 'bg-green-500',
+    demande_materiel: 'bg-orange-500',
+    reponse_materiel: 'bg-red-500',
+    nouvelle_communication: 'bg-purple-500' // NOUVEAU
+  };
+  
+  return colors[type] || 'bg-gray-500';
+}
+
+/**
+ * Obtenir le message de notification formaté
+ */
+export function formatNotificationMessage(
+  type: NotificationType,
+  metadata: NotificationMetadata
+): string {
+  switch (type) {
+    case 'nouvelle_communication':
+      const priority = metadata.communication_priority === 'Urgent' ? ' (URGENT)' :
+                      metadata.communication_priority === 'High' ? ' (IMPORTANT)' : '';
+      const source = metadata.is_association_communication ? 'Association' : metadata.source_name;
+      return `${source} : ${metadata.communication_title}${priority}`;
+    
+    case 'nouvel_event':
+      return `Nouvel événement : ${metadata.event_name}`;
+    
+    case 'nouveau_club':
+      return `Nouveau club : ${metadata.club_name}`;
+    
+    case 'demande_materiel':
+      return `Demande de matériel pour : ${metadata.request_event_name}`;
+    
+    case 'reponse_materiel':
+      const status = metadata.status === 'approved' ? 'approuvée' :
+                    metadata.status === 'rejected' ? 'refusée' : 'partiellement approuvée';
+      return `Demande ${status} : ${metadata.response_event_name}`;
+    
+    default:
+      return 'Nouvelle notification';
+  }
 }

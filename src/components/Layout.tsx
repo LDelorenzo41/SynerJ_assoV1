@@ -11,7 +11,8 @@ import {
   CalendarDays,
   Package,    // NOUVEAU: icône pour le matériel
   Clipboard,  // NOUVEAU: icône pour les demandes
-  Heart       // NOUVEAU: icône pour les sponsors
+  Heart,      // NOUVEAU: icône pour les sponsors
+  MessageSquare // NOUVEAU: icône pour les communications
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { MobileTopBar } from './MobileTopBar';
@@ -96,6 +97,7 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/associations', label: 'Association', icon: Building },
         { path: '/clubs', label: 'Clubs', icon: Users },
+        { path: '/communications', label: 'Communications', icon: MessageSquare },
         // Navigation pour Super Admin
         { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
         { path: '/sponsors', label: 'Sponsors', icon: Heart },
@@ -106,6 +108,7 @@ export default function Layout({ children }: LayoutProps) {
       items.push(
         { path: '/my-club', label: 'Mon Club', icon: Users },
         { path: '/events', label: 'Événements', icon: Calendar },
+        { path: '/communications', label: 'Communications', icon: MessageSquare },
         // Navigation pour Club Admin
         { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
         { path: '/sponsors', label: 'Sponsors', icon: Heart },
@@ -115,6 +118,7 @@ export default function Layout({ children }: LayoutProps) {
     if (profile.role === 'Member' || profile.role === 'Supporter') {
       items.push(
         { path: '/events', label: 'Événements', icon: Calendar },
+        { path: '/communications', label: 'Communications', icon: MessageSquare },
         { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
         { path: '/clubs', label: 'Clubs', icon: Users },
         { path: '/sponsors', label: 'Sponsors', icon: Heart },

@@ -262,6 +262,7 @@ interface UseNotificationBadgesReturn {
     nouvel_event: number;
     demande_materiel: number;
     reponse_materiel: number;
+    nouvelle_communication: number;
   };
   totalUnread: number;
   loading: boolean;
@@ -279,7 +280,8 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
     nouveau_club: 0,
     nouvel_event: 0,
     demande_materiel: 0,
-    reponse_materiel: 0
+    reponse_materiel: 0,
+    nouvelle_communication: 0
   });
   const [totalUnread, setTotalUnread] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -295,7 +297,8 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
         nouveau_club: counts.by_type.nouveau_club || 0,
         nouvel_event: counts.by_type.nouvel_event || 0,
         demande_materiel: counts.by_type.demande_materiel || 0,
-        reponse_materiel: counts.by_type.reponse_materiel || 0
+        reponse_materiel: counts.by_type.reponse_materiel || 0,
+        nouvelle_communication: counts.by_type.nouvelle_communication || 0
       });
       
       setTotalUnread(counts.total);
@@ -306,7 +309,8 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
         nouveau_club: 0,
         nouvel_event: 0,
         demande_materiel: 0,
-        reponse_materiel: 0
+        reponse_materiel: 0,
+        nouvelle_communication: 0
       });
       setTotalUnread(0);
     } finally {
@@ -335,7 +339,7 @@ export function useNotificationBadges(): UseNotificationBadgesReturn {
       console.log(`🔍 ${deletedCount} notifications supprimées de type ${type}`); // LOG AJOUTÉ
       
       // Mise à jour immédiate de l'interface
-      const currentCount = badges[type];
+      const currentCount = badges[type as keyof typeof badges]; // Type assertion for safety
       setBadges(prev => ({ ...prev, [type]: 0 }));
       setTotalUnread(prev => Math.max(0, prev - currentCount));
       console.log(`🔍 Badge mis à jour: ${type} -> 0`); // LOG AJOUTÉ
