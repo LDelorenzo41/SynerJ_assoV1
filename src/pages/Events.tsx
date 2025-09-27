@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -27,6 +27,7 @@ import {
   CalendarX,
   Wand2,     // Ajouté
   RefreshCw, // Ajouté
+  Map,       // Nouveau pour la carte
 } from 'lucide-react';
 
 interface Event {
@@ -80,6 +81,194 @@ const LogoDisplay: React.FC<LogoDisplayProps> = ({ src, alt, size = 'w-8 h-8', f
   );
 };
 
+// Composant modale pour la carte
+interface MapModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  location: string;
+  eventName: string;
+}
+
+const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventName }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen || !mapRef.current) return;
+
+    // Charger Leaflet dynamiquement
+    const loadLeaflet = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Vérifier si Leaflet est déjà chargé
+        if (typeof window !== 'undefined' && !(window as any).L) {
+          // Charger CSS
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          document.head.appendChild(link);
+
+          // Charger JS
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          script.onload = () => initMap();
+          script.onerror = () => setError('Erreur lors du chargement de la carte');
+          document.head.appendChild(script);
+        } else {
+          initMap();
+        }
+      } catch (err) {
+        setError('Erreur lors de l\'initialisation de la carte');
+        setLoading(false);
+      }
+    };
+
+    const initMap = async () => {
+      try {
+        const L = (window as any).L;
+        
+        // Géocoder l'adresse avec Nominatim
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`
+        );
+        const data = await response.json();
+
+        if (data.length === 0) {
+          setError('Adresse introuvable');
+          setLoading(false);
+          return;
+        }
+
+        const { lat, lon, display_name } = data[0];
+
+        // Nettoyer la carte existante si elle existe
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+        }
+
+        // Créer la carte
+        const map = L.map(mapRef.current).setView([parseFloat(lat), parseFloat(lon)], 15);
+
+        // Ajouter les tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Ajouter un marqueur
+        const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);
+        marker.bindPopup(`
+          <div class="p-2">
+            <h3 class="font-bold text-sm mb-1">${eventName}</h3>
+            <p class="text-xs text-gray-600">${display_name}</p>
+          </div>
+        `).openPopup();
+
+        mapInstanceRef.current = map;
+        setLoading(false);
+
+        // Redimensionner la carte après un petit délai
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
+
+      } catch (err) {
+        console.error('Erreur géocodage:', err);
+        setError('Erreur lors de la localisation de l\'adresse');
+        setLoading(false);
+      }
+    };
+
+    loadLeaflet();
+
+    // Cleanup
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [isOpen, location, eventName]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* En-tête */}
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Map className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-lg font-semibold dark:text-white">Localisation de l'événement</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+
+        {/* Contenu */}
+        <div className="p-6">
+          <div className="mb-4">
+            <h3 className="font-bold text-lg dark:text-white mb-1">{eventName}</h3>
+            <div className="flex items-center text-gray-600 dark:text-gray-300">
+              <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="text-sm">{location}</span>
+            </div>
+          </div>
+
+          {/* Carte */}
+          <div className="relative">
+            <div 
+              ref={mapRef} 
+              className="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"
+              style={{ minHeight: '384px' }}
+            />
+            
+            {/* États de chargement et d'erreur */}
+            {loading && (
+              <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Chargement de la carte...</p>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-90 flex items-center justify-center rounded-lg">
+                <div className="text-center p-6">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Vérifiez que l'adresse est correcte et réessayez
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Pied de page avec attribution */}
+          <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+            Carte fournie par OpenStreetMap • Géolocalisation par Nominatim
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Events() {
   const { profile, isClubAdmin } = useAuthNew();
   const [searchParams] = useSearchParams();
@@ -104,6 +293,10 @@ export default function Events() {
   const [rewritingDescription, setRewritingDescription] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [showAiSuggestion, setShowAiSuggestion] = useState(false);
+
+  // États pour la carte
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [selectedEventForMap, setSelectedEventForMap] = useState<Event | null>(null);
   
   const [eventForm, setEventForm] = useState<EventForm>({
     name: '',
@@ -273,6 +466,18 @@ if (clubId) {
       }
       return newSet;
     });
+  };
+
+  // Fonction pour ouvrir la carte
+  const openMapModal = (event: Event) => {
+    setSelectedEventForMap(event);
+    setShowMapModal(true);
+  };
+
+  // Fonction pour fermer la carte
+  const closeMapModal = () => {
+    setShowMapModal(false);
+    setSelectedEventForMap(null);
   };
 
   const handleImageUpload = async (file: File) => {
@@ -770,7 +975,7 @@ if (clubId) {
                   />
                 </div>
                 <p className="text-xs dark-text-muted mt-1">
-                  L'adresse sera utilisée pour afficher une carte interactive (bientôt disponible)
+                  L'adresse sera utilisée pour afficher une carte interactive
                 </p>
               </div>
               
@@ -1043,10 +1248,7 @@ if (clubId) {
                               <span className="text-sm flex-1">{event.location}</span>
                               <button 
                                 className="ml-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
-                                onClick={() => {
-                                  // TODO: Ouvrir modal Google Maps
-                                  alert('Fonctionnalité "Voir sur la carte" à venir !');
-                                }}
+                                onClick={() => openMapModal(event)}
                               >
                                 Voir sur la carte
                               </button>
@@ -1167,6 +1369,7 @@ if (clubId) {
         </div>
       </div>
 
+      {/* Modale pour l'aperçu d'image */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
@@ -1187,6 +1390,16 @@ if (clubId) {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Modale pour la carte */}
+      {selectedEventForMap && (
+        <MapModal
+          isOpen={showMapModal}
+          onClose={closeMapModal}
+          location={selectedEventForMap.location || ''}
+          eventName={selectedEventForMap.name}
+        />
       )}
     </div>
   );
