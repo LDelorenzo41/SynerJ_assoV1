@@ -62,13 +62,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const pathNotificationMap: Record<string, Array<keyof typeof badges>> = {
       '/clubs': ['nouveau_club'],
       '/events': ['nouvel_event'],
+      '/communications': ['nouvelle_communication'],
       '/equipment-management': ['demande_materiel'],
       '/equipment-reservation': ['reponse_materiel'],
-      '/dashboard': ['nouveau_club', 'nouvel_event', 'demande_materiel', 'reponse_materiel']
+      '/dashboard': [
+        'nouveau_club', 
+        'nouvel_event', 
+        'nouvelle_communication',
+        'demande_materiel', 
+        'reponse_materiel'
+      ]
     };
 
     const relevantTypes = pathNotificationMap[itemPath] || [];
-    return relevantTypes.reduce((total, type) => total + badges[type], 0);
+    return relevantTypes.reduce((total, type) => total + (badges[type] || 0), 0);
   };
 
   // ============================================
@@ -80,6 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const pathNotificationMap: Record<string, Array<keyof typeof badges>> = {
       '/clubs': ['nouveau_club'],
       '/events': ['nouvel_event'],
+      '/communications': ['nouvelle_communication'],
       '/equipment-management': ['demande_materiel'],
       '/equipment-reservation': ['reponse_materiel']
     };

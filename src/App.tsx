@@ -15,6 +15,7 @@ import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
 import SponsorEdit from './pages/SponsorEdit';
+import Communications from './pages/Communications';
 
 // Import des nouveaux composants de réservation
 import EquipmentManagement from './components/equipment/EquipmentManagement';
@@ -92,6 +93,16 @@ function App() {
             <Layout>
               <ProtectedRoute>
                 <Events />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/communications"
+          element={
+            <Layout>
+              <ProtectedRoute>
+                <Communications />
               </ProtectedRoute>
             </Layout>
           }

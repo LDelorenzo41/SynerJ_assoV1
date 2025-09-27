@@ -1,4 +1,4 @@
-// ============================================
+// = an===========================================
 // SERVICE DE NOTIFICATIONS
 // Fichier : src/services/notificationService.ts
 // ============================================
@@ -137,7 +137,7 @@ export class NotificationService {
   }
 
   /**
-   * Compter les notifications par type
+   * Compter les notifications par type (VERSION MISE À JOUR)
    * Utile pour les badges spécifiques
    */
   static async getNotificationCounts(userId: string): Promise<NotificationCount> {
@@ -157,7 +157,8 @@ export class NotificationService {
         nouveau_club: 0,
         nouvel_event: 0,
         demande_materiel: 0,
-        reponse_materiel: 0
+        reponse_materiel: 0,
+        nouvelle_communication: 0
       }
     };
 
@@ -309,6 +310,151 @@ export class NotificationService {
   }
 
   // ============================================
+  // MÉTHODES SPÉCIFIQUES AUX COMMUNICATIONS
+  // ============================================
+
+  /**
+   * Nettoyer les notifications d'une communication supprimée
+   */
+  static async deleteCommunicationNotifications(communicationId: string): Promise<number> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('type', 'nouvelle_communication')
+      .eq('metadata->>communication_id', communicationId)
+      .select('id');
+
+    if (error) {
+      console.error('Error cleaning up communication notifications:', error);
+      return 0;
+    }
+
+    return data?.length || 0;
+  }
+
+  /**
+   * Marquer toutes les notifications de communication comme lues
+   */
+  static async markAllCommunicationNotificationsRead(userId: string): Promise<void> {
+    await this.markAllAsReadByType(userId, 'nouvelle_communication');
+  }
+
+  /**
+   * Récupérer les notifications de communication pour un utilisateur
+   */
+  static async getCommunicationNotifications(
+    userId: string,
+    limit: number = 10,
+    offset: number = 0
+  ): Promise<Notification[]> {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('type', 'nouvelle_communication')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        console.error('Error fetching communication notifications:', error);
+        throw new Error(`Impossible de récupérer les notifications: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error: any) {
+      console.error('Error in getCommunicationNotifications:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Compter les notifications de communication non lues
+   */
+  static async getUnreadCommunicationNotificationsCount(userId: string): Promise<number> {
+    try {
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('type', 'nouvelle_communication')
+        .eq('is_read', false);
+
+      if (error) {
+        console.error('Error counting unread communication notifications:', error);
+        return 0;
+      }
+
+      return count || 0;
+    } catch (error: any) {
+      console.error('Error in getUnreadCommunicationNotificationsCount:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Marquer une notification de communication spécifique comme lue
+   */
+  static async markCommunicationNotificationRead(
+    userId: string, 
+    communicationId: string
+  ): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('type', 'nouvelle_communication')
+        .contains('metadata', { communication_id: communicationId });
+
+      if (error) {
+        console.error('Error marking communication notification as read:', error);
+        throw new Error(`Impossible de marquer la notification comme lue: ${error.message}`);
+      }
+    } catch (error: any) {
+      console.error('Error in markCommunicationNotificationRead:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Créer des notifications de communication en masse (optimisée)
+   */
+  static async createBulkCommunicationNotifications(
+    userIds: string[],
+    communicationId: string,
+    communicationTitle: string,
+    communicationPriority: 'Low' | 'Normal' | 'High' | 'Urgent',
+    isAssociationCommunication: boolean,
+    sourceName: string,
+    authorName: string
+  ): Promise<Notification[]> {
+    const priorityPrefix = communicationPriority === 'Urgent' ? '🔴 URGENT - ' :
+                          communicationPriority === 'High' ? '🟠 IMPORTANT - ' : '';
+    
+    const sourceType = isAssociationCommunication ? 'L\'association' : 'Le club';
+    const title = `${priorityPrefix}Nouvelle communication`;
+    const message = `${sourceType} ${sourceName} a publié : "${communicationTitle}"`;
+
+    const notifications = userIds.map(userId => ({
+      user_id: userId,
+      type: 'nouvelle_communication' as const,
+      title,
+      message,
+      metadata: {
+        communication_id: communicationId,
+        communication_title: communicationTitle,
+        communication_priority: communicationPriority,
+        communication_author: authorName,
+        is_association_communication: isAssociationCommunication,
+        source_name: sourceName
+      }
+    }));
+
+    return await this.createBulkNotifications(notifications);
+  }
+
+  // ============================================
   // MÉTHODES UTILITAIRES POUR LES CRÉATEURS
   // ============================================
 
@@ -412,5 +558,37 @@ export class NotificationService {
         admin_notes: adminNotes
       }
     });
+  }
+
+  /**
+   * Créer une notification "nouvelle communication"
+   */
+  static async notifyNewCommunication(
+    userIds: string[], 
+    communicationTitle: string, 
+    communicationId: string,
+    priority: 'Low' | 'Normal' | 'High' | 'Urgent',
+    visibility: 'Public' | 'Private',
+    authorName: string,
+    isAssociationCommunication: boolean,
+    sourceName: string
+  ): Promise<void> {
+    const notifications = userIds.map(userId => ({
+      user_id: userId,
+      type: 'nouvelle_communication' as NotificationType,
+      title: 'Nouvelle communication',
+      message: `${sourceName}: ${communicationTitle}${priority === 'Urgent' ? ' (URGENT)' : priority === 'High' ? ' (IMPORTANT)' : ''}`,
+      metadata: {
+        communication_id: communicationId,
+        communication_title: communicationTitle,
+        communication_priority: priority,
+        communication_visibility: visibility,
+        communication_author: authorName,
+        is_association_communication: isAssociationCommunication,
+        source_name: sourceName
+      }
+    }));
+
+    await this.createBulkNotifications(notifications);
   }
 }

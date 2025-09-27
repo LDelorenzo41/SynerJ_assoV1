@@ -11,6 +11,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 export type Database = {
   public: {
     Tables: {
@@ -54,7 +62,7 @@ export type Database = {
           club_email: string;
           association_id: string;
           club_code: string;
-          website_url: string | null; // Ligne ajoutée
+          website_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -64,7 +72,7 @@ export type Database = {
           club_email: string;
           association_id: string;
           club_code?: string;
-          website_url?: string | null; // Ligne ajoutée
+          website_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -74,7 +82,7 @@ export type Database = {
           club_email?: string;
           association_id?: string;
           club_code?: string;
-          website_url?: string | null; // Ligne ajoutée
+          website_url?: string | null;
           created_at?: string;
         };
       };
@@ -168,7 +176,7 @@ export type Database = {
           created_at?: string;
         };
       };
-      // ============ NOUVELLES TABLES DE RÉSERVATION ============
+      // ============ TABLES DE RÉSERVATION ============
       equipment_items: {
         Row: {
           id: string;
@@ -326,6 +334,103 @@ export type Database = {
           created_at?: string;
         };
       };
+      // ============ NOUVELLE TABLE COMMUNICATIONS ============
+      communications: {
+        Row: {
+          id: string;
+          title: string;
+          content: string;
+          visibility: 'Public' | 'Private';
+          priority: 'Low' | 'Normal' | 'High' | 'Urgent';
+          club_id: string | null;
+          association_id: string;
+          author_id: string;
+          target_clubs: string[] | null;
+          image_url: string | null;
+          expires_at: string | null;
+          is_pinned: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          content: string;
+          visibility: 'Public' | 'Private';
+          priority?: 'Low' | 'Normal' | 'High' | 'Urgent';
+          club_id?: string | null;
+          association_id: string;
+          author_id: string;
+          target_clubs?: string[] | null;
+          image_url?: string | null;
+          expires_at?: string | null;
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          content?: string;
+          visibility?: 'Public' | 'Private';
+          priority?: 'Low' | 'Normal' | 'High' | 'Urgent';
+          club_id?: string | null;
+          association_id?: string;
+          author_id?: string;
+          target_clubs?: string[] | null;
+          image_url?: string | null;
+          expires_at?: string | null;
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // ============ TABLE NOTIFICATIONS (pour la cohérence) ============
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: 'nouveau_club' | 'nouvel_event' | 'demande_materiel' | 'reponse_materiel' | 'nouvelle_communication';
+          title: string;
+          message: string;
+          is_read: boolean;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: 'nouveau_club' | 'nouvel_event' | 'demande_materiel' | 'reponse_materiel' | 'nouvelle_communication';
+          title: string;
+          message: string;
+          is_read?: boolean;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: 'nouveau_club' | 'nouvel_event' | 'demande_materiel' | 'reponse_materiel' | 'nouvelle_communication';
+          title?: string;
+          message?: string;
+          is_read?: boolean;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+    };
+    Enums: {
+      notification_type: 
+        | 'nouveau_club' 
+        | 'nouvel_event' 
+        | 'demande_materiel' 
+        | 'reponse_materiel' 
+        | 'nouvelle_communication';
+      communication_visibility: 'Public' | 'Private';
+      communication_priority: 'Low' | 'Normal' | 'High' | 'Urgent';
     };
     Functions: {
       check_equipment_availability: {
@@ -338,6 +443,46 @@ export type Database = {
         };
         Returns: boolean;
       };
+      cleanup_expired_communications: {
+        Args: Record<PropertyKey, never>;
+        Returns: void;
+      };
     };
+  };
+};
+
+// ============================================
+// TYPES HELPERS SUPPLÉMENTAIRES
+// ============================================
+
+// Type pour une communication avec relations
+export type CommunicationWithRelations = Database['public']['Tables']['communications']['Row'] & {
+  clubs?: Database['public']['Tables']['clubs']['Row'];
+  associations?: Database['public']['Tables']['associations']['Row'];
+  profiles?: Database['public']['Tables']['profiles']['Row'];
+  target_clubs_data?: Database['public']['Tables']['clubs']['Row'][];
+};
+
+// Type pour les requêtes de communications
+export type CommunicationQuery = Database['public']['Tables']['communications']['Row'];
+
+// Type pour l'insertion de communications
+export type CommunicationInsert = Database['public']['Tables']['communications']['Insert'];
+
+// Type pour la mise à jour de communications
+export type CommunicationUpdate = Database['public']['Tables']['communications']['Update'];
+
+// Type pour les notifications de communication
+export type CommunicationNotification = Database['public']['Tables']['notifications']['Row'] & {
+  type: 'nouvelle_communication';
+  metadata: {
+    communication_id: string;
+    communication_title: string;
+    communication_priority: 'Low' | 'Normal' | 'High' | 'Urgent';
+    communication_visibility: 'Public' | 'Private';
+    communication_author: string;
+    is_association_communication: boolean;
+    source_name?: string;
+    [key: string]: any;
   };
 };
