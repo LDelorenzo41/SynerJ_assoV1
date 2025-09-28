@@ -1,4 +1,4 @@
-// netlify/functions/rewrite-description.ts
+// netlify/functions/rewrite-communication.ts
 import { Handler } from '@netlify/functions'
 import OpenAI from 'openai'
 
@@ -27,28 +27,28 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const { eventName, description } = JSON.parse(event.body || '{}')
+    const { title, content } = JSON.parse(event.body || '{}')
 
-    if (!eventName || !description) {
+    if (!title || !content) {
       return {
         statusCode: 400,
         headers: jsonHeaders,
-        body: JSON.stringify({ error: 'Paramètres manquants: eventName et description sont requis.' }),
+        body: JSON.stringify({ error: 'Paramètres manquants: title et content sont requis.' }),
       }
     }
 
-    const prompt = `Tu es un expert en communication événementielle sportive et associative.
-Réécris cette description d'événement pour la rendre dynamique, engageante et moderne.
+    const prompt = `Tu es un correcteur professionnel pour communications officielles.
+Corrige uniquement l'orthographe, la grammaire et la fluidité sans changer le contenu.
 
 Consignes:
-- Maximum 600 caractères
-- Ton enthousiaste mais professionnel
-- Mets en avant les bénéfices pour les participants
-- Inclue un appel à l'action clair à la fin
-- Phrases courtes et percutantes
+- Corriger les fautes d'orthographe et de grammaire
+- Améliorer la fluidité de lecture
+- Formules de politesse appropriées si nécessaire
+- NE PAS changer le contenu ou le message
+- NE PAS ajouter de créativité
 
-Nom de l'événement: "${eventName}"
-Description originale: "${description}"`
+
+Texte original: "${content}"`
 
     // API Responses avec GPT-5-nano
     const response = await openai.responses.create({
@@ -67,12 +67,12 @@ Description originale: "${description}"`
       (response as any)?.output?.[0]?.content?.[0]?.text ??
       ''
 
-    // Sécurise, coupe à 600 caractères, supprime espaces multiples
+    // Sécurise, coupe à 1000 caractères, supprime espaces multiples
     const rewrittenDescription = (raw || '')
       .toString()
       .replace(/\s+/g, ' ')
       .trim()
-      .slice(0, 600)
+      .slice(0, 1000)
 
     if (!rewrittenDescription) {
       return {
@@ -92,12 +92,12 @@ Description originale: "${description}"`
       }),
     }
   } catch (error: any) {
-    console.error('rewrite-description error:', error?.message || error)
+    console.error('rewrite-communication error:', error?.message || error)
     return {
       statusCode: 500,
       headers: jsonHeaders,
       body: JSON.stringify({
-        error: 'Erreur serveur lors de la réécriture.',
+        error: 'Erreur serveur lors de la correction.',
         details: error?.message || String(error),
       }),
     }

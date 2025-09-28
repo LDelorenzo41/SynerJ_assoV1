@@ -29,7 +29,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
-    // Authentification (ne change pas)
+    // Authentification
     const auth = new GoogleAuth({
       credentials: JSON.parse(GCP_SERVICE_ACCOUNT_KEY),
       scopes: 'https://www.googleapis.com/auth/cloud-platform',
@@ -41,48 +41,68 @@ export const handler: Handler = async (event: HandlerEvent) => {
       throw new Error('Impossible d\'obtenir un jeton d\'accès.');
     }
 
-    const { eventName, description } = JSON.parse(event.body || '{}');
+    const { eventName, description, isForCommunication } = JSON.parse(event.body || '{}');
     if (!eventName) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: "Le nom de l'événement est requis." }),
+        body: JSON.stringify({ success: false, error: "Le nom de l'événement/communication est requis." }),
       };
     }
 
-    // === PROMPT DYNAMIQUE AVEC AIDE CONTEXTUELLE ===
-    const promptLines = [
-      `Crée une illustration graphique et stylisée pour un événement. Le visuel doit être moderne, symbolique et épuré.`,
-      `Le thème principal de l'image doit être directement et fidèlement inspiré par le nom et la description suivants.`,
-      `Nom de l'événement : "${eventName}".`,
-      `Description : "${description}".`,
-      `---`,
-      `Instructions de style obligatoires :`,
-      `- Style : illustration vectorielle, style graphique plat (flat design), minimaliste, couleurs vives et harmonieuses.`,
-      `- Composition : se concentrer sur une représentation claire et iconique du thème de l'événement.`,
-      `- Texte : Ne pas inclure de texte, de lettres ou de chiffres.`,
-      `- Format : Carré.`
-    ];
+    // Prompt adaptatif selon le contexte (événement vs communication)
+    const promptLines = isForCommunication 
+      ? [
+          `Crée une icône vectorielle moderne et professionnelle pour une communication d'entreprise.`,
+          `Le visuel doit être symbolique, épuré et immédiatement compréhensible.`,
+          `Sujet de la communication : "${eventName}".`,
+          `Contenu : "${description}".`,
+          `---`,
+          `Instructions de style OBLIGATOIRES :`,
+          `- Style : Icône vectorielle ultra-simplifiée, design flat/minimal`,
+          `- Couleurs : 2-3 couleurs maximum, palette moderne et harmonieuse`,
+          `- Composition : Symbole central unique et reconnaissable`,
+          `- Forme : Iconique, géométrique, sans détails superflus`,
+          `- Lisibilité : Compréhensible même en petit format`,
+          `- Texte : AUCUN texte, lettres ou chiffres`,
+          `- Format : Carré ou cercle parfait`,
+          `- Inspiration : Pictogrammes de signalétique, logos d'apps mobiles`
+        ]
+      : [
+          `Crée une illustration vectorielle moderne et stylisée pour un événement sportif/associatif.`,
+          `Le visuel doit être dynamique, symbolique et épuré.`,
+          `Nom de l'événement : "${eventName}".`,
+          `Description : "${description}".`,
+          `---`,
+          `Instructions de style OBLIGATOIRES :`,
+          `- Style : Illustration vectorielle, flat design minimaliste`,
+          `- Couleurs : Palette vive et harmonieuse (3-4 couleurs max)`,
+          `- Composition : Éléments centrés, équilibrés, sans surcharge`,
+          `- Forme : Géométrique, claire, moderne`,
+          `- Dynamisme : Sensation de mouvement et d'énergie`,
+          `- Texte : AUCUN texte, lettres ou chiffres`,
+          `- Format : Carré`,
+          `- Inspiration : Pictogrammes olympiques, logos de clubs sportifs`
+        ];
 
-    // On cherche les mots-clés difficiles et on donne une "antisèche" à l'IA
+    // Aide contextuelle pour mots-clés difficiles
     const lowerCaseEvent = (eventName + ' ' + description).toLowerCase();
 
     if (lowerCaseEvent.includes('bilboquet')) {
       promptLines.push(
         `---`,
-        `Note importante pour l'IA : Le bilboquet est un jeu d'adresse composé d'une boule en bois percée d'un trou, reliée par une ficelle à un manche en bois qui a une pointe et une coupelle. Le but est de lancer la boule pour la rattraper avec la pointe ou la coupelle. L'illustration doit représenter ces éléments de manière stylisée.`
+        `Note importante : Le bilboquet est un jeu d'adresse avec une boule en bois percée d'un trou, reliée par une ficelle à un manche en bois avec une pointe et une coupelle. Représenter ces éléments de manière stylisée et géométrique.`
       );
     }
     
     if (lowerCaseEvent.includes('football')) {
       promptLines.push(
         `---`,
-        `Note importante pour l'IA : Le terme "football" doit être interprété comme du soccer (ballon rond). L'illustration doit montrer un ballon de football classique, et non un ballon de football américain.`
+        `Note importante : "Football" = soccer (ballon rond). Illustration avec ballon de football classique, pas football américain.`
       );
     }
 
     const prompt = promptLines.join('\n');
-    // === FIN DE L'AMÉLIORATION ===
 
     const endpoint = `https://us-central1-aiplatform.googleapis.com/v1/projects/${GCP_PROJECT_ID}/locations/us-central1/publishers/google/models/imagegeneration:predict`;
     
@@ -98,7 +118,6 @@ export const handler: Handler = async (event: HandlerEvent) => {
       }),
     });
     
-    // ... reste de la fonction (ne change pas) ...
     const responseData = await apiResponse.json();
 
     if (!apiResponse.ok) {
