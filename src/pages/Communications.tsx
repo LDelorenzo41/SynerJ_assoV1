@@ -282,29 +282,49 @@ export default function Communications() {
   
       if (error) throw error;
   
-      // FILTRAGE CÔTÉ CLIENT pour les communications privées ciblées
+      // FILTRAGE CÔTÉ CLIENT selon les rôles
       let filteredCommunications = data || [];
-      
-      if (!clubId && (profile.role === 'Club Admin' || profile.role === 'Member')) {
-        filteredCommunications = filteredCommunications.filter(comm => {
-          // Communications du propre club
-          if (comm.club_id === profile.club_id) return true;
-          
-          // Communications publiques (club ou association)
-          if (comm.visibility === 'Public') return true;
-          
-          // Communications privées d'association ciblant le club
-          if (comm.club_id === null && 
-              comm.visibility === 'Private' && 
-              comm.target_clubs && 
-              profile.club_id &&
-              comm.target_clubs.includes(profile.club_id)) {
-            return true;
-          }
-          
-          return false;
-        });
-      }
+
+      if (!clubId) {
+        // Filtrage selon le rôle utilisateur
+        if (profile.role === 'Super Admin') {
+          filteredCommunications = filteredCommunications.filter(comm => {
+            // Ses propres communications (club ou association)
+            if (comm.author_id === profile.id) return true;
+            
+            // Communications publiques des clubs de son association
+            if (comm.club_id !== null && comm.visibility === 'Public') return true;
+            
+            // Communications publiques d'association
+            if (comm.club_id === null && comm.visibility === 'Public') return true;
+            
+            return false;
+          });
+        }
+        
+        else if (profile.role === 'Club Admin' || profile.role === 'Member') {
+          filteredCommunications = filteredCommunications.filter(comm => {
+            // Communications du propre club
+            if (comm.club_id === profile.club_id) return true;
+            
+            // Communications publiques (club ou association)
+            if (comm.visibility === 'Public') return true;
+            
+            // Communications privées d'association ciblant le club
+            if (comm.club_id === null && 
+                comm.visibility === 'Private' && 
+                comm.target_clubs && 
+                profile.club_id &&
+                comm.target_clubs.includes(profile.club_id)) {
+              return true;
+            }
+            
+            return false;
+          });
+        }
+  
+  // Pour les Supporters, pas de filtrage supplémentaire car déjà géré par la requête SQL
+}
   
       setCommunications(filteredCommunications);
     } catch (error) {
@@ -357,12 +377,13 @@ export default function Communications() {
     try {
       setGeneratingImage(true);
   
-      const res = await fetch('/.netlify/functions/generate-communication-image', {
+      const res = await fetch('/.netlify/functions/generate-event-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: communicationForm.title,
-          content: communicationForm.content,
+          eventName: communicationForm.title,
+          description: communicationForm.content,
+          isForCommunication: true,
         }),
       });
   
@@ -393,41 +414,40 @@ export default function Communications() {
   };
 
   const handleRewriteContent = async () => {
-    if (!communicationForm.title || !communicationForm.content) {
-      alert("Veuillez d'abord entrer un titre et un contenu pour la communication");
-      return;
-    }
+  if (!communicationForm.title || !communicationForm.content) {
+    alert("Veuillez d'abord entrer un titre et un contenu pour la communication");
+    return;
+  }
 
-    try {
-      setRewritingContent(true);
-      
-      const response = await fetch('/.netlify/functions/rewrite-communication', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: communicationForm.title,
-          content: communicationForm.content,
-          priority: communicationForm.priority,
-        }),
-      });
+  try {
+    setRewritingContent(true);
+    
+    const response = await fetch('/.netlify/functions/rewrite-communication', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: communicationForm.title,
+        content: communicationForm.content,
+      }),
+    });
 
-      const data = await response.json();
-      
-      if (data.success && data.rewrittenContent) {
-        setAiSuggestion(data.rewrittenContent);
-        setShowAiSuggestion(true);
-      } else {
-        throw new Error(data.error || 'Erreur lors de la réécriture');
-      }
-    } catch (error: any) {
-      console.error('Error rewriting content:', error);
-      alert('Erreur lors de la réécriture: ' + error.message);
-    } finally {
-      setRewritingContent(false);
+    const data = await response.json();
+    
+    if (data.success && data.rewrittenDescription) {
+      setAiSuggestion(data.rewrittenDescription);
+      setShowAiSuggestion(true);
+    } else {
+      throw new Error(data.error || 'Erreur lors de la réécriture');
     }
-  };
+  } catch (error: any) {
+    console.error('Error rewriting content:', error);
+    alert('Erreur lors de la réécriture: ' + error.message);
+  } finally {
+    setRewritingContent(false);
+  }
+};
 
   const acceptAiSuggestion = () => {
     if (aiSuggestion) {
@@ -1024,6 +1044,15 @@ export default function Communications() {
                         className="flex-1 px-3 py-1 bg-purple-600 dark:bg-purple-700 text-white text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
                       >
                         Utiliser ce contenu
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          acceptAiSuggestion();
+                        }}
+                        className="flex-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                      >
+                        Utiliser et modifier
                       </button>
                     </div>
                   </div>
