@@ -31,6 +31,7 @@ export type Database = {
           phone: string | null;
           description: string | null;
           association_code: string;
+          logo_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -41,6 +42,7 @@ export type Database = {
           phone?: string | null;
           description?: string | null;
           association_code?: string;
+          logo_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -51,6 +53,7 @@ export type Database = {
           phone?: string | null;
           description?: string | null;
           association_code?: string;
+          logo_url?: string | null;
           created_at?: string;
         };
       };
@@ -63,6 +66,7 @@ export type Database = {
           association_id: string;
           club_code: string;
           website_url: string | null;
+          logo_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -73,6 +77,7 @@ export type Database = {
           association_id: string;
           club_code?: string;
           website_url?: string | null;
+          logo_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -83,6 +88,7 @@ export type Database = {
           association_id?: string;
           club_code?: string;
           website_url?: string | null;
+          logo_url?: string | null;
           created_at?: string;
         };
       };

@@ -790,6 +790,7 @@ export default function Dashboard() {
         <div className="p-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             
+            {/* VIGNETTES SUPER ADMIN - MODIFIÉES ICI */}
             {isSuperAdmin && (
               <>
                 <Link to="/associations" className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors group">
@@ -814,9 +815,22 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Link>
+                {/* NOUVELLE VIGNETTE COMMUNICATIONS POUR SUPER ADMIN */}
+                <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
+                      <MessageCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium dark-text">Communications</p>
+                      <p className="text-sm dark-text-muted">Gérer les communications</p>
+                    </div>
+                  </div>
+                </Link>
               </>
             )}
 
+            {/* VIGNETTES CLUB ADMIN - MODIFIÉES ICI */}
             {isClubAdmin && (
               <>
                 <Link to="/my-club" className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors group">
@@ -838,6 +852,18 @@ export default function Dashboard() {
                     <div>
                       <p className="font-medium dark-text">Événements</p>
                       <p className="text-sm dark-text-muted">Créer et gérer</p>
+                    </div>
+                  </div>
+                </Link>
+                {/* NOUVELLE VIGNETTE COMMUNICATIONS POUR CLUB ADMIN */}
+                <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
+                      <MessageCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium dark-text">Communications</p>
+                      <p className="text-sm dark-text-muted">Gérer les communications</p>
                     </div>
                   </div>
                 </Link>
