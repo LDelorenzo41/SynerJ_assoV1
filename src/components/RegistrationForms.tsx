@@ -35,7 +35,7 @@ interface ClubForm {
   description: string;
   club_email: string;
   contact_email: string;
-  website_url?: string; // Ajout du champ website_url
+  website_url?: string;
   association_code: string;
   logo_url: string;
   password: string;
@@ -120,7 +120,6 @@ export default function RegistrationForms() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const navigate = useNavigate();
 
-  // États pour l'inscription utilisateur multi-étapes
   const [userStep, setUserStep] = useState(1);
   const [clubValidation, setClubValidation] = useState<{loading: boolean, valid: boolean | null, clubName: string}>({
     loading: false,
@@ -128,7 +127,6 @@ export default function RegistrationForms() {
     clubName: ''
   });
 
-  // États pour les logos
   const [associationLogo, setAssociationLogo] = useState<File | null>(null);
   const [clubLogo, setClubLogo] = useState<File | null>(null);
 
@@ -148,7 +146,7 @@ export default function RegistrationForms() {
     description: '',
     club_email: '',
     contact_email: '',
-    website_url: '', // Ajout du champ website_url dans l'état initial
+    website_url: '',
     association_code: '',
     logo_url: '',
     password: '',
@@ -169,22 +167,18 @@ export default function RegistrationForms() {
     }
   });
 
-  // Upload de logo vers Supabase Storage
   const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
     try {
       console.log(`Début upload ${type} logo pour l'entité ${entityId}`);
 
-      // Vérifier que le fichier est valide
       if (!file || file.size === 0) {
         throw new Error('Fichier invalide');
       }
 
-      // Vérifier la taille (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
         throw new Error('Le fichier ne doit pas dépasser 2MB');
       }
 
-      // Vérifier le type de fichier
       if (!file.type.startsWith('image/')) {
         throw new Error('Seuls les fichiers image sont acceptés');
       }
@@ -192,14 +186,12 @@ export default function RegistrationForms() {
       const fileExt = file.name.split('.').pop() || 'jpg';
       const fileName = `${entityId}-${Date.now()}.${fileExt}`;
       
-      // Utiliser le bucket "logos" avec le bon dossier selon le type
       const bucketName = 'logos';
       const folderName = type === 'association' ? 'association-logos' : 'club-logos';
       const filePath = `${folderName}/${fileName}`;
       
       console.log(`Tentative upload vers le bucket "${bucketName}", chemin: ${filePath}`);
 
-      // Essayer directement l'upload sans vérifier l'existence du bucket
       const { error: uploadError, data: uploadData } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file, {
@@ -224,7 +216,6 @@ export default function RegistrationForms() {
         
       console.log('URL publique générée:', publicUrl);
       
-      // Vérifier que l'URL est valide
       if (!publicUrl || !publicUrl.includes(fileName)) {
         throw new Error('URL publique invalide générée');
       }
@@ -240,7 +231,6 @@ export default function RegistrationForms() {
     }
   };
 
-  // Validation en temps réel du code de club
   const validateClubCode = async (code: string) => {
     if (!code || code.length < 8) {
       setClubValidation({ loading: false, valid: null, clubName: '' });
@@ -324,7 +314,7 @@ export default function RegistrationForms() {
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: associationForm.email,
-        password: associationForm.password, // Utilise le mot de passe saisi
+        password: associationForm.password,
         options: {
           data: {
             first_name: 'Super',
@@ -380,7 +370,7 @@ export default function RegistrationForms() {
       
       setMessage({
         type: 'success',
-        text: `Association créée avec succès ! Un e-mail de confirmation a été envoyé à ${associationForm.email}. Veuillez valider votre compte avant de vous connecter.`,
+        text: `Structure créée avec succès ! Un e-mail de confirmation a été envoyé à ${associationForm.email}. Veuillez valider votre compte avant de vous connecter.`,
       });
 
       setAssociationForm({
@@ -394,7 +384,7 @@ export default function RegistrationForms() {
       }, 3000);
 
     } catch (error: any) {
-      console.error('Erreur création association:', error);
+      console.error('Erreur création structure:', error);
       setMessage({ type: 'error', text: error.message });
     } finally {
       setLoading(false);
@@ -421,7 +411,7 @@ export default function RegistrationForms() {
 
       if (assocError) {
         if (assocError.code === 'PGRST116') {
-          throw new Error(`Code d'association invalide: ${cleanAssociationCode}`);
+          throw new Error(`Code de structure invalide: ${cleanAssociationCode}`);
         }
         throw assocError;
       }
@@ -451,7 +441,7 @@ export default function RegistrationForms() {
           description: clubForm.description,
           club_email: clubForm.club_email,
           contact_email: clubForm.contact_email || null,
-          website_url: clubForm.website_url || null, // Ajout de website_url
+          website_url: clubForm.website_url || null,
           association_id: association.id,
           logo_url: null
         }])
@@ -462,7 +452,6 @@ export default function RegistrationForms() {
 
       console.log('Club créé:', club);
 
-      // Upload du logo si un fichier a été sélectionné
       if (clubLogo) {
         console.log('=== DÉBUT UPLOAD LOGO ===');
         console.log('Fichier logo:', {
@@ -494,7 +483,6 @@ export default function RegistrationForms() {
           }
         } catch (logoError) {
           console.error('Erreur lors de l\'upload du logo:', logoError);
-          // Ne pas faire échouer la création du club si seul le logo pose problème
         }
       } else {
         console.log('Aucun logo sélectionné');
@@ -515,11 +503,9 @@ export default function RegistrationForms() {
 
       console.log('=== CRÉATION CLUB TERMINÉE ===');
 
-      // NOUVEAU : Notifier le Super Admin ET tous les followers/supporters de l'association
       try {
         console.log('=== DÉBUT NOTIFICATIONS CRÉATION CLUB ===');
         
-        // 1. Récupérer le Super Admin de l'association
         const { data: superAdmin, error: superAdminError } = await supabase
           .from('profiles')
           .select('id')
@@ -527,23 +513,21 @@ export default function RegistrationForms() {
           .eq('role', 'Super Admin')
           .single();
 
-        // 2. Récupérer tous les supporters et members de l'association (peu importe leur club)
         const { data: followers, error: followersError } = await supabase
           .from('profiles')
           .select('id')
           .eq('association_id', association.id)
-          .in('role', ['Supporter', 'Member']); // TOUS les Supporters et Members de l'association
+          .in('role', ['Supporter', 'Member']);
 
         console.log('Super Admin trouvé:', superAdmin?.id);
         console.log('Followers trouvés:', followers?.length || 0);
 
-        // 3. Préparer la liste des destinataires
         const recipients = [];
         
         if (superAdmin && !superAdminError) {
           recipients.push(superAdmin.id);
         } else {
-          console.warn('⚠️ Aucun Super Admin trouvé pour l\'association:', association.id);
+          console.warn('⚠️ Aucun Super Admin trouvé pour la structure:', association.id);
         }
 
         if (followers && !followersError) {
@@ -554,14 +538,12 @@ export default function RegistrationForms() {
 
         console.log('Total destinataires:', recipients.length);
 
-        // 4. Envoyer les notifications à tous les destinataires
         if (recipients.length > 0) {
-          // Créer les notifications pour tous en une seule fois
           const notifications = recipients.map(userId => ({
             user_id: userId,
             type: 'nouveau_club' as const,
             title: 'Nouveau club créé',
-            message: `Le club "${club.name}" vient d'être créé dans votre association.`,
+            message: `Le club "${club.name}" vient d'être créé dans votre structure.`,
             metadata: {
               club_id: club.id,
               club_name: club.name,
@@ -577,7 +559,6 @@ export default function RegistrationForms() {
         
       } catch (notificationError) {
         console.error('Erreur lors de l\'envoi des notifications:', notificationError);
-        // Ne pas faire échouer la création du club si les notifications échouent
       }
 
       console.log('=== FIN NOTIFICATIONS CRÉATION CLUB ===');
@@ -587,13 +568,12 @@ export default function RegistrationForms() {
         text: `Club créé ! Code: ${club.club_code}. Un email de confirmation a été envoyé à ${clubForm.club_email}. Veuillez valider votre compte avant de vous connecter.`,
       });
       
-      // Réinitialisation du formulaire et redirection avec le nouveau champ
       setClubForm({ 
         name: '', 
         description: '', 
         club_email: '', 
         contact_email: '',
-        website_url: '', // Ajout dans la réinitialisation
+        website_url: '',
         association_code: '', 
         logo_url: '', 
         password: '' 
@@ -719,7 +699,6 @@ export default function RegistrationForms() {
       });
       setUserStep(1);
 
-      // Redirection avec rechargement de la page pour mettre à jour le statut dans le header
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 2000);
@@ -963,7 +942,7 @@ export default function RegistrationForms() {
                       className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-900">Association multiclub</span>
+                      <span className="text-sm font-medium text-gray-900">Structure multiclub</span>
                       <div className="text-xs text-gray-500">Actualités générales, événements inter-clubs et communications officielles</div>
                     </div>
                   </label>
@@ -1049,10 +1028,10 @@ export default function RegistrationForms() {
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Building className="h-10 w-10 text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer une Association</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer une Structure</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Démarrez votre organisation et gérez plusieurs clubs sous une association. 
-                  Parfait pour les grandes organisations.
+                  Démarrez votre organisation et gérez plusieurs clubs sous une structure commune. 
+                  Parfait pour les associations ou services municipaux.
                 </p>
                 <div className="inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
                   Commencer
@@ -1071,8 +1050,8 @@ export default function RegistrationForms() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer un Club</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Rejoignez une association existante et créez votre club pour organiser 
-                  des événements et des membres.
+                  Rejoignez une structure existante et créez votre club pour organiser 
+                  des événements et gérer vos membres.
                 </p>
                 <div className="inline-flex items-center text-green-600 font-semibold group-hover:text-green-700">
                   Commencer
@@ -1109,27 +1088,34 @@ export default function RegistrationForms() {
         {/* Association Form */}
         {activeForm === 'association' && (
           <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Créer une Association</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Créer une Structure</h2>
             
             <form onSubmit={handleCreateAssociation} className="space-y-8">
               {/* Informations générales */}
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">Informations générales</h3>
                 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom de l'Association *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={associationForm.name}
-                      onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Nom de votre association"
-                    />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nom de la Structure *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={associationForm.name}
+                    onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="Association Sportive de [Commune]"
+                  />
+                  <div className="mt-2 text-xs text-gray-500 space-y-1">
+                    <p className="font-medium">Exemples :</p>
+                    <p>• Association Sportive de [Commune]</p>
+                    <p>• Ville de [Commune] - Service des Sports</p>
+                    <p>• Office Municipal des Sports de [Commune]</p>
                   </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Ville
@@ -1142,9 +1128,6 @@ export default function RegistrationForms() {
                       placeholder="Paris"
                     />
                   </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Téléphone
@@ -1157,7 +1140,6 @@ export default function RegistrationForms() {
                       placeholder="01 23 45 67 89"
                     />
                   </div>
-                  <div/>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -1171,7 +1153,7 @@ export default function RegistrationForms() {
                       value={associationForm.email}
                       onChange={(e) => setAssociationForm({ ...associationForm, email: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="contact@association.com"
+                      placeholder="contact@structure.com"
                     />
                   </div>
                   <div>
@@ -1199,13 +1181,13 @@ export default function RegistrationForms() {
                     value={associationForm.description}
                     onChange={(e) => setAssociationForm({ ...associationForm, description: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="Décrivez brièvement votre association..."
+                    placeholder="Décrivez brièvement votre structure..."
                   />
                 </div>
 
                 {/* Logo Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de l'association</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de la structure</label>
                   <ProfilePictureUpload
                     onImageSelect={handleAssociationLogoSelect}
                     currentImage={associationForm.logo_url}
@@ -1291,7 +1273,7 @@ export default function RegistrationForms() {
                   disabled={loading}
                   className="flex-1 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  {loading ? 'Création...' : 'Créer l\'Association'}
+                  {loading ? 'Création...' : 'Créer la Structure'}
                 </button>
               </div>
             </form>
@@ -1367,7 +1349,7 @@ export default function RegistrationForms() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Code d'Association *
+                  Code de Structure *
                 </label>
                 <input
                   type="text"
@@ -1378,11 +1360,10 @@ export default function RegistrationForms() {
                   placeholder="ASSOC-12345678"
                 />
                 <p className="mt-2 text-sm text-gray-500">
-                  Demandez le code d'association au super admin de votre organisation
+                  Demandez le code de structure au super admin de votre organisation
                 </p>
               </div>
 
-              {/* CHAMP AJOUTÉ */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Site web du club
@@ -1412,7 +1393,6 @@ export default function RegistrationForms() {
                 />
               </div>
 
-              {/* Logo Upload pour club */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Logo du club</label>
                 <ProfilePictureUpload

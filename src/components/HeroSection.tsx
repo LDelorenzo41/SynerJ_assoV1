@@ -27,7 +27,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
               onClick={() => document.getElementById('registration')?.scrollIntoView({ behavior: 'smooth' })}
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-1"
             >
-              Créer votre association aujourd'hui !
+              Créer votre structure aujourd'hui !
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
             <button

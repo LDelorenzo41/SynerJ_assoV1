@@ -21,7 +21,7 @@ export default function HowItWorksSection() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Créez votre organisation</h3>
               <p className="text-gray-600">
-                Commencez par créer votre association ou rejoignez-en une existante en tant que club.
+                Commencez par créer votre structure ou rejoignez-en une existante en tant que club.
               </p>
             </div>
 

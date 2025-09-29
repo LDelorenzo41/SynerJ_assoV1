@@ -160,7 +160,7 @@ export default function Associations() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Building className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
-          <p className="text-xl dark-text-muted">Aucune association trouvée</p>
+          <p className="text-xl dark-text-muted">Aucune structure trouvée</p>
         </div>
       </div>
     );
@@ -287,7 +287,7 @@ export default function Associations() {
                 rows={2}
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                placeholder="Description de l'association"
+                placeholder="Description de la structure"
                 className="w-full dark-input px-3 py-2 rounded-lg"
               />
             ) : (
@@ -344,12 +344,12 @@ export default function Associations() {
         </div>
       </div>
 
-      {/* Code d'Association */}
+      {/* Code de Structure */}
       <div className="dark-card shadow-sm rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
           <h2 className="text-xl font-semibold dark-text flex items-center">
             <Building className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
-            Code d'Association
+            Code de Structure
           </h2>
         </div>
         <div className="p-6">
@@ -387,7 +387,7 @@ export default function Associations() {
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
           <h2 className="text-xl font-semibold dark-text flex items-center">
             <Building className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
-            Clubs de l'Association ({clubs.length})
+            Clubs de la Structure ({clubs.length})
           </h2>
           <Link
             to="/clubs"
@@ -402,7 +402,7 @@ export default function Associations() {
             <div className="text-center py-12">
               <Building className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
               <p className="text-lg dark-text-muted mb-2">Aucun club enregistré</p>
-              <p className="text-sm dark-text-muted">Les clubs peuvent rejoindre votre association en utilisant le code ci-dessus</p>
+              <p className="text-sm dark-text-muted">Les clubs peuvent rejoindre votre structure en utilisant le code ci-dessus</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
