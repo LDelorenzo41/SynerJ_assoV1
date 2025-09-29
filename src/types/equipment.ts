@@ -210,6 +210,7 @@ export const EQUIPMENT_CATEGORIES = [
   'Cuisine',
   'Sécurité',
   'Technique',
+  'Salle/installation',
   'Autre'
 ] as const;
 
