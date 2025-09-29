@@ -19,9 +19,9 @@ export default function FeaturesSection() {
             <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
               <Building className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Gestion d'associations</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Gestion de structures</h3>
             <p className="text-gray-600 mb-6">
-              Créez et gérez facilement vos associations avec des outils de gestion complets et intuitifs.
+              Créez et gérez facilement vos structures (associations ou services municipaux) avec des outils complets.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center text-gray-700">
@@ -43,9 +43,9 @@ export default function FeaturesSection() {
             <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-6">
               <Users className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Clubs dynamiques</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Clubs & Communication</h3>
             <p className="text-gray-600 mb-6">
-              Organisez vos clubs, gérez les membres et créez des communautés engagées.
+              Organisez vos clubs, gérez les membres et communiquez efficacement avec vos communautés.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center text-gray-700">
@@ -54,11 +54,11 @@ export default function FeaturesSection() {
               </li>
               <li className="flex items-center text-gray-700">
                 <Check className="h-4 w-4 text-green-500 mr-2" />
-                Événements privés/publics
+                Communications ciblées
               </li>
               <li className="flex items-center text-gray-700">
                 <Check className="h-4 w-4 text-green-500 mr-2" />
-                Communication intégrée
+                Événements privés/publics
               </li>
             </ul>
           </div>
@@ -67,9 +67,9 @@ export default function FeaturesSection() {
             <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
               <Calendar className="h-8 w-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Événements intelligents</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Événements & Ressources</h3>
             <p className="text-gray-600 mb-6">
-              Créez, gérez et promouvez vos événements avec des outils avancés de planification.
+              Créez des événements, gérez votre calendrier et réservez du matériel en toute simplicité.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center text-gray-700">
@@ -78,7 +78,7 @@ export default function FeaturesSection() {
               </li>
               <li className="flex items-center text-gray-700">
                 <Check className="h-4 w-4 text-green-500 mr-2" />
-                Inscriptions automatiques
+                Réservation de matériel
               </li>
               <li className="flex items-center text-gray-700">
                 <Check className="h-4 w-4 text-green-500 mr-2" />

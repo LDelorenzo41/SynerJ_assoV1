@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 
 interface AssociationInfo {
@@ -53,6 +53,17 @@ export default function Dashboard() {
   const [showAssociationSearch, setShowAssociationSearch] = useState(false);
   const [showChangeConfirmation, setShowChangeConfirmation] = useState(false);
   const [selectedAssociationId, setSelectedAssociationId] = useState<string | null>(null);
+  const [structureSearchQuery, setStructureSearchQuery] = useState('');
+  
+  // États pour devenir membre
+  const [showBecomeMemberModal, setShowBecomeMemberModal] = useState(false);
+  const [memberClubCode, setMemberClubCode] = useState('');
+  const [clubCodeValidation, setClubCodeValidation] = useState<{loading: boolean, valid: boolean | null, clubName: string, clubId: string | null}>({
+    loading: false,
+    valid: null,
+    clubName: '',
+    clubId: null
+  });
 
   useEffect(() => {
     fetchUserInfo();
@@ -68,7 +79,6 @@ export default function Dashboard() {
       const now = new Date().toISOString();
       
       if (profile.role === 'Club Admin' && profile.club_id) {
-        // Récupérer les événements et infos du club séparément
         const [eventsResult, clubResult] = await Promise.all([
           supabase
             .from('events')
@@ -210,19 +220,16 @@ export default function Dashboard() {
   const handleJoinAssociation = async (associationId: string) => {
     if (!profile?.id) return;
     try {
-      // 1. Supprimer tous les clubs suivis de l'ancienne association
       await supabase
         .from('user_clubs')
         .delete()
         .eq('user_id', profile.id);
 
-      // 2. Supprimer tous les événements du calendrier personnel  
       await supabase
         .from('user_calendar_events')
         .delete()
         .eq('user_id', profile.id);
 
-      // 3. Changer l'association
       const { error } = await supabase
         .from('profiles')
         .update({ association_id: associationId })
@@ -249,6 +256,91 @@ export default function Dashboard() {
     }
     setShowChangeConfirmation(false);
     setSelectedAssociationId(null);
+  };
+
+  const validateClubCode = async (code: string) => {
+    if (!code || code.length < 8) {
+      setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
+      return;
+    }
+
+    setClubCodeValidation({ loading: true, valid: null, clubName: '', clubId: null });
+
+    try {
+      const cleanClubCode = code.trim().toUpperCase();
+      
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('id, name, association_id')
+        .eq('club_code', cleanClubCode)
+        .single();
+
+      if (error || !data) {
+        setClubCodeValidation({ loading: false, valid: false, clubName: '', clubId: null });
+      } else {
+        // Vérifier que le club appartient à la même structure que le supporter
+        if (profile?.association_id && data.association_id !== profile.association_id) {
+          setClubCodeValidation({ loading: false, valid: false, clubName: '', clubId: null });
+        } else {
+          setClubCodeValidation({ loading: false, valid: true, clubName: data.name, clubId: data.id });
+        }
+      }
+    } catch (err) {
+      setClubCodeValidation({ loading: false, valid: false, clubName: '', clubId: null });
+    }
+  };
+
+  const handleBecomeMember = async () => {
+    if (!profile?.id || !clubCodeValidation.clubId) return;
+
+    try {
+      setLoading(true);
+
+      // 1. Vérifier si l'utilisateur suit déjà ce club
+      const { data: existingFollow } = await supabase
+        .from('user_clubs')
+        .select('club_id')
+        .eq('user_id', profile.id)
+        .eq('club_id', clubCodeValidation.clubId)
+        .single();
+
+      // 2. Mettre à jour le profil : changer le rôle et ajouter le club_id
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          role: 'Member',
+          club_id: clubCodeValidation.clubId
+        })
+        .eq('id', profile.id);
+
+      if (profileError) throw profileError;
+
+      // 3. Ajouter l'entrée dans user_clubs uniquement si elle n'existe pas déjà
+      if (!existingFollow) {
+        const { error: userClubError } = await supabase
+          .from('user_clubs')
+          .insert({
+            user_id: profile.id,
+            club_id: clubCodeValidation.clubId
+          });
+
+        if (userClubError) throw userClubError;
+      }
+
+      // 4. Recharger les infos et fermer le modal
+      await fetchUserInfo();
+      setShowBecomeMemberModal(false);
+      setMemberClubCode('');
+      setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
+      
+      // Recharger la page pour mettre à jour tous les composants
+      window.location.reload();
+    } catch (error) {
+      console.error('Error becoming member:', error);
+      alert('Erreur lors de la mise à jour de votre statut. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getRoleDisplayName = (role: string) => {
@@ -472,18 +564,30 @@ export default function Dashboard() {
     if (profile?.role === 'Supporter') {
       return (
         <div className="dark-bg p-4 rounded-lg">
-          <div className="flex items-center">
-            <LogoDisplay 
-              src={null} 
-              alt="Aucun club" 
-              fallbackIcon={Users}
-              iconColor="text-gray-400 dark:text-slate-500"
-            />
-            <div className="ml-3">
-              <p className="text-sm dark-text-muted">Club</p>
-              <p className="text-lg font-semibold dark-text-muted">Aucun club</p>
-              <p className="text-xs dark-text-muted">Accès aux événements publics</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <LogoDisplay 
+                src={null} 
+                alt="Aucun club" 
+                fallbackIcon={Users}
+                iconColor="text-gray-400 dark:text-slate-500"
+              />
+              <div className="ml-3">
+                <p className="text-sm dark-text-muted">Club</p>
+                <p className="text-lg font-semibold dark-text-muted">Aucun club</p>
+                <p className="text-xs dark-text-muted">Accès aux événements publics</p>
+              </div>
             </div>
+            <button
+              onClick={() => setShowBecomeMemberModal(true)}
+              className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all hover:scale-110 group relative"
+              title="Devenir membre d'un club"
+            >
+              <UserPlus className="h-6 w-6 animate-pulse" />
+              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                Devenir membre
+              </span>
+            </button>
           </div>
         </div>
       );
@@ -517,42 +621,67 @@ export default function Dashboard() {
       const buttonHoverBg = hasAssociation ? 'hover:bg-purple-100 dark:hover:bg-purple-900/40' : 'hover:bg-yellow-100 dark:hover:bg-yellow-900/40';
 
       const otherAssociations = availableAssociations.filter(assoc => assoc.id !== profile?.association_id);
+      
+      // Filtrer les structures selon la recherche
+      const filteredAssociations = otherAssociations.filter(assoc => 
+        assoc.name.toLowerCase().includes(structureSearchQuery.toLowerCase())
+      );
 
       return (
         <div className={`${bgColor} p-4 rounded-lg`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center flex-1">
               <LogoDisplay 
                 src={associationInfo?.logo_url || null} 
                 alt={hasAssociation ? `Logo ${associationInfo?.name}` : 'Non affilié'} 
                 fallbackIcon={Building}
                 iconColor={iconColor}
               />
-              <div className="ml-3">
-                <p className="text-sm dark-text-muted">Association</p>
+              <div className="ml-3 flex-1">
+                <p className="text-sm dark-text-muted">Structure</p>
                 <p className="text-lg font-semibold dark-text">
                   {hasAssociation ? associationInfo?.name : 'Non affilié'}
                 </p>
               </div>
             </div>
             <button
-              onClick={() => setShowAssociationSearch(!showAssociationSearch)}
-              className={`${iconColor} p-2 rounded-lg ${buttonHoverBg}`}
-              title={hasAssociation ? "Changer d'association" : "Rechercher une association"}
+              onClick={() => {
+                setShowAssociationSearch(!showAssociationSearch);
+                setStructureSearchQuery('');
+              }}
+              className={`${iconColor} p-3 rounded-lg ${buttonHoverBg} transition-all hover:scale-110 group relative`}
+              title={hasAssociation ? "Changer de structure" : "Choisir une structure"}
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-6 w-6 animate-pulse" />
+              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                {hasAssociation ? "Changer de structure" : "Choisir votre structure"}
+              </span>
             </button>
           </div>
           
           {showAssociationSearch && (
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-3">
               <p className="text-sm dark-text-muted mb-2">
-                {hasAssociation ? 'Changer pour :' : 'Associations disponibles :'}
+                {hasAssociation ? 'Changer pour :' : 'Structures disponibles :'}
               </p>
               
-              {otherAssociations.length > 0 ? (
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {otherAssociations.map((association) => (
+              {/* Champ de recherche */}
+              {otherAssociations.length > 3 && (
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Rechercher une structure..."
+                    value={structureSearchQuery}
+                    onChange={(e) => setStructureSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 pl-9 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark-input text-sm"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+              )}
+              
+              {filteredAssociations.length > 0 ? (
+                <div className="max-h-64 overflow-y-auto space-y-1">
+                  {filteredAssociations.map((association) => (
                     <button
                       key={association.id}
                       onClick={() => handleAssociationSelection(association.id)}
@@ -569,9 +698,13 @@ export default function Dashboard() {
                     </button>
                   ))}
                 </div>
+              ) : structureSearchQuery ? (
+                <p className="text-sm dark-text-muted italic px-3 py-2 dark-card rounded border border-gray-200 dark:border-gray-600">
+                  Aucune structure ne correspond à votre recherche "{structureSearchQuery}"
+                </p>
               ) : (
                 <p className="text-sm dark-text-muted italic px-3 py-2 dark-card rounded border border-gray-200 dark:border-gray-600">
-                  Aucune autre association n'est disponible pour le moment.
+                  Aucune autre structure n'est disponible pour le moment.
                 </p>
               )}
             </div>
@@ -591,7 +724,7 @@ export default function Dashboard() {
               iconColor="text-purple-600 dark:text-purple-400"
             />
             <div className="ml-3">
-              <p className="text-sm dark-text-muted">Association</p>
+              <p className="text-sm dark-text-muted">Structure</p>
               <p className="text-lg font-semibold dark-text">{associationInfo.name}</p>
             </div>
           </div>
@@ -708,7 +841,7 @@ export default function Dashboard() {
                 </h3>
                 <p className="text-sm text-purple-700 dark:text-purple-300">
                   {getRoleDisplayName(profile?.role || '') === 'Super Admin' 
-                    ? 'Tableau de bord de l\'association'
+                    ? 'Tableau de bord de la structure'
                     : getRoleDisplayName(profile?.role || '') === 'Admin Club'
                     ? 'Tableau de bord du club'
                     : getRoleDisplayName(profile?.role || '') === 'Membre'
@@ -734,12 +867,12 @@ export default function Dashboard() {
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
               <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Comment ça fonctionne ?</h3>
               <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                <p>• <strong>Choisissez votre association</strong> pour découvrir ses clubs</p>
+                <p>• <strong>Choisissez votre structure</strong> pour découvrir ses clubs (cliquez sur l'icône 🔍 dans la section "Structure" ci-dessous)</p>
                 <p>• <strong>Suivez les clubs</strong> qui vous intéressent pour voir leurs événements</p>
                 <p>• <strong>Ajoutez à votre calendrier</strong> les événements auxquels vous voulez participer</p>
                 {associationInfo && (
                   <p className="mt-2 pt-2 border-t border-blue-300 dark:border-blue-600">
-                    ⚠️ <strong>Changement d'association :</strong> Vos clubs suivis et événements seront réinitialisés
+                    ⚠️ <strong>Changement de structure :</strong> Vos clubs suivis et événements seront réinitialisés
                   </p>
                 )}
               </div>
@@ -790,7 +923,6 @@ export default function Dashboard() {
         <div className="p-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* VIGNETTES SUPER ADMIN - MODIFIÉES ICI */}
             {isSuperAdmin && (
               <>
                 <Link to="/associations" className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors group">
@@ -799,8 +931,8 @@ export default function Dashboard() {
                       <Building className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium dark-text">Association</p>
-                      <p className="text-sm dark-text-muted">Gérer l'association</p>
+                      <p className="font-medium dark-text">Structure</p>
+                      <p className="text-sm dark-text-muted">Gérer la structure</p>
                     </div>
                   </div>
                 </Link>
@@ -815,7 +947,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Link>
-                {/* NOUVELLE VIGNETTE COMMUNICATIONS POUR SUPER ADMIN */}
                 <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
@@ -830,7 +961,6 @@ export default function Dashboard() {
               </>
             )}
 
-            {/* VIGNETTES CLUB ADMIN - MODIFIÉES ICI */}
             {isClubAdmin && (
               <>
                 <Link to="/my-club" className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors group">
@@ -855,7 +985,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Link>
-                {/* NOUVELLE VIGNETTE COMMUNICATIONS POUR CLUB ADMIN */}
                 <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
@@ -931,21 +1060,21 @@ export default function Dashboard() {
                 <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold dark-text">Changer d'association</h3>
+                <h3 className="text-lg font-semibold dark-text">Changer de structure</h3>
               </div>
             </div>
             
             <div className="mb-6">
               <p className="dark-text-muted mb-3">
-                Vous êtes sur le point de changer d'association. Cette action va :
+                Vous êtes sur le point de changer de structure. Cette action va :
               </p>
               <ul className="list-disc list-inside text-sm dark-text-muted space-y-1 mb-4">
                 <li>Supprimer tous vos clubs suivis actuels</li>
                 <li>Réinitialiser vos préférences de clubs</li>
-                <li>Vous donner accès aux clubs de la nouvelle association</li>
+                <li>Vous donner accès aux clubs de la nouvelle structure</li>
               </ul>
               <p className="text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded text-sm">
-                <strong>Attention :</strong> Cette action est irréversible. Vous devrez à nouveau choisir les clubs à suivre dans votre nouvelle association.
+                <strong>Attention :</strong> Cette action est irréversible. Vous devrez à nouveau choisir les clubs à suivre dans votre nouvelle structure.
               </p>
             </div>
 
@@ -964,6 +1093,107 @@ export default function Dashboard() {
                 className="flex-1 py-2 px-4 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-colors"
               >
                 Confirmer le changement
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Devenir Membre */}
+      {showBecomeMemberModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="dark-card p-6 rounded-lg w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mr-3">
+                  <UserPlus className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-lg font-semibold dark-text">Devenir Membre</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowBecomeMemberModal(false);
+                  setMemberClubCode('');
+                  setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
+                }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+              >
+                <X className="h-5 w-5 dark-text-muted" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="dark-text-muted mb-4">
+                Pour devenir membre d'un club, entrez le code du club que vous souhaitez rejoindre.
+              </p>
+              
+              <label className="block text-sm font-medium dark-text mb-2">
+                Code du Club *
+              </label>
+              <input
+                type="text"
+                value={memberClubCode}
+                onChange={(e) => {
+                  const code = e.target.value;
+                  setMemberClubCode(code);
+                  if (code.length >= 8) {
+                    validateClubCode(code);
+                  } else {
+                    setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
+                  }
+                }}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all dark-input ${
+                  clubCodeValidation.valid === true ? 'border-green-500' :
+                  clubCodeValidation.valid === false ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder="CLUB-12345678"
+              />
+              
+              {clubCodeValidation.loading && (
+                <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 flex items-center">
+                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  Vérification du code...
+                </p>
+              )}
+              
+              {clubCodeValidation.valid === true && (
+                <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
+                  <Check className="w-4 h-4 mr-2" />
+                  Club trouvé : {clubCodeValidation.clubName}
+                </p>
+              )}
+              
+              {clubCodeValidation.valid === false && memberClubCode && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Code de club invalide ou club non disponible dans votre structure
+                </p>
+              )}
+
+              <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                <p className="text-xs text-blue-800 dark:text-blue-300">
+                  <strong>Note :</strong> En devenant membre, vous aurez accès aux événements privés du club et pourrez participer à toutes les activités réservées aux membres.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowBecomeMemberModal(false);
+                  setMemberClubCode('');
+                  setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
+                }}
+                className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleBecomeMember}
+                disabled={!clubCodeValidation.valid || loading}
+                className="flex-1 py-2 px-4 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loading ? 'Traitement...' : 'Devenir Membre'}
               </button>
             </div>
           </div>
