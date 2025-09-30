@@ -4,6 +4,7 @@ import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
+import WelcomeModal from '../components/WelcomeModal'; // Importation du nouveau composant
 
 interface AssociationInfo {
   id: string;
@@ -40,7 +41,7 @@ interface UpcomingEvent {
 }
 
 export default function Dashboard() {
-  const { profile, isSuperAdmin, isClubAdmin } = useAuthNew();
+  const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew(); // Ajout de updateProfile
   const location = useLocation();
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
@@ -55,7 +56,6 @@ export default function Dashboard() {
   const [selectedAssociationId, setSelectedAssociationId] = useState<string | null>(null);
   const [structureSearchQuery, setStructureSearchQuery] = useState('');
   
-  // États pour devenir membre
   const [showBecomeMemberModal, setShowBecomeMemberModal] = useState(false);
   const [memberClubCode, setMemberClubCode] = useState('');
   const [clubCodeValidation, setClubCodeValidation] = useState<{loading: boolean, valid: boolean | null, clubName: string, clubId: string | null}>({
@@ -64,6 +64,25 @@ export default function Dashboard() {
     clubName: '',
     clubId: null
   });
+
+  // ---- Début des ajouts pour le modal de bienvenue ----
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si le profil est chargé et si c'est la première connexion
+    if (profile && profile.first_login_completed === false) {
+      setShowWelcomeModal(true);
+    }
+  }, [profile]);
+
+  const handleCloseWelcomeModal = async () => {
+    if (profile) {
+      // Mettre à jour le profil dans la base de données pour ne plus afficher le modal
+      await updateProfile({ first_login_completed: true });
+      setShowWelcomeModal(false);
+    }
+  };
+  // ---- Fin des ajouts ----
 
   useEffect(() => {
     fetchUserInfo();
@@ -278,7 +297,6 @@ export default function Dashboard() {
       if (error || !data) {
         setClubCodeValidation({ loading: false, valid: false, clubName: '', clubId: null });
       } else {
-        // Vérifier que le club appartient à la même structure que le supporter
         if (profile?.association_id && data.association_id !== profile.association_id) {
           setClubCodeValidation({ loading: false, valid: false, clubName: '', clubId: null });
         } else {
@@ -296,7 +314,6 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // 1. Vérifier si l'utilisateur suit déjà ce club
       const { data: existingFollow } = await supabase
         .from('user_clubs')
         .select('club_id')
@@ -304,7 +321,6 @@ export default function Dashboard() {
         .eq('club_id', clubCodeValidation.clubId)
         .single();
 
-      // 2. Mettre à jour le profil : changer le rôle et ajouter le club_id
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -315,7 +331,6 @@ export default function Dashboard() {
 
       if (profileError) throw profileError;
 
-      // 3. Ajouter l'entrée dans user_clubs uniquement si elle n'existe pas déjà
       if (!existingFollow) {
         const { error: userClubError } = await supabase
           .from('user_clubs')
@@ -327,13 +342,11 @@ export default function Dashboard() {
         if (userClubError) throw userClubError;
       }
 
-      // 4. Recharger les infos et fermer le modal
       await fetchUserInfo();
       setShowBecomeMemberModal(false);
       setMemberClubCode('');
       setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
       
-      // Recharger la page pour mettre à jour tous les composants
       window.location.reload();
     } catch (error) {
       console.error('Error becoming member:', error);
@@ -622,7 +635,6 @@ export default function Dashboard() {
 
       const otherAssociations = availableAssociations.filter(assoc => assoc.id !== profile?.association_id);
       
-      // Filtrer les structures selon la recherche
       const filteredAssociations = otherAssociations.filter(assoc => 
         assoc.name.toLowerCase().includes(structureSearchQuery.toLowerCase())
       );
@@ -665,7 +677,6 @@ export default function Dashboard() {
                 {hasAssociation ? 'Changer pour :' : 'Structures disponibles :'}
               </p>
               
-              {/* Champ de recherche */}
               {otherAssociations.length > 3 && (
                 <div className="relative">
                   <input
@@ -824,6 +835,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Ajout du rendu conditionnel du modal de bienvenue */}
+      {showWelcomeModal && profile && (
+        <WelcomeModal
+          userFirstName={profile.first_name}
+          onClose={handleCloseWelcomeModal}
+        />
+      )}
+
       <div className="dark-card overflow-hidden shadow-sm rounded-lg">
         {associationInfo && (
           <div className="px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
@@ -1099,7 +1118,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Modal Devenir Membre */}
       {showBecomeMemberModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="dark-card p-6 rounded-lg w-full max-w-md mx-4">
