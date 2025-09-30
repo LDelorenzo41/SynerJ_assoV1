@@ -140,14 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Link>
           </div>
           
-          {/* Toggle buttons - INCHANGÉ */}
-          <button
-            onClick={onToggle}
-            className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors lg:hidden"
-            aria-label="Fermer le menu"
-          >
-            <X className="h-5 w-5 dark-text" />
-          </button>
+          {/* Bouton X supprimé - La sidebar se ferme via l'overlay ou la navigation */}
           
           <button
             onClick={onToggle}
