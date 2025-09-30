@@ -4,7 +4,7 @@ import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
-import WelcomeModal from '../components/WelcomeModal'; // Importation du nouveau composant
+import WelcomeModal from '../components/WelcomeModal';
 
 interface AssociationInfo {
   id: string;
@@ -41,7 +41,7 @@ interface UpcomingEvent {
 }
 
 export default function Dashboard() {
-  const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew(); // Ajout de updateProfile
+  const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew();
   const location = useLocation();
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
@@ -65,11 +65,9 @@ export default function Dashboard() {
     clubId: null
   });
 
-  // ---- Début des ajouts pour le modal de bienvenue ----
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
-    // Vérifier si le profil est chargé et si c'est la première connexion
     if (profile && profile.first_login_completed === false) {
       setShowWelcomeModal(true);
     }
@@ -77,12 +75,10 @@ export default function Dashboard() {
 
   const handleCloseWelcomeModal = async () => {
     if (profile) {
-      // Mettre à jour le profil dans la base de données pour ne plus afficher le modal
       await updateProfile({ first_login_completed: true });
       setShowWelcomeModal(false);
     }
   };
-  // ---- Fin des ajouts ----
 
   useEffect(() => {
     fetchUserInfo();
@@ -449,16 +445,16 @@ export default function Dashboard() {
     const groupedEvents = groupEventsByDate(upcomingEvents);
 
     return (
-      <div className="dark-card overflow-hidden shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+      <div className="dark-card overflow-hidden shadow-sm rounded-lg h-full flex flex-col">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold dark-text flex items-center">
+            <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
               <CalendarDays className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
               {profile?.role === 'Club Admin' ? 'Prochains événements du club' : 'Mes prochains événements'}
             </h2>
             <Link 
               to={profile?.role === 'Club Admin' ? "/events" : "/calendrier"}
-              className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center"
+              className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center flex-shrink-0"
             >
               Voir tout
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -466,13 +462,13 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="p-6">
+        <div className="p-4 sm:p-6 flex-1">
           {eventsLoading ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 dark:border-purple-400"></div>
             </div>
           ) : upcomingEvents.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center flex flex-col justify-center h-full">
               <CalendarDays className="h-12 w-12 text-gray-300 dark:text-slate-600 mx-auto mb-3" />
               <p className="dark-text-muted mb-2">Aucun événement à venir</p>
               <p className="text-sm dark-text-muted">
@@ -483,7 +479,7 @@ export default function Dashboard() {
               </p>
               <Link
                 to="/events"
-                className="inline-flex items-center mt-3 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-sm"
+                className="inline-flex items-center justify-center mx-auto mt-3 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-sm"
               >
                 <Eye className="h-4 w-4 mr-1" />
                 {profile?.role === 'Club Admin' ? 'Gérer les événements' : 'Voir les événements'}
@@ -492,58 +488,59 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-4">
               {Object.entries(groupedEvents).map(([dateKey, events]) => (
-                <div key={dateKey} className="border-l-4 border-purple-200 dark:border-purple-700 pl-4">
+                <div key={dateKey}>
                   <div className="flex items-center mb-3">
                     <div className="bg-purple-100 dark:bg-purple-900/50 rounded-full p-2 mr-3">
                       <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <h3 className="font-semibold dark-text">
+                    <h3 className="font-semibold dark-text text-sm sm:text-base">
                       {formatEventDate(events[0].date)}
                     </h3>
-                    <span className="ml-2 text-sm dark-text-muted font-normal">
-                      ({formatEventDateShort(events[0].date)})
-                    </span>
                   </div>
                   
-                  <div className="space-y-2 ml-10">
+                  <div className="space-y-2 pl-4 sm:pl-10">
                     {events.map((event) => (
-                      <div key={event.id} className="flex items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
-                        <LogoDisplay 
-                          src={event.club.logo_url} 
-                          alt={`Logo ${event.club.name}`} 
-                          size="w-8 h-8"
-                          fallbackIcon={Building}
-                          iconColor="text-purple-600 dark:text-purple-400"
-                        />
-                        
-                        <div className="ml-3 flex-1 min-w-0">
-                          <p className="text-sm font-medium dark-text">
-                            {event.name}
-                          </p>
-                          <div className="flex items-center space-x-3 mt-1">
-                            <div className="flex items-center text-xs dark-text-muted">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {formatEventTime(event.date)}
-                            </div>
-                            {event.location && (
+                      // AMÉLIORATION: La mise en page de l'événement est rendue plus flexible
+                      // pour gérer les petits écrans sans écraser le contenu.
+                      <div key={event.id} className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                        <div className="flex items-center w-full">
+                          <LogoDisplay 
+                            src={event.club.logo_url} 
+                            alt={`Logo ${event.club.name}`} 
+                            size="w-8 h-8"
+                            fallbackIcon={Building}
+                            iconColor="text-purple-600 dark:text-purple-400"
+                          />
+                          
+                          <div className="ml-3 flex-1 min-w-0">
+                            <p className="text-sm font-medium dark-text truncate">
+                              {event.name}
+                            </p>
+                            <div className="flex items-center space-x-3 mt-1 flex-wrap">
                               <div className="flex items-center text-xs dark-text-muted">
-                                <MapPin className="h-3 w-3 mr-1" />
-                                <span className="truncate max-w-32">{event.location}</span>
+                                <Clock className="h-3 w-3 mr-1" />
+                                {formatEventTime(event.date)}
                               </div>
-                            )}
+                              {event.location && (
+                                <div className="flex items-center text-xs dark-text-muted">
+                                  <MapPin className="h-3 w-3 mr-1" />
+                                  <span className="truncate">{event.location}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                         
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 self-end sm:self-center flex-shrink-0">
                           {profile?.role !== 'Club Admin' && (
-                            <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-200 dark:bg-purple-900/50 px-2 py-1 rounded font-medium">
+                            <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-200 dark:bg-purple-900/50 px-2 py-1 rounded font-medium truncate">
                               {event.club.name}
                             </span>
                           )}
                           {event.visibility === 'Public' ? (
-                            <Eye className="h-3 w-3 text-green-600 dark:text-green-400" />
+                            <Eye className="h-4 w-4 text-green-600 dark:text-green-400" title="Événement public"/>
                           ) : (
-                            <Users className="h-3 w-3 text-orange-600 dark:text-orange-400" />
+                            <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" title="Réservé aux membres"/>
                           )}
                         </div>
                       </div>
@@ -574,26 +571,28 @@ export default function Dashboard() {
   };
 
   const renderClubSection = () => {
+    // AMÉLIORATION: Padding et tailles de texte ajustés pour mobile
+    const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       return (
-        <div className="dark-bg p-4 rounded-lg">
+        <div className={`dark-bg ${cardPadding} rounded-lg`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center min-w-0">
               <LogoDisplay 
                 src={null} 
                 alt="Aucun club" 
                 fallbackIcon={Users}
                 iconColor="text-gray-400 dark:text-slate-500"
               />
-              <div className="ml-3">
-                <p className="text-sm dark-text-muted">Club</p>
-                <p className="text-lg font-semibold dark-text-muted">Aucun club</p>
-                <p className="text-xs dark-text-muted">Accès aux événements publics</p>
+              <div className="ml-3 min-w-0">
+                <p className="text-xs sm:text-sm dark-text-muted">Club</p>
+                <p className="text-base sm:text-lg font-semibold dark-text-muted truncate">Aucun club</p>
+                <p className="text-xs dark-text-muted hidden sm:block">Accès aux événements publics</p>
               </div>
             </div>
             <button
               onClick={() => setShowBecomeMemberModal(true)}
-              className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all hover:scale-110 group relative"
+              className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all hover:scale-110 group relative flex-shrink-0"
               title="Devenir membre d'un club"
             >
               <UserPlus className="h-6 w-6 animate-pulse" />
@@ -607,7 +606,7 @@ export default function Dashboard() {
     }
     if (clubInfo) {
       return (
-        <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+        <div className={`bg-green-50 dark:bg-green-900/20 ${cardPadding} rounded-lg`}>
           <div className="flex items-center">
             <LogoDisplay 
               src={clubInfo.logo_url} 
@@ -615,9 +614,9 @@ export default function Dashboard() {
               fallbackIcon={Building}
               iconColor="text-green-600 dark:text-green-400"
             />
-            <div className="ml-3">
-              <p className="text-sm dark-text-muted">Club</p>
-              <p className="text-lg font-semibold dark-text">{clubInfo.name}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-xs sm:text-sm dark-text-muted">Club</p>
+              <p className="text-base sm:text-lg font-semibold dark-text truncate">{clubInfo.name}</p>
             </div>
           </div>
         </div>
@@ -627,6 +626,8 @@ export default function Dashboard() {
   };
   
   const renderAssociationSection = () => {
+    // AMÉLIORATION: Padding et tailles de texte ajustés pour mobile
+    const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       const hasAssociation = !!associationInfo;
       const bgColor = hasAssociation ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20';
@@ -640,18 +641,18 @@ export default function Dashboard() {
       );
 
       return (
-        <div className={`${bgColor} p-4 rounded-lg`}>
+        <div className={`${bgColor} ${cardPadding} rounded-lg`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center flex-1">
+            <div className="flex items-center flex-1 min-w-0">
               <LogoDisplay 
                 src={associationInfo?.logo_url || null} 
                 alt={hasAssociation ? `Logo ${associationInfo?.name}` : 'Non affilié'} 
                 fallbackIcon={Building}
                 iconColor={iconColor}
               />
-              <div className="ml-3 flex-1">
-                <p className="text-sm dark-text-muted">Structure</p>
-                <p className="text-lg font-semibold dark-text">
+              <div className="ml-3 flex-1 min-w-0">
+                <p className="text-xs sm:text-sm dark-text-muted">Structure</p>
+                <p className="text-base sm:text-lg font-semibold dark-text truncate">
                   {hasAssociation ? associationInfo?.name : 'Non affilié'}
                 </p>
               </div>
@@ -661,12 +662,12 @@ export default function Dashboard() {
                 setShowAssociationSearch(!showAssociationSearch);
                 setStructureSearchQuery('');
               }}
-              className={`${iconColor} p-3 rounded-lg ${buttonHoverBg} transition-all hover:scale-110 group relative`}
+              className={`${iconColor} p-3 rounded-lg ${buttonHoverBg} transition-all hover:scale-110 group relative flex-shrink-0`}
               title={hasAssociation ? "Changer de structure" : "Choisir une structure"}
             >
               <Search className="h-6 w-6 animate-pulse" />
               <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {hasAssociation ? "Changer de structure" : "Choisir votre structure"}
+                {hasAssociation ? "Changer" : "Choisir"}
               </span>
             </button>
           </div>
@@ -726,7 +727,7 @@ export default function Dashboard() {
 
     if (associationInfo) {
       return (
-        <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+        <div className={`bg-purple-50 dark:bg-purple-900/20 ${cardPadding} rounded-lg`}>
           <div className="flex items-center">
             <LogoDisplay 
               src={associationInfo.logo_url} 
@@ -734,9 +735,9 @@ export default function Dashboard() {
               fallbackIcon={Building}
               iconColor="text-purple-600 dark:text-purple-400"
             />
-            <div className="ml-3">
-              <p className="text-sm dark-text-muted">Structure</p>
-              <p className="text-lg font-semibold dark-text">{associationInfo.name}</p>
+            <div className="ml-3 min-w-0">
+              <p className="text-xs sm:text-sm dark-text-muted">Structure</p>
+              <p className="text-base sm:text-lg font-semibold dark-text truncate">{associationInfo.name}</p>
             </div>
           </div>
         </div>
@@ -753,14 +754,15 @@ export default function Dashboard() {
 
     return (
       <div className="dark-card overflow-hidden shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-xl font-semibold dark-text flex items-center">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
             <Eye className="h-5 w-5 mr-2" />
             Clubs que vous suivez ({followedClubs.length})
           </h2>
         </div>
-        <div className="p-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="p-4 sm:p-6">
+          {/* AMÉLIORATION: La grille passe à 1 colonne sur mobile pour une meilleure lisibilité */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {followedClubs.map((club) => (
               <div key={club.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
@@ -772,20 +774,15 @@ export default function Dashboard() {
                     iconColor="text-blue-600 dark:text-blue-400"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold dark-text truncate">
+                    <h3 className="text-base font-semibold dark-text truncate">
                       {club.name}
                     </h3>
-                    {club.contact_email && (
-                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                        📧 {club.contact_email}
-                      </p>
-                    )}
                     {club.description && (
                       <p className="text-xs dark-text-muted mt-1 line-clamp-2">
                         {club.description}
                       </p>
                     )}
-                    <div className="flex space-x-2 mt-3">
+                    <div className="flex flex-wrap gap-2 mt-3">
                       <a
                         href={`/events?club=${club.slug}`}
                         className="inline-flex items-center text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-900/70 transition-colors"
@@ -833,9 +830,37 @@ export default function Dashboard() {
     );
   }
 
+  const QuickActionLink = ({ to, icon: Icon, title, subtitle, colorClass }: { to: string, icon: React.ElementType, title: string, subtitle: string, colorClass: string }) => {
+    // AMÉLIORATION: Composant réutilisable pour les actions rapides pour garantir la cohérence
+    // et appliquer le style responsive une seule fois.
+    const colors: { [key: string]: { bg: string, iconBg: string, text: string } } = {
+        blue: { bg: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30', iconBg: 'bg-blue-600', text: 'text-blue-800 dark:text-blue-200' },
+        green: { bg: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30', iconBg: 'bg-green-600', text: 'text-green-800 dark:text-green-200' },
+        teal: { bg: 'bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30', iconBg: 'bg-teal-600', text: 'text-teal-800 dark:text-teal-200' },
+        indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30', iconBg: 'bg-indigo-600', text: 'text-indigo-800 dark:text-indigo-200' },
+        purple: { bg: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30', iconBg: 'bg-purple-600', text: 'text-purple-800 dark:text-purple-200' },
+        yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30', iconBg: 'bg-yellow-600', text: 'text-yellow-800 dark:text-yellow-200' },
+        orange: { bg: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30', iconBg: 'bg-orange-600', text: 'text-orange-800 dark:text-orange-200' },
+    };
+    const c = colors[colorClass] || colors.blue;
+
+    return (
+        <Link to={to} className={`${c.bg} p-3 sm:p-4 rounded-lg transition-colors group`}>
+            <div className="flex items-center space-x-3">
+                <div className={`p-2 ${c.iconBg} rounded-lg flex-shrink-0`}>
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                    <p className={`font-semibold dark-text text-sm sm:text-base`}>{title}</p>
+                    <p className="text-xs sm:text-sm dark-text-muted truncate">{subtitle}</p>
+                </div>
+            </div>
+        </Link>
+    );
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Ajout du rendu conditionnel du modal de bienvenue */}
+    <div className="space-y-6 sm:space-y-8">
       {showWelcomeModal && profile && (
         <WelcomeModal
           userFirstName={profile.first_name}
@@ -845,273 +870,170 @@ export default function Dashboard() {
 
       <div className="dark-card overflow-hidden shadow-sm rounded-lg">
         {associationInfo && (
-          <div className="px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
-            <div className="flex items-center space-x-4">
+          // AMÉLIORATION: Padding et tailles de texte adaptatifs
+          <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <LogoDisplay 
                 src={associationInfo.logo_url} 
                 alt={`Logo ${associationInfo.name}`} 
-                size="w-12 h-12"
+                size="w-10 h-10 sm:w-12 sm:h-12"
                 fallbackIcon={Building}
                 iconColor="text-purple-600 dark:text-purple-400"
               />
-              <div>
-                <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-200">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base sm:text-lg font-semibold text-purple-900 dark:text-purple-200 truncate">
                   {associationInfo.name}
                 </h3>
-                <p className="text-sm text-purple-700 dark:text-purple-300">
-                  {getRoleDisplayName(profile?.role || '') === 'Super Admin' 
-                    ? 'Tableau de bord de la structure'
-                    : getRoleDisplayName(profile?.role || '') === 'Admin Club'
-                    ? 'Tableau de bord du club'
-                    : getRoleDisplayName(profile?.role || '') === 'Membre'
-                    ? 'Tableau de bord membre'
-                    : 'Tableau de bord supporter'}
+                <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">
+                  {`Tableau de bord ${getRoleDisplayName(profile?.role || '')}`}
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h1 className="text-3xl font-bold dark-text">
-            Bienvenue, {profile?.first_name} {profile?.last_name}
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h1 className="text-2xl sm:text-3xl font-bold dark-text">
+            Bienvenue, {profile?.first_name}
           </h1>
-          <p className="dark-text-muted mt-2">
-            Tableau de bord {getRoleDisplayName(profile?.role || '')}
+          <p className="dark-text-muted mt-1 sm:mt-2 text-sm sm:text-base">
+            Votre espace {getRoleDisplayName(profile?.role || '')}
           </p>
         </div>
         
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {profile?.role === 'Supporter' && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
-              <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Comment ça fonctionne ?</h3>
-              <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                <p>• <strong>Choisissez votre structure</strong> pour découvrir ses clubs (cliquez sur l'icône 🔍 dans la section "Structure" ci-dessous)</p>
-                <p>• <strong>Suivez les clubs</strong> qui vous intéressent pour voir leurs événements</p>
-                <p>• <strong>Ajoutez à votre calendrier</strong> les événements auxquels vous voulez participer</p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2 text-sm sm:text-base">Comment ça fonctionne ?</h3>
+              <div className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                <p>• <strong>Choisissez une structure</strong> pour voir ses clubs.</p>
+                <p>• <strong>Suivez des clubs</strong> pour remplir votre agenda.</p>
+                <p>• <strong>Consultez votre calendrier</strong> pour ne rien manquer.</p>
                 {associationInfo && (
                   <p className="mt-2 pt-2 border-t border-blue-300 dark:border-blue-600">
-                    ⚠️ <strong>Changement de structure :</strong> Vos clubs suivis et événements seront réinitialisés
+                    ⚠️ <strong>Changement de structure :</strong> Vos clubs suivis seront réinitialisés.
                   </p>
                 )}
               </div>
             </div>
           )}
 
-          <div className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-4">
-              <div className="space-y-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <Users className="h-8 w-8 text-blue-600 dark:text-blue-400 mr-3" />
-                    <div>
-                      <p className="text-sm dark-text-muted">Rôle</p>
-                      <p className="text-lg font-semibold dark-text">
-                        {getRoleDisplayName(profile?.role || '')}
-                      </p>
-                    </div>
+          {/* AMÉLIORATION MAJEURE: La grille principale est simplifiée et plus robuste.
+              Elle passe de 1 colonne (mobile) à 3 colonnes (desktop) avec une meilleure distribution. */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg mr-3">
+                    <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm dark-text-muted">Rôle</p>
+                    <p className="text-base sm:text-lg font-semibold dark-text truncate">
+                      {getRoleDisplayName(profile?.role || '')}
+                    </p>
                   </div>
                 </div>
-                
-                {renderClubSection()}
-                
-                {renderAssociationSection()}
-                
-                {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-                  <SponsorCarousel />
-                )}
               </div>
+              
+              {renderClubSection()}
+              {renderAssociationSection()}
+
+              {/* AMÉLIORATION: Le carrousel des sponsors est caché sur desktop ici */}
+              {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+                <div className="hidden lg:block">
+                  <SponsorCarousel />
+                </div>
+              )}
             </div>
 
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-2">
               {renderUpcomingEventsWidget()}
             </div>
           </div>
+          
+          {/* AMÉLIORATION: Le carrousel est affiché en dehors de la grille sur mobile pour un meilleur flux */}
+          {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+            <div className="lg:hidden mt-6">
+              <SponsorCarousel />
+            </div>
+          )}
         </div>
       </div>
 
       {renderFollowedClubsSection()}
 
       <div className="dark-card overflow-hidden shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-xl font-semibold dark-text flex items-center">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
             Actions Rapides
           </h2>
         </div>
-        <div className="p-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            
+        <div className="p-4 sm:p-6">
+          {/* AMÉLIORATION: Grille adaptative pour les actions, de 1 à 4 colonnes. */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {isSuperAdmin && (
               <>
-                <Link to="/associations" className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-600 dark:bg-blue-700 rounded-lg group-hover:bg-blue-700 dark:group-hover:bg-blue-800 transition-colors">
-                      <Building className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Structure</p>
-                      <p className="text-sm dark-text-muted">Gérer la structure</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/clubs" className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-green-600 dark:bg-green-700 rounded-lg group-hover:bg-green-700 dark:group-hover:bg-green-800 transition-colors">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Clubs</p>
-                      <p className="text-sm dark-text-muted">Gérer les clubs</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
-                      <MessageCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Communications</p>
-                      <p className="text-sm dark-text-muted">Gérer les communications</p>
-                    </div>
-                  </div>
-                </Link>
+                <QuickActionLink to="/associations" icon={Building} title="Structure" subtitle="Gérer la structure" colorClass="blue" />
+                <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Gérer les clubs" colorClass="green" />
+                <QuickActionLink to="/communications" icon={MessageCircle} title="Communications" subtitle="Gérer les communications" colorClass="teal" />
               </>
             )}
 
             {isClubAdmin && (
               <>
-                <Link to="/my-club" className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-green-600 dark:bg-green-700 rounded-lg group-hover:bg-green-700 dark:group-hover:bg-green-800 transition-colors">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Mon Club</p>
-                      <p className="text-sm dark-text-muted">Gérer mon club</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/events" className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-indigo-600 dark:bg-indigo-700 rounded-lg group-hover:bg-indigo-700 dark:group-hover:bg-indigo-800 transition-colors">
-                      <Calendar className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Événements</p>
-                      <p className="text-sm dark-text-muted">Créer et gérer</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/communications" className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-teal-600 dark:bg-teal-700 rounded-lg group-hover:bg-teal-700 dark:group-hover:bg-teal-800 transition-colors">
-                      <MessageCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Communications</p>
-                      <p className="text-sm dark-text-muted">Gérer les communications</p>
-                    </div>
-                  </div>
-                </Link>
+                <QuickActionLink to="/my-club" icon={Users} title="Mon Club" subtitle="Gérer mon club" colorClass="green" />
+                <QuickActionLink to="/events" icon={Calendar} title="Événements" subtitle="Créer et gérer" colorClass="indigo" />
+                <QuickActionLink to="/communications" icon={MessageCircle} title="Communications" subtitle="Gérer les communications" colorClass="teal" />
               </>
             )}
 
             {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
               <>
-                <Link to="/events" className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-indigo-600 dark:bg-indigo-700 rounded-lg group-hover:bg-indigo-700 dark:group-hover:bg-indigo-800 transition-colors">
-                      <Eye className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Événements</p>
-                      <p className="text-sm dark-text-muted">Voir les événements</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/calendrier" className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-purple-600 dark:bg-purple-700 rounded-lg group-hover:bg-purple-700 dark:group-hover:bg-purple-800 transition-colors">
-                      <CalendarDays className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Mon Calendrier</p>
-                      <p className="text-sm dark-text-muted">Gérer mes événements</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/clubs" className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors group">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-yellow-600 dark:bg-yellow-700 rounded-lg group-hover:bg-yellow-700 dark:group-hover:bg-yellow-800 transition-colors">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium dark-text">Découvrir Clubs</p>
-                      <p className="text-sm dark-text-muted">Explorer et suivre</p>
-                    </div>
-                  </div>
-                </Link>
+                <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
+                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Gérer mes événements" colorClass="purple" />
+                <QuickActionLink to="/clubs" icon={Users} title="Découvrir Clubs" subtitle="Explorer et suivre" colorClass="yellow" />
               </>
             )}
-
-            <Link to="/sponsors" className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors group">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-orange-600 dark:bg-orange-700 rounded-lg group-hover:bg-orange-700 dark:group-hover:bg-orange-800 transition-colors">
-                  <Building className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <p className="font-medium dark-text">Nos Sponsors</p>
-                  <p className="text-sm dark-text-muted">Découvrir qui nous soutient</p>
-                </div>
-              </div>
-            </Link>
+            
+            <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
           </div>
         </div>
       </div>
 
+      {/* AMÉLIORATION: Les modales sont maintenant full-width sur mobile avec un padding de sécurité */}
       {showChangeConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="dark-card p-6 rounded-lg w-full max-w-md mx-4">
-            <div className="flex items-center mb-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center mr-3">
-                <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="dark-card p-4 sm:p-6 rounded-lg w-full max-w-md">
+            <div className="flex items-start mb-4">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center mr-3">
+                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold dark-text">Changer de structure</h3>
+                <h3 className="text-base sm:text-lg font-semibold dark-text">Changer de structure</h3>
+                <p className="text-sm dark-text-muted mt-1">Êtes-vous sûr de vouloir continuer ?</p>
               </div>
             </div>
             
             <div className="mb-6">
-              <p className="dark-text-muted mb-3">
-                Vous êtes sur le point de changer de structure. Cette action va :
-              </p>
-              <ul className="list-disc list-inside text-sm dark-text-muted space-y-1 mb-4">
-                <li>Supprimer tous vos clubs suivis actuels</li>
-                <li>Réinitialiser vos préférences de clubs</li>
-                <li>Vous donner accès aux clubs de la nouvelle structure</li>
-              </ul>
-              <p className="text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded text-sm">
-                <strong>Attention :</strong> Cette action est irréversible. Vous devrez à nouveau choisir les clubs à suivre dans votre nouvelle structure.
+              <p className="text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded text-xs sm:text-sm">
+                <strong>Attention :</strong> Cette action est irréversible. Vos clubs suivis et événements de calendrier seront réinitialisés.
               </p>
             </div>
 
-            <div className="flex space-x-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                onClick={() => {
-                  setShowChangeConfirmation(false);
-                  setSelectedAssociationId(null);
-                }}
-                className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
+                onClick={() => { setShowChangeConfirmation(false); setSelectedAssociationId(null); }}
+                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={confirmAssociationChange}
-                className="flex-1 py-2 px-4 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-colors"
+                className="w-full py-2 px-4 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-colors"
               >
-                Confirmer le changement
+                Confirmer
               </button>
             </div>
           </div>
@@ -1119,21 +1041,17 @@ export default function Dashboard() {
       )}
 
       {showBecomeMemberModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="dark-card p-6 rounded-lg w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="dark-card p-4 sm:p-6 rounded-lg w-full max-w-md">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <div className="flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mr-3">
-                  <UserPlus className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mr-3">
+                  <UserPlus className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-400" />
                 </div>
-                <h3 className="text-lg font-semibold dark-text">Devenir Membre</h3>
+                <h3 className="text-base sm:text-lg font-semibold dark-text">Devenir Membre</h3>
               </div>
               <button
-                onClick={() => {
-                  setShowBecomeMemberModal(false);
-                  setMemberClubCode('');
-                  setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
-                }}
+                onClick={() => { setShowBecomeMemberModal(false); setMemberClubCode(''); setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null }); }}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
               >
                 <X className="h-5 w-5 dark-text-muted" />
@@ -1141,75 +1059,62 @@ export default function Dashboard() {
             </div>
             
             <div className="mb-6">
-              <p className="dark-text-muted mb-4">
-                Pour devenir membre d'un club, entrez le code du club que vous souhaitez rejoindre.
+              <p className="dark-text-muted mb-4 text-sm sm:text-base">
+                Entrez le code fourni par votre club pour en devenir membre.
               </p>
               
-              <label className="block text-sm font-medium dark-text mb-2">
-                Code du Club *
+              <label htmlFor="club-code" className="block text-xs sm:text-sm font-medium dark-text mb-2">
+                Code du Club
               </label>
               <input
+                id="club-code"
                 type="text"
                 value={memberClubCode}
                 onChange={(e) => {
-                  const code = e.target.value;
+                  const code = e.target.value.toUpperCase();
                   setMemberClubCode(code);
-                  if (code.length >= 8) {
-                    validateClubCode(code);
-                  } else {
-                    setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
-                  }
+                  validateClubCode(code);
                 }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all dark-input ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all dark-input ${
                   clubCodeValidation.valid === true ? 'border-green-500' :
                   clubCodeValidation.valid === false ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
-                placeholder="CLUB-12345678"
+                placeholder="Ex: CLUB-XYZ123"
               />
               
-              {clubCodeValidation.loading && (
-                <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 flex items-center">
-                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
-                  Vérification du code...
-                </p>
-              )}
-              
-              {clubCodeValidation.valid === true && (
-                <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
-                  <Check className="w-4 h-4 mr-2" />
-                  Club trouvé : {clubCodeValidation.clubName}
-                </p>
-              )}
-              
-              {clubCodeValidation.valid === false && memberClubCode && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  Code de club invalide ou club non disponible dans votre structure
-                </p>
-              )}
-
-              <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                <p className="text-xs text-blue-800 dark:text-blue-300">
-                  <strong>Note :</strong> En devenant membre, vous aurez accès aux événements privés du club et pourrez participer à toutes les activités réservées aux membres.
-                </p>
+              <div className="h-5 mt-2 text-sm">
+                {clubCodeValidation.loading && (
+                  <p className="text-blue-600 dark:text-blue-400 flex items-center">
+                    <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></span>
+                    Vérification...
+                  </p>
+                )}
+                {clubCodeValidation.valid === true && (
+                  <p className="text-green-600 dark:text-green-400 flex items-center">
+                    <Check className="w-4 h-4 mr-2" />
+                    Club trouvé : {clubCodeValidation.clubName}
+                  </p>
+                )}
+                {clubCodeValidation.valid === false && memberClubCode.length >= 8 && (
+                  <p className="text-red-600 dark:text-red-400 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Code de club invalide ou indisponible.
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="flex space-x-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                onClick={() => {
-                  setShowBecomeMemberModal(false);
-                  setMemberClubCode('');
-                  setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null });
-                }}
-                className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
+                onClick={() => { setShowBecomeMemberModal(false); setMemberClubCode(''); setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null }); }}
+                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleBecomeMember}
                 disabled={!clubCodeValidation.valid || loading}
-                className="flex-1 py-2 px-4 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-2 px-4 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? 'Traitement...' : 'Devenir Membre'}
               </button>

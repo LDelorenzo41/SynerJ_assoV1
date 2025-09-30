@@ -761,27 +761,29 @@ export default function Communications() {
         </div>
 
         {canCreateCommunication() && (!clubId || (clubInfo && (clubInfo.id === profile?.club_id || isSuperAdmin))) && (
-          <button
-            onClick={() => {
-              setShowForm(true);
-              setEditingCommunication(null);
-              setCommunicationForm({
-                title: '',
-                content: '',
-                visibility: 'Public',
-                priority: 'Normal',
-                target_clubs: [],
-                image_url: '',
-                expires_at: '',
-                is_pinned: false,
-              });
-            }}
-            className="dark-btn-primary px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Nouvelle Communication</span>
-          </button>
-        )}
+  <button
+    onClick={() => {
+      setShowForm(true);
+      setEditingCommunication(null);
+      setCommunicationForm({
+        title: '',
+        content: '',
+        visibility: 'Public',
+        priority: 'Normal',
+        target_clubs: [],
+        image_url: '',
+        expires_at: '',
+        is_pinned: false,
+      });
+    }}
+    className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
+    title="Nouvelle Communication"
+  >
+    <Plus className="h-4 w-4 flex-shrink-0" />
+    <span className="hidden sm:inline lg:hidden ml-2">Nouvelle</span>
+    <span className="hidden lg:inline ml-2">Nouvelle Communication</span>
+  </button>
+)}
       </div>
 
       <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 p-4 rounded-lg">

@@ -281,7 +281,6 @@ export default function Events() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
   const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   
@@ -336,7 +335,7 @@ export default function Events() {
       fetchEvents();
       fetchUserCalendarEvents(); // Ajouter cette ligne
     }
-  }, [profile, showHistory, clubId]);
+  }, [profile, clubId]);
 
   // Nouvelle fonction pour récupérer les événements du calendrier utilisateur
   const fetchUserCalendarEvents = async () => {
@@ -439,13 +438,9 @@ if (clubId) {
   }
 }
 
-    if (showHistory) {
-  query = query.lt('date', now.toISOString());
-} else {
-  query = query.gte('date', now.toISOString());
-}
+    query = query.gte('date', now.toISOString());
 
-    const { data, error } = await query.order('date', { ascending: showHistory ? false : true });
+    const { data, error } = await query.order('date', { ascending: true });
 
     if (error) throw error;
     setEvents(data || []);
@@ -788,13 +783,9 @@ if (clubId) {
 
   const getListTitle = () => {
     if (clubId && clubInfo) {
-      if (showHistory) {
-        return `Historique des événements de ${clubInfo.name}`;
-      }
       return `Événements à venir de ${clubInfo.name}`;
     }
-    
-    return showHistory ? 'Historique des événements' : 'Événements à venir';
+    return 'Événements à venir';
   };
 
   if (profile?.role === 'Supporter' && !profile?.association_id) {
@@ -852,52 +843,29 @@ if (clubId) {
               </div>
             )}
           </div>
-          
-          {!clubId && (
-            <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 dark-card">
-              <button
-                onClick={() => setShowHistory(false)}
-                className={`px-3 py-1 text-sm rounded-l-lg transition-colors ${
-                  !showHistory 
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white' 
-                    : 'dark-text-muted dark-hover'
-                }`}
-              >
-                À venir
-              </button>
-              <button
-                onClick={() => setShowHistory(true)}
-                className={`px-3 py-1 text-sm rounded-r-lg transition-colors ${
-                  showHistory 
-                    ? 'bg-blue-600 dark:bg-blue-700 text-white' 
-                    : 'dark-text-muted dark-hover'
-                }`}
-              >
-                Historique
-              </button>
-            </div>
-          )}
         </div>
 
-        {isClubAdmin && !showHistory && (!clubId || (clubInfo && clubInfo.id === profile?.club_id)) && (
+        {isClubAdmin && (!clubId || (clubInfo && clubInfo.id === profile?.club_id)) && (
           <button
-            onClick={() => {
-              setShowForm(true);
-              setEditingEvent(null);
-              setEventForm({
-                name: '',
-                description: '',
-                date: '',
-                location: '',
-                image_url: '',
-                visibility: 'Public',
-              });
-            }}
-            className="dark-btn-primary px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Créer un Événement</span>
-          </button>
+  onClick={() => {
+    setShowForm(true);
+    setEditingEvent(null);
+    setEventForm({
+      name: '',
+      description: '',
+      date: '',
+      location: '',
+      image_url: '',
+      visibility: 'Public',
+    });
+  }}
+  className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
+  title="Créer un Événement"
+>
+  <Plus className="h-4 w-4 flex-shrink-0" />
+  <span className="hidden sm:inline lg:hidden ml-2">Nouveau</span>
+  <span className="hidden lg:inline ml-2">Créer un Événement</span>
+</button>
         )}
       </div>
 
@@ -1168,11 +1136,6 @@ if (clubId) {
             <Calendar className="h-5 w-5 mr-2" />
             {getListTitle()} ({events.length})
           </h2>
-          {showHistory && (
-            <p className="text-sm dark-text-muted mt-1">
-              Événements passés triés du plus récent au plus ancien
-            </p>
-          )}
         </div>
         <div className="divide-y divide-gray-200 dark:divide-gray-600">
           {events.map((event) => {
@@ -1346,16 +1309,14 @@ if (clubId) {
             <div className="px-6 py-12 text-center">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 mb-4" />
               <p className="dark-text-muted">
-                {clubId && clubInfo ? 
-                  (showHistory ? `Aucun événement passé pour ${clubInfo.name}` : `Aucun événement à venir pour ${clubInfo.name}`) :
-                  (showHistory ? 'Aucun événement dans l\'historique' : 'Aucun événement à venir')
+                {clubId && clubInfo 
+                  ? `Aucun événement à venir pour ${clubInfo.name}`
+                  : 'Aucun événement à venir'
                 }
               </p>
               <p className="text-sm dark-text-muted mt-2">
                 {clubId && clubInfo ? (
-                  `Ce club n'a ${showHistory ? 'organisé aucun événement par le passé' : 'aucun événement programmé'}.`
-                ) : showHistory ? (
-                  'Aucun événement passé trouvé pour votre profil.'
+                  `Ce club n'a aucun événement programmé.`
                 ) : (
                   <>
                     {profile?.role === 'Supporter' && 'Aucun événement public programmé dans votre association.'}

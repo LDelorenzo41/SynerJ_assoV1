@@ -1,4 +1,4 @@
-// Layout.tsx - Version mise à jour avec dark mode
+// Layout.tsx - Version finale corrigée (bottom nav jusqu'à 1024px)
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
@@ -9,15 +9,14 @@ import {
   Home, 
   Settings,
   CalendarDays,
-  Package,    // NOUVEAU: icône pour le matériel
-  Clipboard,  // NOUVEAU: icône pour les demandes
-  Heart,      // NOUVEAU: icône pour les sponsors
-  MessageSquare // NOUVEAU: icône pour les communications
+  Package,
+  Clipboard,
+  Heart,
+  MessageSquare
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
-import { MobileTopBar } from './MobileTopBar';
 import { SponsorBanner } from './SponsorBanner';
-import DarkModeToggle from './DarkModeToggle'; // NOUVEAU: Import du dark mode
+import MobileBottomNav from './MobileBottomNav';
 
 interface AssociationInfo {
   id: string;
@@ -41,15 +40,20 @@ export default function Layout({ children }: LayoutProps) {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     fetchAssociationInfo();
   }, [profile]);
 
-  // Gérer la fermeture de la sidebar mobile lors du redimensionnement
+  // Gérer le resize et fermer la sidebar mobile en mode desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      
+      // Fermer la sidebar mobile si on passe en mode desktop
+      if (width >= 1024) {
         setSidebarOpen(false);
       }
     };
@@ -98,7 +102,6 @@ export default function Layout({ children }: LayoutProps) {
         { path: '/associations', label: 'Association', icon: Building },
         { path: '/clubs', label: 'Clubs', icon: Users },
         { path: '/communications', label: 'Communications', icon: MessageSquare },
-        // Navigation pour Super Admin
         { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
         { path: '/sponsors', label: 'Sponsors', icon: Heart },
       );
@@ -109,7 +112,6 @@ export default function Layout({ children }: LayoutProps) {
         { path: '/my-club', label: 'Mon Club', icon: Users },
         { path: '/events', label: 'Événements', icon: Calendar },
         { path: '/communications', label: 'Communications', icon: MessageSquare },
-        // Navigation pour Club Admin
         { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
         { path: '/sponsors', label: 'Sponsors', icon: Heart },
       );
@@ -130,8 +132,8 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const toggleSidebar = () => {
-    if (window.innerWidth < 1024) {
-      // Mobile: toggle open/close
+    if (windowWidth < 1024) {
+      // Mobile/Tablet: toggle open/close
       setSidebarOpen(!sidebarOpen);
     } else {
       // Desktop: toggle collapsed/expanded
@@ -152,9 +154,9 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen dark-bg flex">
-      {/* Sidebar */}
+      {/* Sidebar - visible uniquement sur desktop (≥1024px) */}
       <Sidebar
-        isOpen={sidebarOpen || !sidebarCollapsed}
+        isOpen={windowWidth < 1024 ? sidebarOpen : !sidebarCollapsed}
         onToggle={toggleSidebar}
         profile={profile}
         associationInfo={associationInfo}
@@ -165,23 +167,11 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile TopBar avec Dark Mode Toggle */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-40">
-          <MobileTopBar 
-            onMenuToggle={() => setSidebarOpen(true)}
-            associationInfo={associationInfo}
-            loading={loading}
-          />
-          {/* NOUVEAU: Dark Mode Toggle pour mobile */}
-          <div className="absolute top-4 right-16">
-            <DarkModeToggle />
-          </div>
-        </div>
-
         {/* Content avec marge adaptative */}
         <main className={`
           flex-1 p-4 sm:p-6 
-          pt-20 lg:pt-6 pb-16
+          pt-6 lg:pt-6 
+          pb-32 lg:pb-20
           transition-all duration-300
         `}>
           <div className="max-w-7xl mx-auto">
@@ -189,10 +179,16 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </main>
 
-        {/* Footer fixe avec bandeau sponsors */}
-        <footer className="fixed bottom-0 left-0 right-0 z-30">
+        {/* Bottom Navigation - visible < 1024px (mobile + tablette) */}
+        <MobileBottomNav 
+          onMenuClick={() => setSidebarOpen(true)}
+          userRole={profile?.role}
+        />
+
+        {/* Bandeau sponsors - au-dessus de la bottom nav sur mobile/tablette */}
+        <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30">
           <SponsorBanner />
-        </footer>
+        </div>
       </div>
     </div>
   );
