@@ -11,6 +11,7 @@ interface Profile {
   association_id: string | null;
   avatar_url: string | null;
   created_at: string;
+  first_login_completed: boolean | null; // Ligne ajoutée
 }
 
 export function useAuthNew() {
