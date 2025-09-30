@@ -1,13 +1,64 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SynerJ - Application Web Complète avec Backend Supabase</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SynerJ">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Lien vers le manifest PWA -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icônes Apple (on les ajoutera plus tard) -->
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <!-- Description pour les app stores et partages -->
+    <meta name="description" content="Plateforme de gestion associative pour les Jeunes Chambres Économiques">
+    <meta property="og:title" content="SynerJ">
+    <meta property="og:description" content="Plateforme de gestion associative pour les Jeunes Chambres Économiques">
+    <meta property="og:type" content="website">
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Enregistrement du Service Worker pour PWA -->
+    <script>
+      // Vérifier si le navigateur supporte les Service Workers
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/service-worker.js')
+            .then((registration) => {
+              console.log('✅ [PWA] Service Worker enregistré avec succès:', registration.scope);
+              
+              // Détecter les mises à jour du Service Worker
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('🔄 [PWA] Nouvelle version du Service Worker détectée');
+                
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('📦 [PWA] Nouvelle version disponible. Rechargez la page pour mettre à jour.');
+                    // On pourrait afficher une notification ici (étape 7 optionnelle)
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.error('❌ [PWA] Erreur lors de l\'enregistrement du Service Worker:', error);
+            });
+        });
+      } else {
+        console.log('⚠️ [PWA] Les Service Workers ne sont pas supportés par ce navigateur');
+      }
+    </script>
   </body>
 </html>
