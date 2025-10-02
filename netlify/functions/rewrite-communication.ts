@@ -6,14 +6,12 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const jsonHeaders = {
   'Content-Type': 'application/json',
-  // CORS basique (ajuste le domaine en prod si besoin)
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 }
 
 export const handler: Handler = async (event) => {
-  // Pré-vol CORS
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: jsonHeaders, body: '' }
   }
@@ -37,37 +35,36 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    const prompt = `Tu es un correcteur professionnel pour communications officielles.
-Corrige uniquement l'orthographe, la grammaire et la fluidité sans changer le contenu.
+    const prompt = `Tu es un expert en communication institutionnelle pour clubs sportifs et associations.
+Réécris cette communication de manière professionnelle et informative.
 
-Consignes:
-- Corriger les fautes d'orthographe et de grammaire
-- Améliorer la fluidité de lecture
-- Formules de politesse appropriées si nécessaire
-- NE PAS changer le contenu ou le message
-- NE PAS ajouter de créativité
+Titre: "${title}"
+Contenu original: "${content}"
 
+Consignes OBLIGATOIRES:
+- Style informatif et professionnel adapté à une communication officielle
+- Corriger toutes les fautes d'orthographe et de grammaire
+- Structurer le texte de manière claire et logique
+- Ton neutre et factuel, sans exagération
+- Conserver TOUS les faits, dates, horaires et informations importantes
+- Améliorer la clarté et la précision du message
+- Maximum 800 caractères
+- Formules de politesse appropriées si pertinent
 
-Texte original: "${content}"`
+Réponds UNIQUEMENT avec le texte réécrit, sans introduction ni commentaire.`
 
-    // API Responses avec GPT-5-nano
     const response = await openai.responses.create({
       model: 'gpt-5-nano',
       input: prompt,
-      // Ces options sont facultatives ; tu peux les retirer si tu veux rester minimaliste
       reasoning: { effort: 'minimal' as const },
       text: { verbosity: 'medium' as const },
     })
 
-    // Extraction défensive
     const raw =
-      // champ pratique renvoyé par le SDK récent
       (response as any).output_text ??
-      // structure de secours si output_text n'est pas présent
       (response as any)?.output?.[0]?.content?.[0]?.text ??
       ''
 
-    // Sécurise, coupe à 1000 caractères, supprime espaces multiples
     const rewrittenDescription = (raw || '')
       .toString()
       .replace(/\s+/g, ' ')
@@ -97,7 +94,7 @@ Texte original: "${content}"`
       statusCode: 500,
       headers: jsonHeaders,
       body: JSON.stringify({
-        error: 'Erreur serveur lors de la correction.',
+        error: 'Erreur serveur lors de la réécriture.',
         details: error?.message || String(error),
       }),
     }

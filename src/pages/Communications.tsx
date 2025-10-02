@@ -46,7 +46,7 @@ interface Communication {
   created_at: string;
   updated_at: string;
   clubs?: {
-    id: string; // Ajouté pour la recherche de sourceName
+    id: string;
     name: string;
     logo_url?: string | null;
   };
@@ -109,7 +109,6 @@ const LogoDisplay: React.FC<LogoDisplayProps> = ({
   );
 };
 
-// Composant pour afficher la priorité
 const PriorityBadge: React.FC<{ priority: 'Low' | 'Normal' | 'High' | 'Urgent' }> = ({ priority }) => {
   const getPriorityStyles = () => {
     switch (priority) {
@@ -160,8 +159,8 @@ export default function Communications() {
   const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
   const [expandedCommunications, setExpandedCommunications] = useState<Set<string>>(new Set());
   const [availableClubs, setAvailableClubs] = useState<Array<{id: string, name: string}>>([]);
+  const [submittingCommunication, setSubmittingCommunication] = useState(false);
   
-  // États pour la réécriture IA
   const [rewritingContent, setRewritingContent] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [showAiSuggestion, setShowAiSuggestion] = useState(false);
@@ -202,13 +201,13 @@ export default function Communications() {
   }, [clubId]);
 
   useEffect(() => {
-    if (profile) {
+    if (profile?.id) {
       fetchCommunications();
       if (canCreateCommunication()) {
         fetchAvailableClubs();
       }
     }
-  }, [profile, clubId]);
+  }, [profile?.id, clubId]);
 
   const fetchAvailableClubs = async () => {
     if (!profile?.association_id) return;
@@ -249,7 +248,6 @@ export default function Communications() {
           profiles (first_name, last_name)
         `);
   
-      // Filtrage par club si paramètre présent
       if (clubId) {
         if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
           query = query.eq('club_id', clubId);
@@ -265,7 +263,6 @@ export default function Communications() {
           }
         }
       } else {
-        // Filtrage par association et rôle - RÉCUPÉRER TOUTES LES COMMUNICATIONS
         query = query.eq('association_id', profile.association_id);
         
         if (profile.role === 'Supporter') {
@@ -273,7 +270,6 @@ export default function Communications() {
         }
       }
   
-      // Filtrer les communications expirées
       const now = new Date().toISOString();
       query = query.or(`expires_at.is.null,expires_at.gte.${now}`);
   
@@ -282,35 +278,22 @@ export default function Communications() {
   
       if (error) throw error;
   
-      // FILTRAGE CÔTÉ CLIENT selon les rôles
       let filteredCommunications = data || [];
 
       if (!clubId) {
-        // Filtrage selon le rôle utilisateur
         if (profile.role === 'Super Admin') {
           filteredCommunications = filteredCommunications.filter(comm => {
-            // Ses propres communications (club ou association)
             if (comm.author_id === profile.id) return true;
-            
-            // Communications publiques des clubs de son association
             if (comm.club_id !== null && comm.visibility === 'Public') return true;
-            
-            // Communications publiques d'association
             if (comm.club_id === null && comm.visibility === 'Public') return true;
-            
             return false;
           });
         }
         
         else if (profile.role === 'Club Admin' || profile.role === 'Member') {
           filteredCommunications = filteredCommunications.filter(comm => {
-            // Communications du propre club
             if (comm.club_id === profile.club_id) return true;
-            
-            // Communications publiques (club ou association)
             if (comm.visibility === 'Public') return true;
-            
-            // Communications privées d'association ciblant le club
             if (comm.club_id === null && 
                 comm.visibility === 'Private' && 
                 comm.target_clubs && 
@@ -318,13 +301,10 @@ export default function Communications() {
                 comm.target_clubs.includes(profile.club_id)) {
               return true;
             }
-            
             return false;
           });
         }
-  
-  // Pour les Supporters, pas de filtrage supplémentaire car déjà géré par la requête SQL
-}
+      }
   
       setCommunications(filteredCommunications);
     } catch (error) {
@@ -414,40 +394,40 @@ export default function Communications() {
   };
 
   const handleRewriteContent = async () => {
-  if (!communicationForm.title || !communicationForm.content) {
-    alert("Veuillez d'abord entrer un titre et un contenu pour la communication");
-    return;
-  }
-
-  try {
-    setRewritingContent(true);
-    
-    const response = await fetch('/.netlify/functions/rewrite-communication', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: communicationForm.title,
-        content: communicationForm.content,
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (data.success && data.rewrittenDescription) {
-      setAiSuggestion(data.rewrittenDescription);
-      setShowAiSuggestion(true);
-    } else {
-      throw new Error(data.error || 'Erreur lors de la réécriture');
+    if (!communicationForm.title || !communicationForm.content) {
+      alert("Veuillez d'abord entrer un titre et un contenu pour la communication");
+      return;
     }
-  } catch (error: any) {
-    console.error('Error rewriting content:', error);
-    alert('Erreur lors de la réécriture: ' + error.message);
-  } finally {
-    setRewritingContent(false);
-  }
-};
+
+    try {
+      setRewritingContent(true);
+      
+      const response = await fetch('/.netlify/functions/rewrite-communication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: communicationForm.title,
+          content: communicationForm.content,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.rewrittenDescription) {
+        setAiSuggestion(data.rewrittenDescription);
+        setShowAiSuggestion(true);
+      } else {
+        throw new Error(data.error || 'Erreur lors de la réécriture');
+      }
+    } catch (error: any) {
+      console.error('Error rewriting content:', error);
+      alert('Erreur lors de la réécriture: ' + error.message);
+    } finally {
+      setRewritingContent(false);
+    }
+  };
 
   const acceptAiSuggestion = () => {
     if (aiSuggestion) {
@@ -469,15 +449,34 @@ export default function Communications() {
       alert('Vous n\'avez pas les permissions pour créer des communications');
       return;
     }
+
+    // Empêcher les soumissions multiples
+    if (submittingCommunication) {
+      return;
+    }
   
     try {
+      setSubmittingCommunication(true);
+
+      // FIX : Convertir expires_at en ISO UTC si défini
+      let expiresAtISO = null;
+      if (communicationForm.expires_at) {
+        const localDate = new Date(communicationForm.expires_at);
+        expiresAtISO = localDate.toISOString();
+      }
+
       const communicationData = {
-        ...communicationForm,
+        title: communicationForm.title,
+        content: communicationForm.content,
+        visibility: communicationForm.visibility,
+        priority: communicationForm.priority,
+        target_clubs: communicationForm.target_clubs.length > 0 ? communicationForm.target_clubs : null,
+        image_url: communicationForm.image_url,
+        expires_at: expiresAtISO,
+        is_pinned: communicationForm.is_pinned,
         association_id: profile!.association_id,
         author_id: profile!.id,
         club_id: profile?.role === 'Club Admin' ? profile.club_id : null,
-        expires_at: communicationForm.expires_at || null,
-        target_clubs: communicationForm.target_clubs.length > 0 ? communicationForm.target_clubs : null,
       };
   
       let createdCommunicationId: string | null = null;
@@ -503,15 +502,12 @@ export default function Communications() {
         if (error) throw error;
         createdCommunicationId = newCommunication.id;
   
-        // Envoyer les notifications
         if (createdCommunicationId && profile?.association_id) {
           try {
             let recipientIds: string[] = [];
         
             if (communicationData.club_id) {
-              // ========== COMMUNICATION DE CLUB ==========
               if (communicationData.visibility === 'Public') {
-                // Communication publique de club : membres du club + followers
                 const [{ data: clubMembers }, { data: followers }] = await Promise.all([
                   supabase
                     .from('profiles')
@@ -527,7 +523,6 @@ export default function Communications() {
                 if (clubMembers) recipientIds.push(...clubMembers.map(m => m.id));
                 if (followers) recipientIds.push(...followers.map(f => f.user_id));
               } else {
-                // Communication privée de club : seulement les membres du club
                 const { data: clubMembers } = await supabase
                   .from('profiles')
                   .select('id')
@@ -537,9 +532,7 @@ export default function Communications() {
                 if (clubMembers) recipientIds = clubMembers.map(m => m.id);
               }
             } else {
-              // ========== COMMUNICATION D'ASSOCIATION ==========
               if (communicationData.visibility === 'Public') {
-                // Communication publique d'association : tous les utilisateurs de l'association
                 const { data: associationUsers } = await supabase
                   .from('profiles')
                   .select('id')
@@ -547,7 +540,6 @@ export default function Communications() {
         
                 if (associationUsers) recipientIds = associationUsers.map(u => u.id);
               } else {
-                // Communication privée d'association : clubs ciblés
                 if (communicationData.target_clubs && communicationData.target_clubs.length > 0) {
                   const { data: targetUsers } = await supabase
                     .from('profiles')
@@ -560,7 +552,6 @@ export default function Communications() {
               }
             }
         
-            // Retirer l'auteur des destinataires et supprimer les doublons
             recipientIds = [...new Set(recipientIds)].filter(id => id !== profile.id);
         
             if (recipientIds.length > 0) {
@@ -575,7 +566,7 @@ export default function Communications() {
                 communicationData.priority,
                 communicationData.visibility,
                 `${profile.first_name} ${profile.last_name}`,
-                communicationData.club_id === null, // isAssociationCommunication
+                communicationData.club_id === null,
                 sourceName
               );
         
@@ -604,11 +595,23 @@ export default function Communications() {
     } catch (error: any) {
       console.error('Error saving communication:', error);
       alert('Error saving communication: ' + error.message);
+    } finally {
+      setSubmittingCommunication(false);
     }
   };
 
   const handleEdit = (communication: Communication) => {
     setEditingCommunication(communication);
+    
+    // FIX : Convertir la date ISO en format datetime-local
+    let localDateTime = '';
+    if (communication.expires_at) {
+      const date = new Date(communication.expires_at);
+      localDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+        .toISOString()
+        .slice(0, 16);
+    }
+    
     setCommunicationForm({
       title: communication.title,
       content: communication.content,
@@ -616,34 +619,32 @@ export default function Communications() {
       priority: communication.priority,
       target_clubs: communication.target_clubs || [],
       image_url: communication.image_url || '',
-      expires_at: communication.expires_at ? communication.expires_at.slice(0, 16) : '',
+      expires_at: localDateTime,
       is_pinned: communication.is_pinned,
     });
     setShowForm(true);
   };
 
   const handleDelete = async (communicationId: string) => {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer cette communication ?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette communication ?')) return;
 
-  try {
-    // Supprimer d'abord les notifications associées
-    await NotificationService.deleteCommunicationNotifications(communicationId);
-    
-    // Puis supprimer la communication
-    const { error } = await supabase
-      .from('communications')
-      .delete()
-      .eq('id', communicationId);
+    try {
+      await NotificationService.deleteCommunicationNotifications(communicationId);
+      
+      const { error } = await supabase
+        .from('communications')
+        .delete()
+        .eq('id', communicationId);
 
-    if (error) throw error;
-    
-    fetchCommunications();
-    
-  } catch (error: any) {
-    console.error('Error deleting communication:', error);
-    alert('Error deleting communication: ' + error.message);
-  }
-};
+      if (error) throw error;
+      
+      fetchCommunications();
+      
+    } catch (error: any) {
+      console.error('Error deleting communication:', error);
+      alert('Error deleting communication: ' + error.message);
+    }
+  };
 
   const togglePin = async (communicationId: string, currentPinStatus: boolean) => {
     try {
@@ -666,7 +667,6 @@ export default function Communications() {
   };
 
   const canManageCommunication = (communication: Communication) => {
-    // Seul l'auteur peut modifier/supprimer sa communication
     return communication.author_id === profile?.id;
   };
 
@@ -721,6 +721,8 @@ export default function Communications() {
                 Pour voir les communications, vous devez d'abord rejoindre une association. 
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
+              
+              {/* CORRECTION : Ajout de la balise <a> ouvrante qui manquait */}
               <a
                 href="/dashboard"
                 className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
@@ -761,29 +763,29 @@ export default function Communications() {
         </div>
 
         {canCreateCommunication() && (!clubId || (clubInfo && (clubInfo.id === profile?.club_id || isSuperAdmin))) && (
-  <button
-    onClick={() => {
-      setShowForm(true);
-      setEditingCommunication(null);
-      setCommunicationForm({
-        title: '',
-        content: '',
-        visibility: 'Public',
-        priority: 'Normal',
-        target_clubs: [],
-        image_url: '',
-        expires_at: '',
-        is_pinned: false,
-      });
-    }}
-    className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
-    title="Nouvelle Communication"
-  >
-    <Plus className="h-4 w-4 flex-shrink-0" />
-    <span className="hidden sm:inline lg:hidden ml-2">Nouvelle</span>
-    <span className="hidden lg:inline ml-2">Nouvelle Communication</span>
-  </button>
-)}
+          <button
+            onClick={() => {
+              setShowForm(true);
+              setEditingCommunication(null);
+              setCommunicationForm({
+                title: '',
+                content: '',
+                visibility: 'Public',
+                priority: 'Normal',
+                target_clubs: [],
+                image_url: '',
+                expires_at: '',
+                is_pinned: false,
+              });
+            }}
+            className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
+            title="Nouvelle Communication"
+          >
+            <Plus className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline lg:hidden ml-2">Nouvelle</span>
+            <span className="hidden lg:inline ml-2">Nouvelle Communication</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 p-4 rounded-lg">
@@ -809,9 +811,11 @@ export default function Communications() {
               <h2 className="text-xl font-bold dark-text">
                 {editingCommunication ? 'Modifier la Communication' : 'Nouvelle Communication'}
               </h2>
+              {/* CORRECTION : Suppression de la ligne dupliquée et erronée `onClick={() => set` */}
               <button 
                 onClick={() => setShowForm(false)}
-                className="p-2 dark-hover rounded-lg"
+                disabled={submittingCommunication}
+                className="p-2 dark-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="h-5 w-5 dark-text" />
               </button>
@@ -830,6 +834,7 @@ export default function Communications() {
                     onChange={(e) => setCommunicationForm({ ...communicationForm, title: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
                     placeholder="Ex: Nouveau règlement concernant les terrains"
+                    disabled={submittingCommunication}
                   />
                 </div>
 
@@ -841,6 +846,7 @@ export default function Communications() {
                     value={communicationForm.priority}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, priority: e.target.value as 'Low' | 'Normal' | 'High' | 'Urgent' })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    disabled={submittingCommunication}
                   >
                     <option value="Low">Faible</option>
                     <option value="Normal">Normale</option>
@@ -859,6 +865,7 @@ export default function Communications() {
                     value={communicationForm.visibility}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, visibility: e.target.value as 'Public' | 'Private' })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    disabled={submittingCommunication}
                   >
                     <option value="Public">Publique</option>
                     <option value="Private">Privée</option>
@@ -874,6 +881,7 @@ export default function Communications() {
                     value={communicationForm.expires_at}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, expires_at: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    disabled={submittingCommunication}
                   />
                   <p className="text-xs dark-text-muted mt-1">
                     Laissez vide pour une communication permanente
@@ -906,6 +914,7 @@ export default function Communications() {
                             }
                           }}
                           className="rounded"
+                          disabled={submittingCommunication}
                         />
                         <span className="text-sm dark-text">{club.name}</span>
                       </label>
@@ -924,6 +933,7 @@ export default function Communications() {
                   checked={communicationForm.is_pinned}
                   onChange={(e) => setCommunicationForm({ ...communicationForm, is_pinned: e.target.checked })}
                   className="rounded"
+                  disabled={submittingCommunication}
                 />
                 <label htmlFor="is_pinned" className="text-sm dark-text flex items-center space-x-1">
                   <Pin className="h-4 w-4" />
@@ -947,6 +957,7 @@ export default function Communications() {
                       type="button"
                       onClick={() => setCommunicationForm({ ...communicationForm, image_url: '' })}
                       className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      disabled={submittingCommunication}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -963,7 +974,7 @@ export default function Communications() {
                         if (file) handleImageUpload(file);
                       }}
                       className="hidden"
-                      disabled={uploadingImage}
+                      disabled={uploadingImage || submittingCommunication}
                     />
                     <div className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
                       <Upload className="h-5 w-5 mx-auto mb-1 text-gray-400 dark:text-slate-500" />
@@ -976,7 +987,7 @@ export default function Communications() {
                   <button
                     type="button"
                     onClick={handleGenerateImage}
-                    disabled={generatingImage || !communicationForm.title}
+                    disabled={generatingImage || !communicationForm.title || submittingCommunication}
                     className="flex-1 p-3 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {generatingImage ? (
@@ -999,7 +1010,7 @@ export default function Communications() {
                   <button
                     type="button"
                     onClick={handleRewriteContent}
-                    disabled={rewritingContent || !communicationForm.title || !communicationForm.content}
+                    disabled={rewritingContent || !communicationForm.title || !communicationForm.content || submittingCommunication}
                     className="flex items-center space-x-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Utiliser l'IA pour améliorer le contenu"
                   >
@@ -1030,6 +1041,7 @@ export default function Communications() {
                         type="button"
                         onClick={rejectAiSuggestion}
                         className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400"
+                        disabled={submittingCommunication}
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -1044,6 +1056,7 @@ export default function Communications() {
                         type="button"
                         onClick={acceptAiSuggestion}
                         className="flex-1 px-3 py-1 bg-purple-600 dark:bg-purple-700 text-white text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
+                        disabled={submittingCommunication}
                       >
                         Utiliser ce contenu
                       </button>
@@ -1053,6 +1066,7 @@ export default function Communications() {
                           acceptAiSuggestion();
                         }}
                         className="flex-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                        disabled={submittingCommunication}
                       >
                         Utiliser et modifier
                       </button>
@@ -1067,6 +1081,7 @@ export default function Communications() {
                   onChange={(e) => setCommunicationForm({ ...communicationForm, content: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
                   placeholder="Rédigez le contenu de votre communication..."
+                  disabled={submittingCommunication}
                 />
               </div>
               
@@ -1074,16 +1089,24 @@ export default function Communications() {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors"
+                  disabled={submittingCommunication}
+                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  disabled={uploadingImage || generatingImage}
-                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={uploadingImage || generatingImage || submittingCommunication}
+                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  {editingCommunication ? 'Mettre à jour' : 'Publier'}
+                  {submittingCommunication ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>{editingCommunication ? 'Mise à jour...' : 'Publication...'}</span>
+                    </>
+                  ) : (
+                    <span>{editingCommunication ? 'Mettre à jour' : 'Publier'}</span>
+                  )}
                 </button>
               </div>
             </form>
@@ -1107,7 +1130,6 @@ export default function Communications() {
             
             return (
               <div key={communication.id} className="px-6 py-6 dark-hover">
-                {/* En-tête avec source */}
                 <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-600">
                   <LogoDisplay 
                     src={communication.club_id ? communication.clubs?.logo_url : communication.associations?.logo_url} 
@@ -1157,7 +1179,6 @@ export default function Communications() {
                   </div>
                 </div>
 
-                {/* Contenu principal */}
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                   {communication.image_url && (
                     <div className="lg:w-80 lg:flex-shrink-0">
@@ -1207,7 +1228,6 @@ export default function Communications() {
                           )}
                         </div>
 
-                        {/* Clubs ciblés pour communications privées */}
                         {communication.visibility === 'Private' && communication.target_clubs_data && communication.target_clubs_data.length > 0 && (
                           <div className="mb-4">
                             <div className="flex items-center text-sm dark-text-muted mb-2">
@@ -1224,7 +1244,6 @@ export default function Communications() {
                           </div>
                         )}
 
-                        {/* Boutons d'action */}
                         <div className="flex items-center space-x-2 mt-4">
                           {canManageCommunication(communication) && (
                             <>
@@ -1297,7 +1316,6 @@ export default function Communications() {
         </div>
       </div>
 
-      {/* Modale pour l'aperçu d'image */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"

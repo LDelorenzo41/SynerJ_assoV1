@@ -2,9 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-// ============================================
-// IMPORT AJOUTÉ
-// ============================================
 import { NotificationService } from '../services/notificationService';
 import { 
   Calendar, 
@@ -25,9 +22,9 @@ import {
   Building,
   CalendarPlus,
   CalendarX,
-  Wand2,     // Ajouté
-  RefreshCw, // Ajouté
-  Map,       // Nouveau pour la carte
+  Wand2,
+  RefreshCw,
+  Map,
 } from 'lucide-react';
 
 interface Event {
@@ -81,7 +78,6 @@ const LogoDisplay: React.FC<LogoDisplayProps> = ({ src, alt, size = 'w-8 h-8', f
   );
 };
 
-// Composant modale pour la carte
 interface MapModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -98,21 +94,17 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
   useEffect(() => {
     if (!isOpen || !mapRef.current) return;
 
-    // Charger Leaflet dynamiquement
     const loadLeaflet = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Vérifier si Leaflet est déjà chargé
         if (typeof window !== 'undefined' && !(window as any).L) {
-          // Charger CSS
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
           document.head.appendChild(link);
 
-          // Charger JS
           const script = document.createElement('script');
           script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
           script.onload = () => initMap();
@@ -131,7 +123,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
       try {
         const L = (window as any).L;
         
-        // Géocoder l'adresse avec Nominatim
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`
         );
@@ -145,20 +136,16 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
 
         const { lat, lon, display_name } = data[0];
 
-        // Nettoyer la carte existante si elle existe
         if (mapInstanceRef.current) {
           mapInstanceRef.current.remove();
         }
 
-        // Créer la carte
         const map = L.map(mapRef.current).setView([parseFloat(lat), parseFloat(lon)], 15);
 
-        // Ajouter les tuiles OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Ajouter un marqueur
         const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);
         marker.bindPopup(`
           <div class="p-2">
@@ -170,7 +157,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
         mapInstanceRef.current = map;
         setLoading(false);
 
-        // Redimensionner la carte après un petit délai
         setTimeout(() => {
           map.invalidateSize();
         }, 100);
@@ -184,7 +170,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
 
     loadLeaflet();
 
-    // Cleanup
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
@@ -204,7 +189,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
         className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête */}
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Map className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -218,7 +202,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
           </button>
         </div>
 
-        {/* Contenu */}
         <div className="p-6">
           <div className="mb-4">
             <h3 className="font-bold text-lg dark:text-white mb-1">{eventName}</h3>
@@ -228,7 +211,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
             </div>
           </div>
 
-          {/* Carte */}
           <div className="relative">
             <div 
               ref={mapRef} 
@@ -236,7 +218,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
               style={{ minHeight: '384px' }}
             />
             
-            {/* États de chargement et d'erreur */}
             {loading && (
               <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg">
                 <div className="text-center">
@@ -259,7 +240,6 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
             )}
           </div>
 
-          {/* Pied de page avec attribution */}
           <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
             Carte fournie par OpenStreetMap • Géolocalisation par Nominatim
           </div>
@@ -283,17 +263,15 @@ export default function Events() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  const [submittingEvent, setSubmittingEvent] = useState(false);
   
-  // États pour le calendrier personnel
   const [userCalendarEvents, setUserCalendarEvents] = useState<string[]>([]);
   const [addingToCalendarId, setAddingToCalendarId] = useState<string | null>(null);
 
-  // États pour la réécriture IA
   const [rewritingDescription, setRewritingDescription] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [showAiSuggestion, setShowAiSuggestion] = useState(false);
 
-  // États pour la carte
   const [showMapModal, setShowMapModal] = useState(false);
   const [selectedEventForMap, setSelectedEventForMap] = useState<Event | null>(null);
   
@@ -307,37 +285,36 @@ export default function Events() {
   });
 
   useEffect(() => {
-  const fetchClubInfo = async () => {
-    if (clubId) {
-      try {
-        const { data, error } = await supabase
-          .from('clubs')
-          .select('id, name, slug')
-          .or(`slug.eq.${clubId},id.eq.${clubId}`)
-          .single();
-        
-        if (!error && data) {
-          setClubInfo(data);
+    const fetchClubInfo = async () => {
+      if (clubId) {
+        try {
+          const { data, error } = await supabase
+            .from('clubs')
+            .select('id, name, slug')
+            .or(`slug.eq.${clubId},id.eq.${clubId}`)
+            .single();
+          
+          if (!error && data) {
+            setClubInfo(data);
+          }
+        } catch (error) {
+          console.error('Error fetching club info:', error);
         }
-      } catch (error) {
-        console.error('Error fetching club info:', error);
+      } else {
+        setClubInfo(null);
       }
-    } else {
-      setClubInfo(null);
-    }
-  };
+    };
 
-  fetchClubInfo();
-}, [clubId]);
+    fetchClubInfo();
+  }, [clubId]);
 
   useEffect(() => {
-    if (profile) {
-      fetchEvents();
-      fetchUserCalendarEvents(); // Ajouter cette ligne
-    }
-  }, [profile, clubId]);
+  if (profile?.id) {
+    fetchEvents();
+    fetchUserCalendarEvents();
+  }
+}, [profile?.id, clubId]);
 
-  // Nouvelle fonction pour récupérer les événements du calendrier utilisateur
   const fetchUserCalendarEvents = async () => {
     if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
 
@@ -356,7 +333,6 @@ export default function Events() {
     }
   };
 
-  // Nouvelle fonction pour ajouter/retirer un événement du calendrier
   const toggleEventInCalendar = async (eventId: string) => {
     if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
 
@@ -365,7 +341,6 @@ export default function Events() {
 
     try {
       if (isInCalendar) {
-        // Retirer du calendrier
         const { error } = await supabase
           .from('user_calendar_events')
           .delete()
@@ -376,7 +351,6 @@ export default function Events() {
 
         setUserCalendarEvents(prev => prev.filter(id => id !== eventId));
       } else {
-        // Ajouter au calendrier
         const { error } = await supabase
           .from('user_calendar_events')
           .insert({
@@ -397,59 +371,55 @@ export default function Events() {
   };
 
   const fetchEvents = async () => {
-  try {
-    if (!profile) {
+    try {
+      if (!profile) {
+        setLoading(false);
+        return;
+      }
+
+      if (profile.role === 'Supporter' && !profile.association_id) {
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+
+      const now = new Date();
+
+      let query = supabase
+        .from('events')
+        .select(`
+          *,
+          clubs (id, name, slug, association_id, logo_url)
+        `);
+
+      if (clubId) {
+        if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+          query = query.eq('club_id', clubId);
+        } else {
+          const { data: clubData } = await supabase
+            .from('clubs')
+            .select('id')
+            .eq('slug', clubId)
+            .single();
+          
+          if (clubData) {
+            query = query.eq('club_id', clubData.id);
+          }
+        }
+      }
+
+      query = query.gte('date', now.toISOString());
+
+      const { data, error } = await query.order('date', { ascending: true });
+
+      if (error) throw error;
+      setEvents(data || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (profile.role === 'Supporter' && !profile.association_id) {
-      setEvents([]);
-      setLoading(false);
-      return;
-    }
-
-    // Utiliser l'heure actuelle
-    const now = new Date();
-
-    let query = supabase
-      .from('events')
-      .select(`
-        *,
-        clubs (id, name, slug, association_id, logo_url)
-      `);
-
-    // Filtrage par club si paramètre présent
-if (clubId) {
-  // Si clubId ressemble à un UUID (ancien format), utiliser directement
-  if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-    query = query.eq('club_id', clubId);
-  } else {
-    // Si c'est un slug, chercher l'ID correspondant
-    const { data: clubData } = await supabase
-      .from('clubs')
-      .select('id')
-      .eq('slug', clubId)
-      .single();
-    
-    if (clubData) {
-      query = query.eq('club_id', clubData.id);
-    }
-  }
-}
-
-    query = query.gte('date', now.toISOString());
-
-    const { data, error } = await query.order('date', { ascending: true });
-
-    if (error) throw error;
-    setEvents(data || []);
-  } catch (error) {
-    console.error('Error fetching events:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const toggleEventExpansion = (eventId: string) => {
     setExpandedEvents(prev => {
@@ -463,13 +433,11 @@ if (clubId) {
     });
   };
 
-  // Fonction pour ouvrir la carte
   const openMapModal = (event: Event) => {
     setSelectedEventForMap(event);
     setShowMapModal(true);
   };
 
-  // Fonction pour fermer la carte
   const closeMapModal = () => {
     setShowMapModal(false);
     setSelectedEventForMap(null);
@@ -505,47 +473,77 @@ if (clubId) {
   const handleGenerateImage = async () => {
     try {
       setGeneratingImage(true);
-  
+
+      // Étape 1 : Analyse et extraction de l'activité principale via OpenAI GPT-5-nano
+      const analysisResponse = await fetch('/.netlify/functions/analyze-event-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: eventForm.name,
+          description: eventForm.description || '',
+        }),
+      });
+
+      if (!analysisResponse.ok) {
+        const errorData = await analysisResponse.json();
+        throw new Error(errorData.error || `Erreur lors de l'analyse: ${analysisResponse.status}`);
+      }
+
+      const analysisData = await analysisResponse.json();
+      
+      if (!analysisData.success || !analysisData.activityDescription) {
+        throw new Error('Impossible d\'extraire la description de l\'activité');
+      }
+
+      const activityDescription = analysisData.activityDescription;
+      console.log('✅ Description extraite par GPT-5-nano:', activityDescription);
+
+      // Étape 2 : Construction du prompt enrichi pour la génération d'image
+      const enhancedDescription = `${activityDescription}
+
+Style visuel : illustration vectorielle moderne, design plat (flat design), couleurs vives et harmonieuses, composition minimaliste et épurée, formes géométriques claires, sensation de dynamisme et d'énergie.`;
+
+      console.log('🎨 Prompt enrichi pour l\'image:', enhancedDescription);
+
+      // Étape 3 : Génération de l'image via Vertex AI
       const res = await fetch('/.netlify/functions/generate-event-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventName: eventForm.name,
-          description: eventForm.description,
+          description: enhancedDescription,
+          isForCommunication: false,
         }),
       });
-  
-      // Toujours lire d'abord en texte (car en cas d'erreur, Netlify Dev renvoie du texte)
+
       const raw = await res.text();
-  
+
       let data: any = null;
       try {
         data = raw ? JSON.parse(raw) : null;
       } catch {
-        // Pas du JSON => lever une erreur lisible
         throw new Error(raw || `HTTP ${res.status}`);
       }
-  
+
       if (!res.ok || !data?.success) {
         throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
       }
-  
-      // URL si dispo, sinon base64 (data URL)
+
       const imageToUse: string | null = data.imageUrl || data.imageBase64 || null;
       if (!imageToUse) throw new Error('Aucune image n\'a été retournée par l\'API.');
-  
-      // Remplir le champ + ouvrir la modale d'aperçu
+
+      console.log('✅ Image générée avec succès');
+
       setEventForm(prev => ({ ...prev, image_url: imageToUse }));
       setSelectedImage(imageToUse);
     } catch (error: any) {
-      console.error('Error generating image:', error);
+      console.error('❌ Erreur lors de la génération de l\'image:', error);
       alert(`Erreur lors de la génération de l'image: ${error?.message || String(error)}`);
     } finally {
       setGeneratingImage(false);
     }
   };
 
-  // Fonction pour appeler l'API de réécriture
   const handleRewriteDescription = async () => {
     if (!eventForm.name || !eventForm.description) {
       alert("Veuillez d'abord entrer un nom et une description pour l'événement");
@@ -582,7 +580,6 @@ if (clubId) {
     }
   };
 
-  // Fonction pour accepter la suggestion IA
   const acceptAiSuggestion = () => {
     if (aiSuggestion) {
       setEventForm({ ...eventForm, description: aiSuggestion });
@@ -591,7 +588,6 @@ if (clubId) {
     }
   };
 
-  // Fonction pour rejeter la suggestion IA
   const rejectAiSuggestion = () => {
     setShowAiSuggestion(false);
     setAiSuggestion(null);
@@ -604,10 +600,25 @@ if (clubId) {
       alert('You must be associated with a club to create events');
       return;
     }
+
+    // Empêcher les soumissions multiples
+    if (submittingEvent) {
+      return;
+    }
   
     try {
+      setSubmittingEvent(true);
+
+      // FIX : Convertir la date locale en ISO UTC
+      const localDate = new Date(eventForm.date);
+      
       const eventData = {
-        ...eventForm,
+        name: eventForm.name,
+        description: eventForm.description,
+        date: localDate.toISOString(),
+        location: eventForm.location,
+        image_url: eventForm.image_url,
+        visibility: eventForm.visibility,
         club_id: profile!.club_id,
       };
   
@@ -708,15 +719,24 @@ if (clubId) {
     } catch (error: any) {
       console.error('Error saving event:', error);
       alert('Error saving event: ' + error.message);
+    } finally {
+      setSubmittingEvent(false);
     }
   };
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
+    
+    // FIX : Convertir la date ISO en format datetime-local
+    const date = new Date(event.date);
+    const localDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+      .toISOString()
+      .slice(0, 16);
+    
     setEventForm({
       name: event.name,
       description: event.description || '',
-      date: event.date.slice(0, 16),
+      date: localDateTime,
       location: event.location || '',
       image_url: event.image_url || '',
       visibility: event.visibility,
@@ -724,27 +744,24 @@ if (clubId) {
     setShowForm(true);
   };
 
-  // ============================================
-  // FONCTION handleDelete MODIFIÉE
-  // ============================================
   const handleDelete = async (eventId: string) => {
-  if (!confirm('Are you sure you want to delete this event?')) return;
+    if (!confirm('Are you sure you want to delete this event?')) return;
 
-  try {
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', eventId);
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId);
 
-    if (error) throw error;
-    
-    fetchEvents();
-    
-  } catch (error: any) {
-    console.error('Error deleting event:', error);
-    alert('Error deleting event: ' + error.message);
-  }
-};
+      if (error) throw error;
+      
+      fetchEvents();
+      
+    } catch (error: any) {
+      console.error('Error deleting event:', error);
+      alert('Error deleting event: ' + error.message);
+    }
+  };
 
   const canManageEvent = (event: Event) => {
     return isClubAdmin && event.club_id === profile?.club_id;
@@ -817,7 +834,6 @@ if (clubId) {
       </div>
     );
   }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -847,25 +863,25 @@ if (clubId) {
 
         {isClubAdmin && (!clubId || (clubInfo && clubInfo.id === profile?.club_id)) && (
           <button
-  onClick={() => {
-    setShowForm(true);
-    setEditingEvent(null);
-    setEventForm({
-      name: '',
-      description: '',
-      date: '',
-      location: '',
-      image_url: '',
-      visibility: 'Public',
-    });
-  }}
-  className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
-  title="Créer un Événement"
->
-  <Plus className="h-4 w-4 flex-shrink-0" />
-  <span className="hidden sm:inline lg:hidden ml-2">Nouveau</span>
-  <span className="hidden lg:inline ml-2">Créer un Événement</span>
-</button>
+            onClick={() => {
+              setShowForm(true);
+              setEditingEvent(null);
+              setEventForm({
+                name: '',
+                description: '',
+                date: '',
+                location: '',
+                image_url: '',
+                visibility: 'Public',
+              });
+            }}
+            className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
+            title="Créer un Événement"
+          >
+            <Plus className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline lg:hidden ml-2">Nouveau</span>
+            <span className="hidden lg:inline ml-2">Créer un Événement</span>
+          </button>
         )}
       </div>
 
@@ -894,7 +910,8 @@ if (clubId) {
               </h2>
               <button 
                 onClick={() => setShowForm(false)}
-                className="p-2 dark-hover rounded-lg"
+                disabled={submittingEvent}
+                className="p-2 dark-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="h-5 w-5 dark-text" />
               </button>
@@ -912,6 +929,7 @@ if (clubId) {
                   onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                   placeholder="Ex: Tournoi de tennis annuel"
+                  disabled={submittingEvent}
                 />
               </div>
               
@@ -925,6 +943,7 @@ if (clubId) {
                   value={eventForm.date}
                   onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
+                  disabled={submittingEvent}
                 />
               </div>
 
@@ -940,6 +959,7 @@ if (clubId) {
                     onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                     placeholder="Ex: 123 Rue de la Paix, 75001 Paris"
+                    disabled={submittingEvent}
                   />
                 </div>
                 <p className="text-xs dark-text-muted mt-1">
@@ -955,6 +975,7 @@ if (clubId) {
                   value={eventForm.visibility}
                   onChange={(e) => setEventForm({ ...eventForm, visibility: e.target.value as 'Public' | 'Members Only' })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
+                  disabled={submittingEvent}
                 >
                   <option value="Public">Public</option>
                   <option value="Members Only">Membres Seulement</option>
@@ -977,6 +998,7 @@ if (clubId) {
                       type="button"
                       onClick={() => setEventForm({ ...eventForm, image_url: '' })}
                       className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      disabled={submittingEvent}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -993,7 +1015,7 @@ if (clubId) {
                         if (file) handleImageUpload(file);
                       }}
                       className="hidden"
-                      disabled={uploadingImage}
+                      disabled={uploadingImage || submittingEvent}
                     />
                     <div className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                       <Upload className="h-5 w-5 mx-auto mb-1 text-gray-400 dark:text-slate-500" />
@@ -1006,7 +1028,7 @@ if (clubId) {
                   <button
                     type="button"
                     onClick={handleGenerateImage}
-                    disabled={generatingImage || !eventForm.name}
+                    disabled={generatingImage || !eventForm.name || submittingEvent}
                     className="flex-1 p-3 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {generatingImage ? (
@@ -1025,7 +1047,6 @@ if (clubId) {
                 </p>
               </div>
               
-              {/* Section Description avec IA */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium dark-text">
@@ -1034,7 +1055,7 @@ if (clubId) {
                   <button
                     type="button"
                     onClick={handleRewriteDescription}
-                    disabled={rewritingDescription || !eventForm.name || !eventForm.description}
+                    disabled={rewritingDescription || !eventForm.name || !eventForm.description || submittingEvent}
                     className="flex items-center space-x-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Utiliser l'IA pour améliorer la description"
                   >
@@ -1052,7 +1073,6 @@ if (clubId) {
                   </button>
                 </div>
 
-                {/* Suggestion IA si disponible */}
                 {showAiSuggestion && aiSuggestion && (
                   <div className="mb-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
                     <div className="flex items-start justify-between mb-2">
@@ -1066,6 +1086,7 @@ if (clubId) {
                         type="button"
                         onClick={rejectAiSuggestion}
                         className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400"
+                        disabled={submittingEvent}
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -1080,6 +1101,7 @@ if (clubId) {
                         type="button"
                         onClick={acceptAiSuggestion}
                         className="flex-1 px-3 py-1 bg-purple-600 dark:bg-purple-700 text-white text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
+                        disabled={submittingEvent}
                       >
                         Utiliser cette description
                       </button>
@@ -1089,6 +1111,7 @@ if (clubId) {
                           acceptAiSuggestion();
                         }}
                         className="flex-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                        disabled={submittingEvent}
                       >
                         Utiliser et modifier
                       </button>
@@ -1102,6 +1125,7 @@ if (clubId) {
                   onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark-input"
                   placeholder="Décrivez votre événement, les détails importants, les instructions pour les participants..."
+                  disabled={submittingEvent}
                 />
                 
                 <p className="text-xs dark-text-muted mt-1">
@@ -1113,16 +1137,24 @@ if (clubId) {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors"
+                  disabled={submittingEvent}
+                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  disabled={uploadingImage || generatingImage}
-                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={uploadingImage || generatingImage || submittingEvent}
+                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  {editingEvent ? 'Mettre à jour' : 'Créer'}
+                  {submittingEvent ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>{editingEvent ? 'Mise à jour...' : 'Création...'}</span>
+                    </>
+                  ) : (
+                    <span>{editingEvent ? 'Mettre à jour' : 'Créer'}</span>
+                  )}
                 </button>
               </div>
             </form>
@@ -1142,7 +1174,6 @@ if (clubId) {
             const isExpanded = expandedEvents.has(event.id);
             return (
               <div key={event.id} className="px-6 py-6 dark-hover">
-                {/* En-tête avec logo et nom du club (même en mode filtrage) */}
                 <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-600">
                   <LogoDisplay 
                     src={event.clubs.logo_url} 
@@ -1170,7 +1201,6 @@ if (clubId) {
                   </div>
                 </div>
 
-                {/* Contenu principal de l'événement */}
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                   {event.image_url && (
                     <div className="lg:w-80 lg:flex-shrink-0">
@@ -1186,10 +1216,8 @@ if (clubId) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        {/* Titre de l'événement */}
                         <h3 className="text-xl font-bold dark-text mb-3">{event.name}</h3>
                         
-                        {/* Informations date et lieu */}
                         <div className="space-y-2 mb-4">
                           <div className="flex items-center dark-text-muted">
                             <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -1219,7 +1247,6 @@ if (clubId) {
                           )}
                         </div>
                         
-                        {/* Description avec expansion */}
                         {event.description && (
                           <div className="mb-4">
                             <p className={`dark-text ${!isExpanded ? 'line-clamp-2' : ''}`}>
@@ -1246,7 +1273,6 @@ if (clubId) {
                           </div>
                         )}
 
-                        {/* Boutons d'action */}
                         <div className="flex items-center space-x-2 mt-4">
                           {canManageEvent(event) && (
                             <>
@@ -1330,7 +1356,6 @@ if (clubId) {
         </div>
       </div>
 
-      {/* Modale pour l'aperçu d'image */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
@@ -1353,7 +1378,6 @@ if (clubId) {
         </div>
       )}
 
-      {/* Modale pour la carte */}
       {selectedEventForMap && (
         <MapModal
           isOpen={showMapModal}
