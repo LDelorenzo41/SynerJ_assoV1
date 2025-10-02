@@ -371,55 +371,55 @@ export default function Events() {
   };
 
   const fetchEvents = async () => {
-    try {
-      if (!profile) {
-        setLoading(false);
-        return;
-      }
+  try {
+    if (!profile) {
+      setLoading(false);
+      return;
+    }
 
-      if (profile.role === 'Supporter' && !profile.association_id) {
-        setEvents([]);
-        setLoading(false);
-        return;
-      }
+    if (profile.role === 'Supporter' && !profile.association_id) {
+      setEvents([]);
+      setLoading(false);
+      return;
+    }
 
-      const now = new Date();
+    const now = new Date();
 
-      let query = supabase
-        .from('events')
-        .select(`
-          *,
-          clubs (id, name, slug, association_id, logo_url)
-        `);
+    let query = supabase
+      .from('events')
+      .select(`
+        *,
+        clubs (id, name, slug, association_id, logo_url)
+      `);
 
-      if (clubId) {
-        if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-          query = query.eq('club_id', clubId);
-        } else {
-          const { data: clubData } = await supabase
-            .from('clubs')
-            .select('id')
-            .eq('slug', clubId)
-            .single();
-          
-          if (clubData) {
-            query = query.eq('club_id', clubData.id);
-          }
+    if (clubId) {
+      if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        query = query.eq('club_id', clubId);
+      } else {
+        const { data: clubData } = await supabase
+          .from('clubs')
+          .select('id')
+          .eq('slug', clubId)
+          .single();
+        
+        if (clubData) {
+          query = query.eq('club_id', clubData.id);
         }
       }
-
-      query = query.gte('date', now.toISOString());
-
-      const { data, error } = await query.order('date', { ascending: true });
-
-      if (error) throw error;
-      setEvents(data || []);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    query = query.gte('date', now.toISOString());
+
+    const { data, error } = await query.order('date', { ascending: true });
+
+    if (error) throw error;
+    setEvents(data || []);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const toggleEventExpansion = (eventId: string) => {
     setExpandedEvents(prev => {
