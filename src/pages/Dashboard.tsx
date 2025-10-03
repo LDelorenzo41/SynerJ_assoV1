@@ -538,10 +538,16 @@ export default function Dashboard() {
                             </span>
                           )}
                           {event.visibility === 'Public' ? (
-                            <Eye className="h-4 w-4 text-green-600 dark:text-green-400" title="Événement public"/>
-                          ) : (
-                            <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" title="Réservé aux membres"/>
-                          )}
+  <div className="flex items-center gap-1">
+    <Eye className="h-4 w-4 text-green-600 dark:text-green-400"/>
+    <span className="text-xs text-green-600 dark:text-green-400">Public</span>
+  </div>
+) : (
+  <div className="flex items-center gap-1">
+    <Users className="h-4 w-4 text-orange-600 dark:text-orange-400"/>
+    <span className="text-xs text-orange-600 dark:text-orange-400">Membres</span>
+  </div>
+)}
                         </div>
                       </div>
                     ))}

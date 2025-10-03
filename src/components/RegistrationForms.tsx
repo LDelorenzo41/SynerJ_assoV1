@@ -44,6 +44,7 @@ interface ClubForm {
 interface UserForm {
   first_name: string;
   last_name: string;
+  pseudo: string;
   email: string;
   password: string;
   club_code: string;
@@ -127,6 +128,9 @@ export default function RegistrationForms() {
     clubName: ''
   });
 
+  const [pseudoAvailable, setPseudoAvailable] = useState<boolean | null>(null);
+  const [checkingPseudo, setCheckingPseudo] = useState(false);
+
   const [associationLogo, setAssociationLogo] = useState<File | null>(null);
   const [clubLogo, setClubLogo] = useState<File | null>(null);
 
@@ -155,6 +159,7 @@ export default function RegistrationForms() {
   const [userForm, setUserForm] = useState<UserForm>({
     first_name: '',
     last_name: '',
+    pseudo: '',
     email: '',
     password: '',
     club_code: '',
@@ -258,11 +263,44 @@ export default function RegistrationForms() {
     }
   };
 
+  const checkPseudoAvailability = async (pseudo: string) => {
+    if (pseudo.length < 3) {
+      setPseudoAvailable(null);
+      return;
+    }
+
+    setCheckingPseudo(true);
+    
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('pseudo')
+        .eq('pseudo', pseudo.trim().toLowerCase())
+        .maybeSingle();
+
+      setCheckingPseudo(false);
+      setPseudoAvailable(!data);
+    } catch {
+      setCheckingPseudo(false);
+      setPseudoAvailable(null);
+    }
+  };
+
   const handleClubCodeChange = (code: string) => {
     setUserForm({ ...userForm, club_code: code });
     
     const timeoutId = setTimeout(() => {
       validateClubCode(code);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  };
+
+  const handlePseudoChange = (pseudo: string) => {
+    setUserForm({ ...userForm, pseudo });
+    
+    const timeoutId = setTimeout(() => {
+      checkPseudoAvailability(pseudo);
     }, 500);
 
     return () => clearTimeout(timeoutId);
@@ -667,6 +705,7 @@ export default function RegistrationForms() {
         .update({
           first_name: userForm.first_name,
           last_name: userForm.last_name,
+          pseudo: userForm.pseudo.trim().toLowerCase(),
           role,
           club_id: clubId,
           association_id: associationId,
@@ -694,10 +733,17 @@ export default function RegistrationForms() {
       });
 
       setUserForm({
-        first_name: '', last_name: '', email: '', password: '', club_code: '', avatar_url: '',
+        first_name: '', 
+        last_name: '', 
+        pseudo: '',
+        email: '', 
+        password: '', 
+        club_code: '', 
+        avatar_url: '',
         email_consents: { clubs: false, association: false, municipality: false, sponsors: false }
       });
       setUserStep(1);
+      setPseudoAvailable(null);
 
       setTimeout(() => {
         window.location.href = '/dashboard';
@@ -758,6 +804,50 @@ export default function RegistrationForms() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pseudo * <span className="text-xs text-gray-500">(visible publiquement)</span>
+              </label>
+              <input
+                type="text"
+                required
+                minLength={3}
+                maxLength={30}
+                pattern="^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_-]{3,30}$"
+                value={userForm.pseudo}
+                onChange={(e) => handlePseudoChange(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                  pseudoAvailable === true ? 'border-green-500' :
+                  pseudoAvailable === false ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="jean_dupont"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                3-30 caractères : lettres, chiffres, tirets (-) et underscores (_)
+              </p>
+              
+              {checkingPseudo && (
+                <p className="mt-2 text-sm text-blue-600 flex items-center">
+                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  Vérification du pseudo...
+                </p>
+              )}
+              
+              {pseudoAvailable === true && (
+                <p className="mt-2 text-sm text-green-600 flex items-center">
+                  <Check className="w-4 h-4 mr-2" />
+                  Pseudo disponible
+                </p>
+              )}
+              
+              {pseudoAvailable === false && userForm.pseudo && (
+                <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Pseudo déjà pris
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Courriel *
               </label>
               <input
@@ -796,7 +886,7 @@ export default function RegistrationForms() {
               <button
                 type="button"
                 onClick={() => setUserStep(2)}
-                disabled={!userForm.first_name || !userForm.last_name || !userForm.email || !userForm.password}
+                disabled={!userForm.first_name || !userForm.last_name || !userForm.pseudo || !userForm.email || !userForm.password || pseudoAvailable === false}
                 className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
               >
                 Suivant
@@ -863,7 +953,7 @@ export default function RegistrationForms() {
               
               {clubValidation.valid === false && userForm.club_code && (
                 <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle className="w-4 w-4 mr-2" />
+                  <AlertCircle className="w-4 h-4 mr-2" />
                   Code de club invalide
                 </p>
               )}
@@ -1394,11 +1484,11 @@ export default function RegistrationForms() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Logo du club</label>
-                <ProfilePictureUpload
-                  onImageSelect={handleClubLogoSelect}
-                  currentImage={clubForm.logo_url}
-                />
+  <label className="block text-sm font-medium text-gray-700 mb-2">Logo du club</label>
+  <ProfilePictureUpload
+    onImageSelect={handleClubLogoSelect}
+    currentImage={clubForm.logo_url}
+  />
                 <p className="text-xs text-gray-500 mt-2">
                   Formats acceptés : PNG, JPG, SVG. Taille max : 2MB. Dimension recommandée : 200x200px
                 </p>
@@ -1454,3 +1544,4 @@ export default function RegistrationForms() {
     </section>
   );
 }
+            

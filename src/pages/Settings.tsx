@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Camera, Lock, Save, User, AlertCircle, Building2, Mail, Globe } from 'lucide-react';
+import { Camera, Lock, Save, User, AlertCircle, Building2, Mail, Globe, Check } from 'lucide-react';
 
 interface Message {
   type: 'success' | 'error';
@@ -42,6 +42,10 @@ export default function Settings() {
   const [associationData, setAssociationData] = useState<AssociationData | null>(null);
   const [associationLoading, setAssociationLoading] = useState(false);
   
+  // État pour la vérification du pseudo
+  const [pseudoAvailable, setPseudoAvailable] = useState<boolean | null>(null);
+  const [checkingPseudo, setCheckingPseudo] = useState(false);
+  
   // État pour le changement de mot de passe
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -53,6 +57,7 @@ export default function Settings() {
   const [profileForm, setProfileForm] = useState({
     first_name: profile?.first_name || '',
     last_name: profile?.last_name || '',
+    pseudo: profile?.pseudo || '',
   });
 
   // État pour les informations du club
@@ -60,7 +65,18 @@ export default function Settings() {
     contact_email: '',
     website_url: '',
   });
+// Ajoutez ce useEffect après la déclaration des states (vers la ligne 70)
 
+// Charger les données du profil dans le formulaire quand le profil est disponible
+useEffect(() => {
+  if (profile) {
+    setProfileForm({
+      first_name: profile.first_name || '',
+      last_name: profile.last_name || '',
+      pseudo: profile.pseudo || '',
+    });
+  }
+}, [profile]); // Se déclenche quand profile change
   // Charger les données du club si l'utilisateur est Club Admin
   useEffect(() => {
     if (profile?.role === 'Club Admin' && profile?.club_id) {
@@ -109,6 +125,40 @@ export default function Settings() {
     } catch (err: any) {
       console.error('Erreur lors du chargement des données de l\'association:', err);
     }
+  };
+
+  // Vérification de la disponibilité du pseudo
+  const checkPseudoAvailability = async (pseudo: string) => {
+    if (pseudo.length < 3 || pseudo === profile?.pseudo) {
+      setPseudoAvailable(null);
+      return;
+    }
+
+    setCheckingPseudo(true);
+    
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('pseudo')
+        .eq('pseudo', pseudo.trim().toLowerCase())
+        .maybeSingle();
+
+      setCheckingPseudo(false);
+      setPseudoAvailable(!data);
+    } catch {
+      setCheckingPseudo(false);
+      setPseudoAvailable(null);
+    }
+  };
+
+  const handlePseudoChange = (pseudo: string) => {
+    setProfileForm({ ...profileForm, pseudo });
+    
+    const timeoutId = setTimeout(() => {
+      checkPseudoAvailability(pseudo);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   };
 
   // Upload de logo (réutilise la logique de RegistrationForms.tsx)
@@ -404,20 +454,34 @@ export default function Settings() {
     setMessage(null);
 
     try {
+      // Vérifier si le pseudo est disponible
+      if (profileForm.pseudo !== profile?.pseudo && pseudoAvailable === false) {
+        throw new Error('Ce pseudo est déjà utilisé');
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
           first_name: profileForm.first_name,
           last_name: profileForm.last_name,
+          pseudo: profileForm.pseudo.trim().toLowerCase(),
         })
         .eq('id', user!.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('Ce pseudo est déjà utilisé');
+        }
+        throw error;
+      }
 
       setMessage({
         type: 'success',
         text: 'Informations mises à jour avec succès !',
       });
+
+      // Réinitialiser l'état de disponibilité du pseudo
+      setPseudoAvailable(null);
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message });
     } finally {
@@ -552,43 +616,90 @@ export default function Settings() {
               Informations personnelles
             </h2>
             
-            <form onSubmit={handleProfileUpdate} className="grid md:grid-cols-2 gap-6">
+            <form onSubmit={handleProfileUpdate} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                    Prénom
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.first_name}
+                    onChange={(e) => setProfileForm({
+                      ...profileForm,
+                      first_name: e.target.value
+                    })}
+                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    placeholder="Votre prénom"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                    Nom
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.last_name}
+                    onChange={(e) => setProfileForm({
+                      ...profileForm,
+                      last_name: e.target.value
+                    })}
+                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    placeholder="Votre nom"
+                  />
+                </div>
+              </div>
+
+              {/* Champ Pseudo */}
               <div>
                 <label className="block text-sm font-medium dark-text-muted mb-2">
-                  Prénom
+                  Pseudo <span className="text-xs">(visible publiquement)</span>
                 </label>
                 <input
                   type="text"
-                  value={profileForm.first_name}
-                  onChange={(e) => setProfileForm({
-                    ...profileForm,
-                    first_name: e.target.value
-                  })}
-                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                  placeholder="Votre prénom"
+                  required
+                  minLength={3}
+                  maxLength={30}
+                  pattern="^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_-]{3,30}$"
+                  value={profileForm.pseudo}
+                  onChange={(e) => handlePseudoChange(e.target.value)}
+                  className={`dark-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                    pseudoAvailable === true ? 'border-green-500' :
+                    pseudoAvailable === false ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}
+                  placeholder="votre_pseudo"
                 />
+                <p className="text-xs dark-text-muted mt-1">
+                  3-30 caractères : lettres, chiffres, tirets (-) et underscores (_)
+                </p>
+                
+                {checkingPseudo && (
+                  <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 flex items-center">
+                    <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                    Vérification du pseudo...
+                  </p>
+                )}
+                
+                {pseudoAvailable === true && (
+                  <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
+                    <Check className="w-4 h-4 mr-2" />
+                    Pseudo disponible
+                  </p>
+                )}
+                
+                {pseudoAvailable === false && profileForm.pseudo && profileForm.pseudo !== profile?.pseudo && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Pseudo déjà pris
+                  </p>
+                )}
               </div>
               
               <div>
-                <label className="block text-sm font-medium dark-text-muted mb-2">
-                  Nom
-                </label>
-                <input
-                  type="text"
-                  value={profileForm.last_name}
-                  onChange={(e) => setProfileForm({
-                    ...profileForm,
-                    last_name: e.target.value
-                  })}
-                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                  placeholder="Votre nom"
-                />
-              </div>
-              
-              <div className="md:col-span-2">
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || (pseudoAvailable === false && profileForm.pseudo !== profile?.pseudo)}
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
                 >
                   <Save className="h-4 w-4 mr-2" />
