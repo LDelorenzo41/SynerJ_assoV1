@@ -7,6 +7,7 @@ interface Profile {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  pseudo: string | null;
   role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
   club_id: string | null;
   association_id: string | null;
@@ -24,6 +25,7 @@ export function useAuthNew() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
+  const [isSigningOut, setIsSigningOut] = useState(false); // 👈 NOUVEAU
   const isOnline = useOnlineStatus();
 
   useEffect(() => {
@@ -40,8 +42,17 @@ export function useAuthNew() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // 👇 MODIFICATION : Ne pas recharger le profil si on est en train de se déconnecter
+      if (event === 'SIGNED_OUT') {
+        setIsSigningOut(true);
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+      
       setUser(session?.user ?? null);
-      if (session?.user && isOnline) {
+      if (session?.user && isOnline && !isSigningOut) {
         fetchProfile(session.user.id);
       } else {
         setProfile(null);
@@ -53,7 +64,8 @@ export function useAuthNew() {
   }, [isOnline]);
 
   useEffect(() => {
-    if (isOnline && user && !profile && retryCount < MAX_RETRIES) {
+    // 👇 MODIFICATION : Ne pas retry si on est en train de se déconnecter
+    if (isOnline && user && !profile && retryCount < MAX_RETRIES && !isSigningOut) {
       console.log(`Connexion rétablie, rechargement du profil (tentative ${retryCount + 1}/${MAX_RETRIES})`);
       const timer = setTimeout(() => {
         fetchProfile(user.id);
@@ -61,7 +73,7 @@ export function useAuthNew() {
       
       return () => clearTimeout(timer);
     }
-  }, [isOnline, user, profile, retryCount]);
+  }, [isOnline, user, profile, retryCount, isSigningOut]);
 
   const fetchProfile = async (userId: string) => {
     if (!isOnline) {
@@ -73,6 +85,11 @@ export function useAuthNew() {
     if (retryCount >= MAX_RETRIES) {
       console.error('Nombre maximum de tentatives atteint');
       setLoading(false);
+      return;
+    }
+
+    // 👇 MODIFICATION : Ne pas fetch si on est en train de se déconnecter
+    if (isSigningOut) {
       return;
     }
 
@@ -99,7 +116,7 @@ export function useAuthNew() {
     } catch (error: any) {
       console.error('Profile fetch error:', error);
       
-      if (isOnline) {
+      if (isOnline && !isSigningOut) {
         setRetryCount(prev => prev + 1);
       }
       
@@ -114,8 +131,12 @@ export function useAuthNew() {
   };
 
   const signOut = async () => {
+    setIsSigningOut(true); // 👈 NOUVEAU : Marquer qu'on se déconnecte
     await supabase.auth.signOut();
     setRetryCount(0);
+    setUser(null);
+    setProfile(null);
+    // Le flag isSigningOut sera réinitialisé au prochain login via l'auth state change
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
