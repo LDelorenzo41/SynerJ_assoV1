@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { NotificationService } from '../services/notificationService';
+import LikeButton from '../components/LikeButton';
 import { 
   Calendar, 
   Plus, 
@@ -250,7 +251,7 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
 };
 
 export default function Events() {
-  const { profile, isClubAdmin } = useAuthNew();
+  const { profile, isClubAdmin, user } = useAuthNew(); // Ajoutez 'user'
   const [searchParams] = useSearchParams();
   const clubId = searchParams.get('club');
   
@@ -1273,7 +1274,13 @@ Style visuel : illustration vectorielle moderne, design plat (flat design), coul
                           </div>
                         )}
 
-                        <div className="flex items-center space-x-2 mt-4">
+                        <div className="flex items-center flex-wrap gap-2 mt-4">
+                          <LikeButton 
+    eventId={event.id} 
+    userId={user?.id}
+    size="sm"
+    showCount={true}
+  />
                           {canManageEvent(event) && (
                             <>
                               <button
