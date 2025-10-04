@@ -428,6 +428,34 @@ export type Database = {
         };
       };
     };
+    // À ajouter dans src/lib/supabase.ts dans l'interface Database['public']['Tables']
+
+event_comments: {
+  Row: {
+    id: string;
+    event_id: string;
+    user_id: string;
+    content: string;
+    created_at: string;
+    updated_at: string | null;
+  };
+  Insert: {
+    id?: string;
+    event_id: string;
+    user_id: string;
+    content: string;
+    created_at?: string;
+    updated_at?: string | null;
+  };
+  Update: {
+    id?: string;
+    event_id?: string;
+    user_id?: string;
+    content?: string;
+    created_at?: string;
+    updated_at?: string | null;
+  };
+};
     Enums: {
       notification_type: 
         | 'nouveau_club' 
