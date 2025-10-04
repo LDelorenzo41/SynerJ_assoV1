@@ -4,6 +4,7 @@ import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { NotificationService } from '../services/notificationService';
 import LikeButton from '../components/LikeButton';
+import { CommentSection } from '../components/CommentSection';
 import { 
   Calendar, 
   Plus, 
@@ -1334,6 +1335,14 @@ Style visuel : illustration vectorielle moderne, design plat (flat design), coul
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Section des commentaires */}
+                <div className="mt-6 border-t border-gray-200 dark:border-gray-600 pt-6">
+                  <CommentSection 
+                    eventId={event.id} 
+                    isEventOwner={canManageEvent(event)} 
+                  />
                 </div>
               </div>
             );
