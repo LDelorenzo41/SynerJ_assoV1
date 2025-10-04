@@ -4,6 +4,8 @@ import { Calendar, Clock, MapPin, Trash2, Eye, EyeOff, Download, RefreshCw, X, M
 import { useCalendar } from '../hooks/useCalendar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import LikeButton from '../components/LikeButton';
+import { useAuthNew } from '../hooks/useAuthNew';
 
 // Composant modale pour la carte
 interface MapModalProps {
@@ -425,6 +427,7 @@ export default function MonCalendrier() {
     calendarEventsCount
   } = useCalendar();
 
+  const { user } = useAuthNew();  // ← AJOUTEZ CETTE LIGNE ICI
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showMapModal, setShowMapModal] = useState(false);
   const [selectedEventForMap, setSelectedEventForMap] = useState<{name: string, location: string} | null>(null);
@@ -618,22 +621,29 @@ export default function MonCalendrier() {
                       </div>
 
                       <div className="flex items-center space-x-2 ml-4">
-                        <button
-                          onClick={() => openShareModal(event)}
-                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                          title="Partager cet événement"
-                        >
-                          <Share2 className="h-4 w-4" />
-                        </button>
-                        
-                        <button
-                          onClick={() => removeEventFromCalendar(event.id)}
-                          className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          title="Retirer de mon calendrier"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+  <LikeButton 
+    eventId={event.id} 
+    userId={user?.id}
+    size="sm"
+    showCount={true}
+  />
+  
+  <button
+    onClick={() => openShareModal(event)}
+    className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+    title="Partager cet événement"
+  >
+    <Share2 className="h-4 w-4" />
+  </button>
+  
+  <button
+    onClick={() => removeEventFromCalendar(event.id)}
+    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+    title="Retirer de mon calendrier"
+  >
+    <Trash2 className="h-4 w-4" />
+  </button>
+</div>
                     </div>
                   </div>
                 </div>
