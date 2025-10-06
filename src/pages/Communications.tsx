@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { NotificationService } from '../services/notificationService';
-import { 
-  MessageSquare, 
-  Plus, 
-  Eye, 
-  EyeOff, 
-  Edit, 
-  Trash2, 
-  AlertCircle, 
-  Users, 
+import { CommunicationLikeButton } from '../components/CommunicationLikeButton';
+import { CommunicationCommentSection } from '../components/CommunicationCommentSection';
+import { useCommunicationCommentStats } from '../hooks/useCommunicationComments';
+import {
+  MessageSquare,
+  Plus,
+  Eye,
+  EyeOff,
+  Edit,
+  Trash2,
+  AlertCircle,
+  Users,
   Upload,
   Sparkles,
   X,
@@ -28,6 +31,7 @@ import {
   Target,
   Globe,
   Lock,
+  MessageCircle,
 } from 'lucide-react';
 
 interface Communication {
@@ -84,20 +88,20 @@ interface LogoDisplayProps {
   iconColor?: string;
 }
 
-const LogoDisplay: React.FC<LogoDisplayProps> = ({ 
-  src, 
-  alt, 
-  size = 'w-8 h-8', 
-  fallbackIcon: FallbackIcon, 
-  iconColor = 'text-gray-400 dark:text-slate-500' 
+const LogoDisplay: React.FC<LogoDisplayProps> = ({
+  src,
+  alt,
+  size = 'w-8 h-8',
+  fallbackIcon: FallbackIcon,
+  iconColor = 'text-gray-400 dark:text-slate-500'
 }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
     <div className={`${size} rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
       {src && !imageError ? (
-        <img 
-          src={src} 
+        <img
+          src={src}
           alt={alt}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}
@@ -148,7 +152,7 @@ export default function Communications() {
   const { profile, isClubAdmin, isSuperAdmin } = useAuthNew();
   const [searchParams] = useSearchParams();
   const clubId = searchParams.get('club');
-  
+
   const [communications, setCommunications] = useState<Communication[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -156,15 +160,17 @@ export default function Communications() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [clubInfo, setClubInfo] = useState<{id: string, name: string, slug?: string} | null>(null);
+  const [clubInfo, setClubInfo] = useState<{ id: string, name: string, slug?: string } | null>(null);
   const [expandedCommunications, setExpandedCommunications] = useState<Set<string>>(new Set());
-  const [availableClubs, setAvailableClubs] = useState<Array<{id: string, name: string}>>([]);
+  const [availableClubs, setAvailableClubs] = useState<Array<{ id: string, name: string }>>([]);
   const [submittingCommunication, setSubmittingCommunication] = useState(false);
-  
+
   const [rewritingContent, setRewritingContent] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [showAiSuggestion, setShowAiSuggestion] = useState(false);
-  
+
+  const [showCommentsFor, setShowCommentsFor] = useState<string | null>(null);
+
   const [communicationForm, setCommunicationForm] = useState<CommunicationForm>({
     title: '',
     content: '',
@@ -185,7 +191,7 @@ export default function Communications() {
             .select('id, name, slug')
             .or(`slug.eq.${clubId},id.eq.${clubId}`)
             .single();
-          
+
           if (!error && data) {
             setClubInfo(data);
           }
@@ -198,6 +204,7 @@ export default function Communications() {
     };
 
     fetchClubInfo();
+
   }, [clubId]);
 
   useEffect(() => {
@@ -211,7 +218,6 @@ export default function Communications() {
 
   const fetchAvailableClubs = async () => {
     if (!profile?.association_id) return;
-
     try {
       const { data, error } = await supabase
         .from('clubs')
@@ -232,13 +238,12 @@ export default function Communications() {
         setLoading(false);
         return;
       }
-  
       if (profile.role === 'Supporter' && !profile.association_id) {
         setCommunications([]);
         setLoading(false);
         return;
       }
-  
+
       let query = supabase
         .from('communications')
         .select(`
@@ -247,7 +252,7 @@ export default function Communications() {
           associations (id, name, logo_url),
           profiles (first_name, last_name)
         `);
-  
+
       if (clubId) {
         if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
           query = query.eq('club_id', clubId);
@@ -257,27 +262,27 @@ export default function Communications() {
             .select('id')
             .eq('slug', clubId)
             .single();
-          
+
           if (clubData) {
             query = query.eq('club_id', clubData.id);
           }
         }
       } else {
         query = query.eq('association_id', profile.association_id);
-        
+
         if (profile.role === 'Supporter') {
           query = query.eq('visibility', 'Public');
         }
       }
-  
+
       const now = new Date().toISOString();
       query = query.or(`expires_at.is.null,expires_at.gte.${now}`);
-  
+
       const { data, error } = await query.order('is_pinned', { ascending: false })
-                                      .order('created_at', { ascending: false });
-  
+        .order('created_at', { ascending: false });
+
       if (error) throw error;
-  
+
       let filteredCommunications = data || [];
 
       if (!clubId) {
@@ -289,23 +294,23 @@ export default function Communications() {
             return false;
           });
         }
-        
+
         else if (profile.role === 'Club Admin' || profile.role === 'Member') {
           filteredCommunications = filteredCommunications.filter(comm => {
             if (comm.club_id === profile.club_id) return true;
             if (comm.visibility === 'Public') return true;
-            if (comm.club_id === null && 
-                comm.visibility === 'Private' && 
-                comm.target_clubs && 
-                profile.club_id &&
-                comm.target_clubs.includes(profile.club_id)) {
+            if (comm.club_id === null &&
+              comm.visibility === 'Private' &&
+              comm.target_clubs &&
+              profile.club_id &&
+              comm.target_clubs.includes(profile.club_id)) {
               return true;
             }
             return false;
           });
         }
       }
-  
+
       setCommunications(filteredCommunications);
     } catch (error) {
       console.error('Error fetching communications:', error);
@@ -329,7 +334,6 @@ export default function Communications() {
   const handleImageUpload = async (file: File) => {
     try {
       setUploadingImage(true);
-      
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `communications/${fileName}`;
@@ -356,7 +360,6 @@ export default function Communications() {
   const handleGenerateImage = async () => {
     try {
       setGeneratingImage(true);
-  
       const res = await fetch('/.netlify/functions/generate-event-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -366,23 +369,23 @@ export default function Communications() {
           isForCommunication: true,
         }),
       });
-  
+
       const raw = await res.text();
-  
+
       let data: any = null;
       try {
         data = raw ? JSON.parse(raw) : null;
       } catch {
         throw new Error(raw || `HTTP ${res.status}`);
       }
-  
+
       if (!res.ok || !data?.success) {
         throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
       }
-  
+
       const imageToUse: string | null = data.imageUrl || data.imageBase64 || null;
       if (!imageToUse) throw new Error('Aucune image n\'a été retournée par l\'API.');
-  
+
       setCommunicationForm(prev => ({ ...prev, image_url: imageToUse }));
       setSelectedImage(imageToUse);
     } catch (error: any) {
@@ -398,10 +401,9 @@ export default function Communications() {
       alert("Veuillez d'abord entrer un titre et un contenu pour la communication");
       return;
     }
-
     try {
       setRewritingContent(true);
-      
+
       const response = await fetch('/.netlify/functions/rewrite-communication', {
         method: 'POST',
         headers: {
@@ -414,7 +416,7 @@ export default function Communications() {
       });
 
       const data = await response.json();
-      
+
       if (data.success && data.rewrittenDescription) {
         setAiSuggestion(data.rewrittenDescription);
         setShowAiSuggestion(true);
@@ -444,7 +446,6 @@ export default function Communications() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!canCreateCommunication()) {
       alert('Vous n\'avez pas les permissions pour créer des communications');
       return;
@@ -454,7 +455,7 @@ export default function Communications() {
     if (submittingCommunication) {
       return;
     }
-  
+
     try {
       setSubmittingCommunication(true);
 
@@ -478,9 +479,9 @@ export default function Communications() {
         author_id: profile!.id,
         club_id: profile?.role === 'Club Admin' ? profile.club_id : null,
       };
-  
+
       let createdCommunicationId: string | null = null;
-  
+
       if (editingCommunication) {
         const { error } = await supabase
           .from('communications')
@@ -489,7 +490,7 @@ export default function Communications() {
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingCommunication.id);
-  
+
         if (error) throw error;
         createdCommunicationId = editingCommunication.id;
       } else {
@@ -498,14 +499,14 @@ export default function Communications() {
           .insert([communicationData])
           .select()
           .single();
-  
+
         if (error) throw error;
         createdCommunicationId = newCommunication.id;
-  
+
         if (createdCommunicationId && profile?.association_id) {
           try {
             let recipientIds: string[] = [];
-        
+
             if (communicationData.club_id) {
               if (communicationData.visibility === 'Public') {
                 const [{ data: clubMembers }, { data: followers }] = await Promise.all([
@@ -519,7 +520,7 @@ export default function Communications() {
                     .select('user_id')
                     .eq('club_id', communicationData.club_id)
                 ]);
-        
+
                 if (clubMembers) recipientIds.push(...clubMembers.map(m => m.id));
                 if (followers) recipientIds.push(...followers.map(f => f.user_id));
               } else {
@@ -528,7 +529,7 @@ export default function Communications() {
                   .select('id')
                   .eq('club_id', communicationData.club_id)
                   .in('role', ['Member', 'Club Admin']);
-        
+
                 if (clubMembers) recipientIds = clubMembers.map(m => m.id);
               }
             } else {
@@ -537,7 +538,7 @@ export default function Communications() {
                   .from('profiles')
                   .select('id')
                   .eq('association_id', profile.association_id);
-        
+
                 if (associationUsers) recipientIds = associationUsers.map(u => u.id);
               } else {
                 if (communicationData.target_clubs && communicationData.target_clubs.length > 0) {
@@ -546,19 +547,19 @@ export default function Communications() {
                     .select('id')
                     .in('club_id', communicationData.target_clubs)
                     .in('role', ['Member', 'Club Admin']);
-        
+
                   if (targetUsers) recipientIds = targetUsers.map(u => u.id);
                 }
               }
             }
-        
+
             recipientIds = [...new Set(recipientIds)].filter(id => id !== profile.id);
-        
+
             if (recipientIds.length > 0) {
-              const sourceName = communicationData.club_id 
+              const sourceName = communicationData.club_id
                 ? (await supabase.from('clubs').select('name').eq('id', communicationData.club_id).single()).data?.name || 'Club'
-                : (await supabase.from('associations').select('name').eq('id', profile.association_id).single()).data?.name || 'Association';
-        
+                : (await supabase.from('associations').select('name').eq('id', profile.association_id!).single()).data?.name || 'Association';
+
               await NotificationService.notifyNewCommunication(
                 recipientIds,
                 communicationData.title,
@@ -569,7 +570,7 @@ export default function Communications() {
                 communicationData.club_id === null,
                 sourceName
               );
-        
+
               console.log(`✅ Notifications envoyées pour la communication "${communicationData.title}" (${communicationData.visibility}) à ${recipientIds.length} destinataires`);
             }
           } catch (notificationError) {
@@ -577,7 +578,7 @@ export default function Communications() {
           }
         }
       }
-  
+
       setCommunicationForm({
         title: '',
         content: '',
@@ -591,7 +592,7 @@ export default function Communications() {
       setShowForm(false);
       setEditingCommunication(null);
       fetchCommunications();
-      
+
     } catch (error: any) {
       console.error('Error saving communication:', error);
       alert('Error saving communication: ' + error.message);
@@ -602,7 +603,6 @@ export default function Communications() {
 
   const handleEdit = (communication: Communication) => {
     setEditingCommunication(communication);
-    
     // FIX : Convertir la date ISO en format datetime-local
     let localDateTime = '';
     if (communication.expires_at) {
@@ -611,7 +611,7 @@ export default function Communications() {
         .toISOString()
         .slice(0, 16);
     }
-    
+
     setCommunicationForm({
       title: communication.title,
       content: communication.content,
@@ -627,19 +627,18 @@ export default function Communications() {
 
   const handleDelete = async (communicationId: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette communication ?')) return;
-
     try {
       await NotificationService.deleteCommunicationNotifications(communicationId);
-      
+
       const { error } = await supabase
         .from('communications')
         .delete()
         .eq('id', communicationId);
 
       if (error) throw error;
-      
+
       fetchCommunications();
-      
+
     } catch (error: any) {
       console.error('Error deleting communication:', error);
       alert('Error deleting communication: ' + error.message);
@@ -650,16 +649,16 @@ export default function Communications() {
     try {
       const { error } = await supabase
         .from('communications')
-        .update({ 
+        .update({
           is_pinned: !currentPinStatus,
           updated_at: new Date().toISOString()
         })
         .eq('id', communicationId);
 
       if (error) throw error;
-      
+
       fetchCommunications();
-      
+
     } catch (error: any) {
       console.error('Error toggling pin:', error);
       alert('Error updating communication: ' + error.message);
@@ -685,7 +684,6 @@ export default function Communications() {
     if (clubId && clubInfo) {
       return `Communications du club ${clubInfo.name}`;
     }
-    
     if (profile?.role === 'Super Admin') return 'Toutes les communications de votre association';
     if (profile?.role === 'Club Admin') return 'Communications de votre club et communications publiques';
     if (profile?.role === 'Member') return 'Communications de votre club et communications publiques';
@@ -697,7 +695,6 @@ export default function Communications() {
     if (clubId && clubInfo) {
       return `Toutes les communications publiées par ${clubInfo.name}`;
     }
-    
     if (profile?.role === 'Super Admin') return 'Vous pouvez créer des communications pour toute l\'association et gérer toutes les communications.';
     if (profile?.role === 'Club Admin') return 'Vous pouvez créer des communications pour votre club et voir les communications publiques.';
     if (profile?.role === 'Member') return 'Vous voyez les communications de votre club et les communications publiques de l\'association.';
@@ -705,37 +702,60 @@ export default function Communications() {
     return '';
   };
 
+  // Gestion du cas Supporter sans association
   if (profile?.role === 'Supporter' && !profile?.association_id) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold dark-text">Communications</h1>
         </div>
-
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
           <div className="flex items-start">
             <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
             <div>
               <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Association requise</h2>
               <p className="text-yellow-800 dark:text-yellow-300 mb-4">
-                Pour voir les communications, vous devez d'abord rejoindre une association. 
+                Pour voir les communications, vous devez d'abord rejoindre une association.
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
-              
-              {/* CORRECTION : Ajout de la balise <a> ouvrante qui manquait */}
-              <a
-                href="/dashboard"
+              <Link
+                to="/dashboard"
                 className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Aller au tableau de bord
-              </a>
+              </Link>
             </div>
           </div>
         </div>
       </div>
     );
   }
+
+  // Composant pour le bouton commentaires avec compteur
+  const CommentButton: React.FC<{
+    communicationId: string;
+    isOpen: boolean;
+    onClick: () => void;
+  }> = ({ communicationId, isOpen, onClick }) => {
+    const { stats } = useCommunicationCommentStats(communicationId);
+
+    return (
+      <button
+        onClick={onClick}
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg
+        text-gray-600 dark:text-gray-400 
+        bg-gray-100 dark:bg-gray-800 
+        hover:bg-gray-200 dark:hover:bg-gray-700
+        transition-all"
+      >
+        <MessageCircle className="w-5 h-5" />
+        <span className="text-sm font-medium">
+          {stats.totalComments}
+        </span>
+      </button>
+    );
+  };
 
   if (loading) {
     return (
@@ -752,16 +772,15 @@ export default function Communications() {
           <h1 className="text-3xl font-bold dark-text">{getPageTitle()}</h1>
           {clubId && clubInfo && (
             <div className="mt-2 flex items-center space-x-2">
-              <a 
-                href="/communications" 
+              <Link
+                to="/communications"
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
               >
                 ← Retour à toutes les communications
-              </a>
+              </Link>
             </div>
           )}
         </div>
-
         {canCreateCommunication() && (!clubId || (clubInfo && (clubInfo.id === profile?.club_id || isSuperAdmin))) && (
           <button
             onClick={() => {
@@ -811,8 +830,7 @@ export default function Communications() {
               <h2 className="text-xl font-bold dark-text">
                 {editingCommunication ? 'Modifier la Communication' : 'Nouvelle Communication'}
               </h2>
-              {/* CORRECTION : Suppression de la ligne dupliquée et erronée `onClick={() => set` */}
-              <button 
+              <button
                 onClick={() => setShowForm(false)}
                 disabled={submittingCommunication}
                 className="p-2 dark-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -820,7 +838,7 @@ export default function Communications() {
                 <X className="h-5 w-5 dark-text" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
@@ -945,12 +963,12 @@ export default function Communications() {
                 <label className="block text-sm font-medium dark-text mb-2">
                   Image de la Communication
                 </label>
-                
+
                 {communicationForm.image_url && (
                   <div className="mb-4 relative">
-                    <img 
-                      src={communicationForm.image_url} 
-                      alt="Aperçu" 
+                    <img
+                      src={communicationForm.image_url}
+                      alt="Aperçu"
                       className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
                     />
                     <button
@@ -970,7 +988,7 @@ export default function Communications() {
                       type="file"
                       accept="image/*"
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
+                        const file = e.target.files?.[0]
                         if (file) handleImageUpload(file);
                       }}
                       className="hidden"
@@ -1001,7 +1019,7 @@ export default function Communications() {
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium dark-text">
@@ -1046,11 +1064,11 @@ export default function Communications() {
                         <X className="h-4 w-4" />
                       </button>
                     </div>
-                    
+
                     <div className="dark-card p-2 rounded border border-purple-100 dark:border-purple-600 mb-3">
                       <p className="text-sm dark-text whitespace-pre-wrap">{aiSuggestion}</p>
                     </div>
-                    
+
                     <div className="flex space-x-2">
                       <button
                         type="button"
@@ -1084,7 +1102,7 @@ export default function Communications() {
                   disabled={submittingCommunication}
                 />
               </div>
-              
+
               <div className="flex space-x-3 pt-4">
                 <button
                   type="button"
@@ -1124,15 +1142,15 @@ export default function Communications() {
         <div className="divide-y divide-gray-200 dark:divide-gray-600">
           {communications.map((communication) => {
             const isExpanded = expandedCommunications.has(communication.id);
-            const authorName = communication.profiles 
+            const authorName = communication.profiles
               ? `${communication.profiles.first_name} ${communication.profiles.last_name}`
               : 'Auteur inconnu';
-            
+
             return (
               <div key={communication.id} className="px-6 py-6 dark-hover">
                 <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-600">
-                  <LogoDisplay 
-                    src={communication.club_id ? communication.clubs?.logo_url : communication.associations?.logo_url} 
+                  <LogoDisplay
+                    src={communication.club_id ? communication.clubs?.logo_url : communication.associations?.logo_url}
                     alt={`Logo ${communication.club_id ? communication.clubs?.name : communication.associations?.name}`}
                     size="w-10 h-10"
                     fallbackIcon={communication.club_id ? Building : Globe}
@@ -1153,11 +1171,10 @@ export default function Communications() {
                       ) : (
                         <Lock className="h-3 w-3 text-orange-600 dark:text-orange-400" />
                       )}
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${
-                        communication.visibility === 'Public'
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                          : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                      }`}>
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${communication.visibility === 'Public'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                        }`}>
                         {communication.visibility === 'Public' ? 'Publique' : 'Privée'}
                       </span>
                       <PriorityBadge priority={communication.priority} />
@@ -1182,15 +1199,15 @@ export default function Communications() {
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                   {communication.image_url && (
                     <div className="lg:w-80 lg:flex-shrink-0">
-                      <img 
-                        src={communication.image_url} 
+                      <img
+                        src={communication.image_url}
                         alt={communication.title}
                         className="w-full h-48 lg:h-32 object-contain bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setSelectedImage(communication.image_url)}
                       />
                     </div>
                   )}
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
@@ -1203,7 +1220,7 @@ export default function Communications() {
                             </span>
                           )}
                         </h3>
-                        
+
                         <div className="mb-4">
                           <p className={`dark-text ${!isExpanded ? 'line-clamp-3' : ''}`}>
                             {communication.content}
@@ -1244,16 +1261,32 @@ export default function Communications() {
                           </div>
                         )}
 
-                        <div className="flex items-center space-x-2 mt-4">
+                        <div className="space-y-4 mt-4">
+
+                          {/* Barre d'actions : Likes et Commentaires */}
+                          <div className="flex items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            {/* Bouton de like */}
+                            <CommunicationLikeButton
+                              communicationId={communication.id}
+                              showCount={true}
+                              variant="default"
+                            />
+                            {/* Bouton pour afficher/masquer les commentaires avec compteur */}
+                            <CommentButton
+                              communicationId={communication.id}
+                              isOpen={showCommentsFor === communication.id}
+                              onClick={() => setShowCommentsFor(
+                                showCommentsFor === communication.id ? null : communication.id
+                              )}
+                            />
+                          </div>
+
+                          {/* Actions de gestion (Épingler, Modifier, Supprimer) */}
                           {canManageCommunication(communication) && (
-                            <>
+                            <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => togglePin(communication.id, communication.is_pinned)}
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${
-                                  communication.is_pinned
-                                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50'
-                                    : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-900/50'
-                                }`}
+                                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${communication.is_pinned ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-900/50'}`}
                               >
                                 {communication.is_pinned ? (
                                   <>
@@ -1281,7 +1314,17 @@ export default function Communications() {
                                 <Trash2 className="h-4 w-4" />
                                 <span>Supprimer</span>
                               </button>
-                            </>
+                            </div>
+                          )}
+
+                          {/* Section des commentaires (affichée conditionnellement) */}
+                          {showCommentsFor === communication.id && (
+                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                              <CommunicationCommentSection
+                                communicationId={communication.id}
+                                isCommunicationOwner={canManageCommunication(communication)}
+                              />
+                            </div>
                           )}
                         </div>
                       </div>
@@ -1295,7 +1338,7 @@ export default function Communications() {
             <div className="px-6 py-12 text-center">
               <MessageSquare className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 mb-4" />
               <p className="dark-text-muted">
-                {clubId && clubInfo ? 
+                {clubId && clubInfo ?
                   `Aucune communication pour ${clubInfo.name}` :
                   'Aucune communication disponible'
                 }
@@ -1317,13 +1360,13 @@ export default function Communications() {
       </div>
 
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl max-h-[90vh] w-full">
-            <img 
-              src={selectedImage} 
+            <img
+              src={selectedImage}
               alt="Communication en plein écran"
               className="w-full h-full object-contain rounded-lg"
               onClick={(e) => e.stopPropagation()}
