@@ -240,40 +240,92 @@ export default function Sponsors() {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
   };
 
-  const generateEmailContent = (sponsor: Sponsor, editToken: string) => {
-    const subject = `Merci pour votre soutien – mettez à jour vos informations - ${sponsor.name}`;
+  const generateEmailContent = (sponsor: Sponsor, editToken: string, sponsorCode: string) => {
+    const subject = `Merci pour votre soutien – Accès à votre espace sponsor - ${sponsor.name}`;
     
+    const sponsorTypeLimits: Record<string, string> = {
+      'Platine': '4 campagnes par mois',
+      'Or': '3 campagnes par mois',
+      'Argent': '2 campagnes par mois',
+      'Bronze': '1 campagne par mois',
+      'Partenaire': '1 campagne par mois'
+    };
+  
     const body = `Bonjour,
+  
+  Nous tenons à vous remercier chaleureusement pour votre soutien en tant que sponsor ${sponsor.sponsor_type}. 🙏
+  
+  Afin de mettre en valeur votre entreprise dans nos communications, voici les informations que nous avons actuellement :
+  
+  Vos informations actuelles :
+  - Nom : ${sponsor.name}
+  - Email : ${sponsor.contact_email}
+  - Niveau de sponsoring : ${sponsor.sponsor_type}
+  ${sponsor.description ? `- Description : ${sponsor.description}` : ''}
+  
+  📧 INSCRIPTION SUR LA PLATEFORME SYNERJ
+  
+  Vous pouvez maintenant vous inscrire sur notre plateforme pour :
+  ✓ Gérer vos informations sponsor (logo, description, coordonnées)
+  ✓ Envoyer des campagnes de mailing à nos membres (${sponsorTypeLimits[sponsor.sponsor_type]})
+  ✓ Accéder à des outils de communication dédiés
+  
+  🔑 Votre code d'inscription sponsor : ${sponsorCode}
+  
+  👉 Pour vous inscrire :
+  1. Rendez-vous sur ${window.location.origin}
+  2. Cliquez sur "Inscription Sponsor"
+  3. Utilisez le code ci-dessus pour créer votre compte
+  
+  📝 VALIDER VOTRE PROFIL PUBLIC
 
-Nous tenons à vous remercier chaleureusement pour votre soutien à notre club. 🙏
-
-Afin de mettre en valeur votre entreprise dans nos communications, voici les informations que nous avons actuellement :
-
-Vos informations actuelles :
-- Nom : ${sponsor.name}
-- Email : ${sponsor.contact_email}
-${sponsor.description ? `- Description : ${sponsor.description}` : ''}
-
-Pour valider et compléter votre profil (logo, description détaillée, coordonnées), veuillez cliquer sur ce lien :
-${window.location.origin}/sponsor-edit/${editToken}
-
-Ce lien vous permettra de modifier toutes vos informations directement.
-
-Pour toute question, n'hésitez pas à me contacter.
-Encore merci pour votre confiance et votre engagement à nos côtés. 💙
-
-Cordialement,
-${profile?.first_name} ${profile?.last_name}`;
-
+Vous devez maintenant valider votre profil public (logo, description détaillée, coordonnées) via ce lien :
+  ${window.location.origin}/sponsor-edit/${editToken}
+  
+  Pour toute question, n'hésitez pas à me contacter.
+  Encore merci pour votre confiance et votre engagement à nos côtés. 💙
+  
+  Cordialement,
+  ${profile?.first_name} ${profile?.last_name}`;
+  
     return { subject, body };
   };
 
   const openMailClient = (sponsor: Sponsor, editToken: string) => {
-    const { subject, body } = generateEmailContent(sponsor, editToken);
+    // Récupérer le code sponsor selon le type
+    let sponsorCode = '';
     
-    const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    window.open(mailtoLink);
+    if (sponsor.club_id && profile?.role === 'Club Admin') {
+      // Récupérer le sponsors_code du club
+      supabase
+        .from('clubs')
+        .select('sponsors_code')
+        .eq('id', sponsor.club_id)
+        .single()
+        .then(({ data }) => {
+          if (data?.sponsors_code) {
+            sponsorCode = data.sponsors_code;
+            const { subject, body } = generateEmailContent(sponsor, editToken, sponsorCode);
+            const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+          }
+        });
+    } else if (sponsor.association_id && profile?.role === 'Super Admin') {
+      // Récupérer le sponsors_code de l'association
+      supabase
+        .from('associations')
+        .select('sponsors_code')
+        .eq('id', sponsor.association_id)
+        .single()
+        .then(({ data }) => {
+          if (data?.sponsors_code) {
+            sponsorCode = data.sponsors_code;
+            const { subject, body } = generateEmailContent(sponsor, editToken, sponsorCode);
+            const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+          }
+        });
+    }
   };
 
   const deleteSponsor = async (sponsorId: string) => {
@@ -645,6 +697,24 @@ ${profile?.first_name} ${profile?.last_name}`;
                   <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Niveau de sponsoring *</label>
+                  <select
+                    value={formData.sponsor_type}
+                    onChange={(e) => setFormData({ ...formData, sponsor_type: e.target.value as any })}
+                    className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  >
+                    <option value="Platine">Platine (4 campagnes/mois)</option>
+                    <option value="Or">Or (3 campagnes/mois)</option>
+                    <option value="Argent">Argent (2 campagnes/mois)</option>
+                    <option value="Bronze">Bronze (1 campagne/mois)</option>
+                    <option value="Partenaire">Partenaire (1 campagne/mois)</option>
+                  </select>
+                  <p className="text-xs dark-text-muted mt-1">
+                    Le niveau détermine le nombre de campagnes de mailing autorisées par mois
+                  </p>
+                </div>
+
                 <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                   <button type="button" onClick={() => setShowCreateForm(false)} className="px-4 py-2 dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
                     Annuler
@@ -741,6 +811,24 @@ ${profile?.first_name} ${profile?.last_name}`;
                   <input type="text" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="123 Rue de la Paix, 75001 Paris" />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium dark-text-muted mb-2">Niveau de sponsoring *</label>
+                  <select
+                    value={formData.sponsor_type}
+                    onChange={(e) => setFormData({ ...formData, sponsor_type: e.target.value as any })}
+                    className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  >
+                    <option value="Platine">Platine (4 campagnes/mois)</option>
+                    <option value="Or">Or (3 campagnes/mois)</option>
+                    <option value="Argent">Argent (2 campagnes/mois)</option>
+                    <option value="Bronze">Bronze (1 campagne/mois)</option>
+                    <option value="Partenaire">Partenaire (1 campagne/mois)</option>
+                  </select>
+                  <p className="text-xs dark-text-muted mt-1">
+                    Le niveau détermine le nombre de campagnes de mailing autorisées par mois
+                  </p>
+                </div>
+
                 <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                   <button type="button" onClick={() => { setShowEditForm(false); setEditingSponsor(null); }} className="px-4 py-2 dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
                     Annuler
@@ -767,7 +855,7 @@ ${profile?.first_name} ${profile?.last_name}`;
               
               <div className="p-6 border-b border-gray-100 dark:border-gray-600">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 flex-1">
                     {sponsor.logo_url ? (
                       <img src={sponsor.logo_url} alt={`Logo ${sponsor.name}`} className="h-12 w-12 object-contain rounded" />
                     ) : (
@@ -775,11 +863,22 @@ ${profile?.first_name} ${profile?.last_name}`;
                         <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
-                    <div>
-                      <h3 className="text-lg font-semibold dark-text flex items-center">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold dark-text flex items-center flex-wrap gap-2">
                         {sponsor.name}
+                        {/* Badge niveau de sponsor */}
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          sponsor.sponsor_type === 'Platine' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
+                          sponsor.sponsor_type === 'Or' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                          sponsor.sponsor_type === 'Argent' ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400' :
+                          'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                        }`}>
+                          {sponsor.sponsor_type}
+                        </span>
                         {!sponsor.is_confirmed && (
-                          <span className="ml-2 px-2 py-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full">En attente</span>
+                          <span className="px-2 py-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full">
+                            En attente
+                          </span>
                         )}
                       </h3>
                     </div>

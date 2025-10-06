@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Building2, Upload, Save, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Building2, Upload, Save, CheckCircle, AlertCircle, X, UserPlus } from 'lucide-react';
 import Footer from '../components/Footer';
 
 interface Sponsor {
@@ -35,6 +35,7 @@ interface SponsorFormData {
 
 export default function SponsorEdit() {
   const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
   const [sponsor, setSponsor] = useState<Sponsor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,7 +162,7 @@ export default function SponsorEdit() {
       const updateData = {
         ...formData,
         website: formData.website.startsWith('http') ? formData.website : (formData.website ? `https://${formData.website}` : ''),
-        is_confirmed: true, // Marquer comme confirmé par le sponsor
+        is_confirmed: true,
       };
 
       const { error } = await supabase
@@ -208,12 +209,34 @@ export default function SponsorEdit() {
           <div className="flex items-center justify-center mb-4">
             <CheckCircle className="h-16 w-16 text-green-500 dark:text-green-400" />
           </div>
-          <h1 className="text-2xl font-bold text-center dark-text mb-4">Profil mis à jour !</h1>
+          <h1 className="text-2xl font-bold text-center dark-text mb-4">Profil validé !</h1>
           <p className="dark-text-muted text-center mb-6">
-            Vos informations ont été mises à jour avec succès. Merci pour votre partenariat !
+            Vos informations ont été validées avec succès. Merci pour votre partenariat !
           </p>
-          <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Vous pouvez fermer cette page.</p>
+          
+          {/* CTA pour créer un compte sponsor */}
+          <div className="space-y-4">
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+              <h3 className="font-semibold text-orange-900 dark:text-orange-300 mb-2">
+                Prochaine étape : Créez votre compte sponsor
+              </h3>
+              <p className="text-sm text-orange-800 dark:text-orange-200 mb-3">
+                Pour accéder à la plateforme et gérer vos campagnes de mailing, créez maintenant votre compte sponsor.
+              </p>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="w-full flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 transition-colors"
+              >
+                <UserPlus className="h-5 w-5 mr-2" />
+                Créer mon compte sponsor
+              </button>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Vous avez déjà un compte ? <a href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">Se connecter</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -228,10 +251,10 @@ export default function SponsorEdit() {
           <div className="bg-blue-600 dark:bg-blue-700 px-6 py-4">
             <h1 className="text-2xl font-bold text-white flex items-center">
               <Building2 className="h-6 w-6 mr-2" />
-              Compléter mon profil sponsor
+              Valider mon profil sponsor
             </h1>
             <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
-              Mettez à jour vos informations pour finaliser votre profil
+              Validez vos informations pour finaliser votre profil public
             </p>
           </div>
 
@@ -406,7 +429,7 @@ export default function SponsorEdit() {
                 ) : (
                   <Save className="h-5 w-5 mr-2" />
                 )}
-                {submitting ? 'Mise à jour en cours...' : 'Mettre à jour mon profil'}
+                {submitting ? 'Validation en cours...' : 'Valider mon profil'}
               </button>
             </div>
           </form>

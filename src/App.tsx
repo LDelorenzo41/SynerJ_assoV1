@@ -57,14 +57,9 @@ function App() {
           } 
         />
         <Route 
-          path="/sponsor-edit/:token" 
-          element={
-            <>
-              <PublicHeader />
-              <SponsorEdit />
-            </>
-          } 
-        />
+  path="/sponsor-edit/:token" 
+  element={<SponsorEdit />} 
+/>
         
         {/* Routes protégées AVEC Layout */}
         <Route

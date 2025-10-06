@@ -18,7 +18,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
             et clubs
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            La plateforme tout-en-un pour gérer associations, clubs et membres. 
+            La plateforme tout-en-un pour gérer la communucation des associations, clubs et membres. 
             Organisez des événements, connectez vos communautés et développez votre impact.
           </p>
           
