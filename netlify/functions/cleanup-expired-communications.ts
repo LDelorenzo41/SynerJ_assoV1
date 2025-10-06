@@ -3,7 +3,7 @@ import { Handler, schedule } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // Clé service, pas anon
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -33,7 +33,33 @@ export const handler: Handler = schedule("0 2 * * *", async (event) => {
     const expiredIds = expiredCommunications.map(c => c.id);
     console.log(`🔍 ${expiredIds.length} communication(s) expirée(s) trouvée(s)`);
 
-    // 2. Supprimer les notifications associées
+    // 2. Supprimer les likes associés aux communications expirées
+    const { data: deletedLikes, error: likesError } = await supabase
+      .from('communication_likes')
+      .delete()
+      .in('communication_id', expiredIds)
+      .select('id');
+
+    if (likesError) {
+      console.error('❌ Erreur suppression likes:', likesError);
+    } else {
+      console.log(`🗑️ ${deletedLikes?.length || 0} like(s) supprimé(s)`);
+    }
+
+    // 3. Supprimer les commentaires associés aux communications expirées
+    const { data: deletedComments, error: commentsError } = await supabase
+      .from('communication_comments')
+      .delete()
+      .in('communication_id', expiredIds)
+      .select('id');
+
+    if (commentsError) {
+      console.error('❌ Erreur suppression commentaires:', commentsError);
+    } else {
+      console.log(`🗑️ ${deletedComments?.length || 0} commentaire(s) supprimé(s)`);
+    }
+
+    // 4. Supprimer les notifications associées
     const { data: deletedNotifications, error: notifError } = await supabase
       .from('notifications')
       .delete()
@@ -47,7 +73,7 @@ export const handler: Handler = schedule("0 2 * * *", async (event) => {
       console.log(`🗑️ ${deletedNotifications?.length || 0} notification(s) supprimée(s)`);
     }
 
-    // 3. Supprimer les communications expirées
+    // 5. Supprimer les communications expirées (CASCADE supprimera aussi les relations)
     const { data: deletedCommunications, error: commError } = await supabase
       .from('communications')
       .delete()
@@ -62,7 +88,7 @@ export const handler: Handler = schedule("0 2 * * *", async (event) => {
     const deletedCount = deletedCommunications?.length || 0;
     console.log(`✅ ${deletedCount} communication(s) expirée(s) supprimée(s)`);
 
-    // 4. Log détaillé
+    // 6. Log détaillé
     deletedCommunications?.forEach(comm => {
       console.log(`   - "${comm.title}" (${comm.id})`);
     });
@@ -70,9 +96,13 @@ export const handler: Handler = schedule("0 2 * * *", async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: `Nettoyage terminé : ${deletedCount} communications et ${deletedNotifications?.length || 0} notifications supprimées`,
-        deletedCommunications: deletedCount,
-        deletedNotifications: deletedNotifications?.length || 0
+        message: `Nettoyage terminé avec succès`,
+        summary: {
+          communications: deletedCount,
+          likes: deletedLikes?.length || 0,
+          comments: deletedComments?.length || 0,
+          notifications: deletedNotifications?.length || 0,
+        }
       })
     };
 

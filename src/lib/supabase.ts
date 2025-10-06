@@ -1,4 +1,4 @@
-// src/lib/supabase.ts - Version mise à jour avec les tables de réservation
+// src/lib/supabase.ts - Version complète corrigée
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -182,7 +182,6 @@ export type Database = {
           created_at?: string;
         };
       };
-      // ============ TABLES DE RÉSERVATION ============
       equipment_items: {
         Row: {
           id: string;
@@ -340,7 +339,6 @@ export type Database = {
           created_at?: string;
         };
       };
-      // ============ NOUVELLE TABLE COMMUNICATIONS ============
       communications: {
         Row: {
           id: string;
@@ -391,7 +389,6 @@ export type Database = {
           updated_at?: string;
         };
       };
-      // ============ TABLE NOTIFICATIONS (pour la cohérence) ============
       notifications: {
         Row: {
           id: string;
@@ -427,35 +424,99 @@ export type Database = {
           updated_at?: string;
         };
       };
+      communication_likes: {
+        Row: {
+          id: string;
+          user_id: string;
+          communication_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          communication_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          communication_id?: string;
+          created_at?: string;
+        };
+      };
+      communication_comments: {
+        Row: {
+          id: string;
+          communication_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          communication_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          communication_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+      };
+      event_comments: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+      };
+      event_likes: {
+        Row: {
+          id: string;
+          user_id: string;
+          event_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          event_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          event_id?: string;
+          created_at?: string;
+        };
+      };
     };
-    // À ajouter dans src/lib/supabase.ts dans l'interface Database['public']['Tables']
-
-event_comments: {
-  Row: {
-    id: string;
-    event_id: string;
-    user_id: string;
-    content: string;
-    created_at: string;
-    updated_at: string | null;
-  };
-  Insert: {
-    id?: string;
-    event_id: string;
-    user_id: string;
-    content: string;
-    created_at?: string;
-    updated_at?: string | null;
-  };
-  Update: {
-    id?: string;
-    event_id?: string;
-    user_id?: string;
-    content?: string;
-    created_at?: string;
-    updated_at?: string | null;
-  };
-};
     Enums: {
       notification_type: 
         | 'nouveau_club' 
