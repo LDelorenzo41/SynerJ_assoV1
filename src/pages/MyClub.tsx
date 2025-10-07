@@ -25,6 +25,7 @@ interface ClubData {
   contact_email: string | null;
   website_url: string | null; // AJOUTÉ : Champ website_url
   club_code: string;
+  sponsors_code: string; // AJOUTÉ : Champ sponsors_code
   logo_url?: string;
   created_at: string;
   association: {
@@ -62,6 +63,7 @@ export default function MyClub() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedSponsorCode, setCopiedSponsorCode] = useState(false); // AJOUTÉ : État pour le code sponsor
   
   // États pour l'édition des informations du club
   const [isEditing, setIsEditing] = useState(false);
@@ -156,6 +158,19 @@ export default function MyClub() {
         await navigator.clipboard.writeText(clubData.club_code);
         setCopiedCode(true);
         setTimeout(() => setCopiedCode(false), 2000);
+      } catch (err) {
+        console.error('Erreur lors de la copie:', err);
+      }
+    }
+  };
+
+  // AJOUTÉ : Fonction pour copier le code sponsor
+  const copySponsorCode = async () => {
+    if (clubData?.sponsors_code) {
+      try {
+        await navigator.clipboard.writeText(clubData.sponsors_code);
+        setCopiedSponsorCode(true);
+        setTimeout(() => setCopiedSponsorCode(false), 2000);
       } catch (err) {
         console.error('Erreur lors de la copie:', err);
       }
@@ -502,6 +517,53 @@ export default function MyClub() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AJOUTÉ : Section Code Sponsor */}
+      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 className="text-xl font-semibold dark-text flex items-center">
+            <Building2 className="h-5 w-5 mr-2" />
+            Code Sponsor
+          </h2>
+        </div>
+        <div className="p-6">
+          <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+            <p className="text-sm dark-text-muted mb-3">
+              Partagez ce code avec les entreprises que vous souhaitez avoir comme sponsors de votre club :
+            </p>
+            <div className="flex items-center space-x-3">
+              <div className="flex-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-3">
+                <code className="text-lg font-mono dark-text select-all">
+                  {clubData.sponsors_code}
+                </code>
+              </div>
+              <button
+                onClick={copySponsorCode}
+                className={`px-4 py-3 rounded-lg transition-colors flex items-center space-x-2 ${
+                  copiedSponsorCode 
+                    ? 'bg-green-600 text-white dark:bg-green-500' 
+                    : 'bg-orange-100 dark:bg-orange-900/30 dark-text-muted hover:bg-orange-200 dark:hover:bg-orange-900/50'
+                }`}
+              >
+                {copiedSponsorCode ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>Copié!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span>Copier</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="text-xs dark-text-muted mt-2">
+              Les sponsors utiliseront ce code pour s'inscrire et accéder aux outils de mailing de votre club.
+            </p>
           </div>
         </div>
       </div>
