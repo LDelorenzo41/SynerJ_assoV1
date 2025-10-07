@@ -65,6 +65,16 @@ export default function Settings() {
     contact_email: '',
     website_url: '',
   });
+
+  // ✅ AJOUT : État pour les préférences email
+  const [emailPreferences, setEmailPreferences] = useState({
+  email_consent_clubs: false,
+  email_consent_association: false,
+  email_consent_municipality: false,
+  email_consent_sponsors: false,
+});
+  const [emailPreferencesLoading, setEmailPreferencesLoading] = useState(false);
+
 // Ajoutez ce useEffect après la déclaration des states (vers la ligne 70)
 
 // Charger les données du profil dans le formulaire quand le profil est disponible
@@ -75,8 +85,11 @@ useEffect(() => {
       last_name: profile.last_name || '',
       pseudo: profile.pseudo || '',
     });
+    // ✅ AJOUT : Charger aussi les préférences email
+    fetchEmailPreferences();
   }
 }, [profile]); // Se déclenche quand profile change
+
   // Charger les données du club si l'utilisateur est Club Admin
   useEffect(() => {
     if (profile?.role === 'Club Admin' && profile?.club_id) {
@@ -160,6 +173,61 @@ useEffect(() => {
 
     return () => clearTimeout(timeoutId);
   };
+
+  // ✅ AJOUT : Gestion des préférences email
+  const handleEmailPreferencesUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailPreferencesLoading(true);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          email_consent_clubs: emailPreferences.email_consent_clubs,
+          email_consent_association: emailPreferences.email_consent_association,
+          email_consent_municipality: emailPreferences.email_consent_municipality,
+          email_consent_sponsors: emailPreferences.email_consent_sponsors,
+        })
+        .eq('id', user!.id);
+
+      if (error) throw error;
+
+      setMessage({
+        type: 'success',
+        text: 'Préférences email mises à jour avec succès !',
+      });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setEmailPreferencesLoading(false);
+    }
+  };
+  // ✅ AJOUTER : cette nouvelle fonction après vos autres fonctions
+const fetchEmailPreferences = async () => {
+  if (!user?.id) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('email_consent_clubs, email_consent_association, email_consent_municipality, email_consent_sponsors')
+      .eq('id', user.id)
+      .single();
+
+    if (error) throw error;
+
+    if (data) {
+      setEmailPreferences({
+        email_consent_clubs: data.email_consent_clubs || false,
+        email_consent_association: data.email_consent_association || false,
+        email_consent_municipality: data.email_consent_municipality || false,
+        email_consent_sponsors: data.email_consent_sponsors || false,
+      });
+    }
+  } catch (err: any) {
+    console.error('Erreur lors du chargement des préférences email:', err);
+  }
+};
 
   // Upload de logo (réutilise la logique de RegistrationForms.tsx)
   const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
@@ -661,7 +729,7 @@ useEffect(() => {
                   required
                   minLength={3}
                   maxLength={30}
-                  pattern="^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_-]{3,30}$"
+                  
                   value={profileForm.pseudo}
                   onChange={(e) => handlePseudoChange(e.target.value)}
                   className={`dark-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
@@ -706,6 +774,110 @@ useEffect(() => {
                   {loading ? 'Sauvegarde...' : 'Sauvegarder les informations'}
                 </button>
               </div>
+            </form>
+          </div>
+
+          {/* ✅ NOUVELLE SECTION : Préférences Email */}
+          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
+            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+              <Mail className="h-5 w-5 mr-2" />
+              Préférences de notification email
+            </h2>
+            
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                Vous pouvez à tout moment activer ou désactiver les notifications email selon vos préférences. 
+                Ces paramètres respectent le RGPD et vous donnent un contrôle total sur vos données.
+              </p>
+            </div>
+
+            <form onSubmit={handleEmailPreferencesUpdate} className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                  <div>
+                    <h3 className="font-medium dark-text">Emails des clubs</h3>
+                    <p className="text-sm dark-text-muted">Notifications et actualités des clubs que vous suivez</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emailPreferences.email_consent_clubs}
+                      onChange={(e) => setEmailPreferences({
+                        ...emailPreferences,
+                        email_consent_clubs: e.target.checked
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                  <div>
+                    <h3 className="font-medium dark-text">Emails de l'association</h3>
+                    <p className="text-sm dark-text-muted">Communications officielles de votre association</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emailPreferences.email_consent_association}
+                      onChange={(e) => setEmailPreferences({
+                        ...emailPreferences,
+                        email_consent_association: e.target.checked
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                  <div>
+                    <h3 className="font-medium dark-text">Emails de la mairie</h3>
+                    <p className="text-sm dark-text-muted">Informations municipales et événements locaux</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emailPreferences.email_consent_municipality}
+                      onChange={(e) => setEmailPreferences({
+                        ...emailPreferences,
+                        email_consent_municipality: e.target.checked
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                  <div>
+                    <h3 className="font-medium dark-text">Emails des sponsors</h3>
+                    <p className="text-sm dark-text-muted">Offres et communications des partenaires du club</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emailPreferences.email_consent_sponsors}
+                      onChange={(e) => setEmailPreferences({
+                        ...emailPreferences,
+                        email_consent_sponsors: e.target.checked
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={emailPreferencesLoading}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                {emailPreferencesLoading ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
+              </button>
             </form>
           </div>
 

@@ -962,6 +962,51 @@ export default function RegistrationForms() {
         .eq('id', authData.user.id);
   
       if (profileError) throw profileError;
+      // Dans RegistrationForms.tsx, dans la fonction handleSponsorRegistration
+
+// 4. Lier automatiquement le sponsor existant au nouveau compte utilisateur
+// 4. Lier automatiquement le sponsor existant au nouveau compte utilisateur
+try {
+  const cleanCode = sponsorForm.sponsor_code.trim().toUpperCase();
+  
+  // D'abord, trouver le club via le code sponsor
+  let clubId = null;
+  if (cleanCode.startsWith('SPONSO-CLUB-')) {
+    const { data: club } = await supabase
+      .from('clubs')
+      .select('id')
+      .eq('sponsors_code', cleanCode)
+      .single();
+    clubId = club?.id;
+  }
+
+  // Ensuite, chercher le sponsor par email ET club_id
+  const { data: existingSponsor, error: findError } = await supabase
+    .from('sponsors')
+    .select('id')
+    .eq('contact_email', sponsorForm.email)
+    .eq('club_id', clubId)
+    .maybeSingle();
+
+  if (existingSponsor && !findError) {
+    const { error: linkError } = await supabase
+      .from('sponsors')
+      .update({ user_id: authData.user.id })
+      .eq('id', existingSponsor.id);
+    
+    if (linkError) {
+      console.warn('Erreur lors de la liaison du sponsor existant:', linkError);
+    } else {
+      console.log('Sponsor existant lié avec succès au nouveau compte:', existingSponsor.id);
+    }
+  } else {
+    console.log('Aucun sponsor existant trouvé avec email et club correspondants');
+  }
+} catch (linkError) {
+  console.warn('Erreur lors de la tentative de liaison sponsor:', linkError);
+}
+
+// Le reste du code continue normalement...
   
       setMessage({
         type: 'success',
@@ -1047,7 +1092,7 @@ export default function RegistrationForms() {
                 required
                 minLength={3}
                 maxLength={30}
-                pattern="^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_-]{3,30}$"
+                
                 value={userForm.pseudo}
                 onChange={(e) => handlePseudoChange(e.target.value)}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
@@ -1062,7 +1107,7 @@ export default function RegistrationForms() {
               
               {checkingPseudo && (
                 <p className="mt-2 text-sm text-blue-600 flex items-center">
-                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
                   Vérification du pseudo...
                 </p>
               )}
@@ -1175,7 +1220,7 @@ export default function RegistrationForms() {
               
               {clubValidation.loading && (
                 <p className="mt-2 text-sm text-blue-600 flex items-center">
-                  <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
                   Vérification du code...
                 </p>
               )}
@@ -1909,7 +1954,7 @@ export default function RegistrationForms() {
                 
                 {sponsorValidation.loading && (
                   <p className="mt-2 text-sm text-blue-600 flex items-center">
-                    <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                    <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
                     Vérification du code...
                   </p>
                 )}

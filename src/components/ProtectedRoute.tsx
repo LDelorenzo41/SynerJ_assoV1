@@ -4,8 +4,8 @@ import { useAuthNew } from '../hooks/useAuthNew';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
-  allowedRoles?: Array<'Super Admin' | 'Club Admin' | 'Member' | 'Supporter'>;
+  requiredRole?: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter' | 'Sponsor';
+  allowedRoles?: Array<'Super Admin' | 'Club Admin' | 'Member' | 'Supporter' | 'Sponsor'>;
 }
 
 export default function ProtectedRoute({ 

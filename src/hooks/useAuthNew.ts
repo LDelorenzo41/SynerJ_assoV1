@@ -8,7 +8,7 @@ interface Profile {
   first_name: string | null;
   last_name: string | null;
   pseudo: string | null;
-  role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter';
+  role: 'Super Admin' | 'Club Admin' | 'Member' | 'Supporter' | 'Sponsor';
   club_id: string | null;
   association_id: string | null;
   avatar_url: string | null;
@@ -213,6 +213,7 @@ export function useAuthNew() {
     isClubAdmin: profile?.role === 'Club Admin',
     isMember: profile?.role === 'Member',
     isSupporter: profile?.role === 'Supporter',
+    isSponsor: profile?.role === 'Sponsor',
     isOnline,
     signOut,
     updateProfile,

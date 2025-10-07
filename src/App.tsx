@@ -16,6 +16,7 @@ import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
 import SponsorEdit from './pages/SponsorEdit';
 import Communications from './pages/Communications';
+import Mailing from './pages/Mailing';
 
 // Import des nouveaux composants de réservation
 import EquipmentManagement from './components/equipment/EquipmentManagement';
@@ -57,9 +58,9 @@ function App() {
           } 
         />
         <Route 
-  path="/sponsor-edit/:token" 
-  element={<SponsorEdit />} 
-/>
+          path="/sponsor-edit/:token" 
+          element={<SponsorEdit />} 
+        />
         
         {/* Routes protégées AVEC Layout */}
         <Route
@@ -174,6 +175,18 @@ function App() {
             <Layout>
               <ProtectedRoute allowedRoles={['Club Admin', 'Super Admin']}>
                 <ClubReservation />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        {/* Ajout de la route Mailing - À ajouter avec les autres routes protégées */}
+        <Route
+          path="/mailing"
+          element={
+            <Layout>
+              <ProtectedRoute allowedRoles={['Super Admin', 'Club Admin', 'Sponsor']}>
+                <Mailing />
               </ProtectedRoute>
             </Layout>
           }

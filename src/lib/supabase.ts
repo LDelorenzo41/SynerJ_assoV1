@@ -516,6 +516,56 @@ export type Database = {
           created_at?: string;
         };
       };
+      mailing_campaigns: {
+        Row: {
+          id: string;
+          sent_by: string;
+          sender_role: string;
+          club_id: string | null;
+          association_id: string | null;
+          consent_type: string;
+          subject: string;
+          message: string;
+          message_preview: string | null;
+          recipient_count: number;
+          sent_at: string;
+          sponsor_type: string | null;
+          sponsor_level: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          sent_by: string;
+          sender_role: string;
+          club_id?: string | null;
+          association_id?: string | null;
+          consent_type: string;
+          subject: string;
+          message: string;
+          message_preview?: string | null;
+          recipient_count?: number;
+          sent_at?: string;
+          sponsor_type?: string | null;
+          sponsor_level?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          sent_by?: string;
+          sender_role?: string;
+          club_id?: string | null;
+          association_id?: string | null;
+          consent_type?: string;
+          subject?: string;
+          message?: string;
+          message_preview?: string | null;
+          recipient_count?: number;
+          sent_at?: string;
+          sponsor_type?: string | null;
+          sponsor_level?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Enums: {
       notification_type: 
