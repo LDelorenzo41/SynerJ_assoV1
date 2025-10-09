@@ -121,13 +121,14 @@ const getNavigationItems = (): NavigationItem[] => {
 
   // ✅ NOUVELLE SECTION POUR LES SPONSORS
   if (profile.role === 'Sponsor') {
-    items.push(
-      { path: '/events', label: 'Événements', icon: Calendar },
-      { path: '/communications', label: 'Communications', icon: MessageSquare },
-      { path: '/clubs', label: 'Clubs', icon: Users },
-      { path: '/sponsors', label: 'Sponsors', icon: Heart },
-    );
-  }
+  return [
+    { path: '/dashboard', label: 'Tableau de bord', icon: Home },
+    { path: '/events', label: 'Événements', icon: Calendar },
+    { path: '/communications', label: 'Communications', icon: MessageSquare },
+    { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
+    { path: '/clubs', label: 'Clubs', icon: Users },
+  ];
+}
 
   if (profile.role === 'Member' || profile.role === 'Supporter') {
     items.push(

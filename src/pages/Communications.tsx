@@ -238,12 +238,69 @@ export default function Communications() {
         setLoading(false);
         return;
       }
+  
+      // Cas Supporter sans association
       if (profile.role === 'Supporter' && !profile.association_id) {
         setCommunications([]);
         setLoading(false);
         return;
       }
-
+  
+      // ✅ AJOUTER CE BLOC POUR LES SPONSORS
+      if (profile.role === 'Sponsor') {
+        // Les Sponsors voient uniquement les communications publiques de leur association
+        if (!profile.association_id) {
+          setCommunications([]);
+          setLoading(false);
+          return;
+        }
+  
+        console.log('🔍 [Sponsor] Fetching communications for association:', profile.association_id);
+  
+        let query = supabase
+          .from('communications')
+          .select(`
+            *,
+            clubs (id, name, logo_url),
+            associations (id, name, logo_url),
+            profiles (first_name, last_name)
+          `)
+          .eq('association_id', profile.association_id)
+          .eq('visibility', 'Public'); // Les Sponsors ne voient QUE les communications publiques
+  
+        if (clubId) {
+          if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+            query = query.eq('club_id', clubId);
+          } else {
+            const { data: clubData } = await supabase
+              .from('clubs')
+              .select('id')
+              .eq('slug', clubId)
+              .single();
+  
+            if (clubData) {
+              query = query.eq('club_id', clubData.id);
+            }
+          }
+        }
+  
+        const now = new Date().toISOString();
+        query = query.or(`expires_at.is.null,expires_at.gte.${now}`);
+  
+        const { data, error } = await query
+          .order('is_pinned', { ascending: false })
+          .order('created_at', { ascending: false });
+  
+        if (error) throw error;
+  
+        console.log('✅ [Sponsor] Communications loaded:', data?.length || 0);
+        setCommunications(data || []);
+        setLoading(false);
+        return;
+      }
+  
+      // ... Reste du code existant pour les autres rôles ...
+  
       let query = supabase
         .from('communications')
         .select(`
@@ -252,7 +309,7 @@ export default function Communications() {
           associations (id, name, logo_url),
           profiles (first_name, last_name)
         `);
-
+  
       if (clubId) {
         if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
           query = query.eq('club_id', clubId);
@@ -262,29 +319,29 @@ export default function Communications() {
             .select('id')
             .eq('slug', clubId)
             .single();
-
+  
           if (clubData) {
             query = query.eq('club_id', clubData.id);
           }
         }
       } else {
         query = query.eq('association_id', profile.association_id);
-
+  
         if (profile.role === 'Supporter') {
           query = query.eq('visibility', 'Public');
         }
       }
-
+  
       const now = new Date().toISOString();
       query = query.or(`expires_at.is.null,expires_at.gte.${now}`);
-
+  
       const { data, error } = await query.order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
-
+  
       if (error) throw error;
-
+  
       let filteredCommunications = data || [];
-
+  
       if (!clubId) {
         if (profile.role === 'Super Admin') {
           filteredCommunications = filteredCommunications.filter(comm => {
@@ -294,7 +351,7 @@ export default function Communications() {
             return false;
           });
         }
-
+  
         else if (profile.role === 'Club Admin' || profile.role === 'Member') {
           filteredCommunications = filteredCommunications.filter(comm => {
             if (comm.club_id === profile.club_id) return true;
@@ -310,7 +367,7 @@ export default function Communications() {
           });
         }
       }
-
+  
       setCommunications(filteredCommunications);
     } catch (error) {
       console.error('Error fetching communications:', error);
@@ -688,6 +745,7 @@ export default function Communications() {
     if (profile?.role === 'Club Admin') return 'Communications de votre club et communications publiques';
     if (profile?.role === 'Member') return 'Communications de votre club et communications publiques';
     if (profile?.role === 'Supporter') return 'Communications publiques de votre association';
+    if (profile?.role === 'Sponsor') return 'Communications publiques de votre association'; // ✅ AJOUTÉ
     return '';
   };
 
@@ -699,11 +757,12 @@ export default function Communications() {
     if (profile?.role === 'Club Admin') return 'Vous pouvez créer des communications pour votre club et voir les communications publiques.';
     if (profile?.role === 'Member') return 'Vous voyez les communications de votre club et les communications publiques de l\'association.';
     if (profile?.role === 'Supporter') return 'Vous ne voyez que les communications publiques de votre association.';
+    if (profile?.role === 'Sponsor') return 'Vous voyez toutes les communications publiques de votre association.'; // ✅ AJOUTÉ
     return '';
   };
 
-  // Gestion du cas Supporter sans association
-  if (profile?.role === 'Supporter' && !profile?.association_id) {
+  // Gestion du cas Supporter/Sponsor sans association
+  if ((profile?.role === 'Supporter' || profile?.role === 'Sponsor') && !profile?.association_id) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -1349,6 +1408,7 @@ export default function Communications() {
                 ) : (
                   <>
                     {profile?.role === 'Supporter' && 'Aucune communication publique dans votre association.'}
+                    {profile?.role === 'Sponsor' && 'Aucune communication publique dans votre association.'} {/* ✅ AJOUTÉ */}
                     {profile?.role === 'Member' && 'Aucune communication dans votre club ou votre association.'}
                     {(profile?.role === 'Club Admin' || profile?.role === 'Super Admin') && 'Commencez par créer une communication.'}
                   </>

@@ -77,15 +77,15 @@ function App() {
           }
         />
         <Route 
-          path="/calendrier" 
-          element={
-            <ProtectedRoute allowedRoles={['Member', 'Supporter']}>
-              <Layout>
-                <MonCalendrier />
-              </Layout>
-            </ProtectedRoute>
-          } 
-        />
+  path="/calendrier" 
+  element={
+    <ProtectedRoute allowedRoles={['Member', 'Supporter', 'Sponsor']}> {/* ← Ajouter 'Sponsor' */}
+      <Layout>
+        <MonCalendrier />
+      </Layout>
+    </ProtectedRoute>
+  } 
+/>
         <Route
           path="/events"
           element={
