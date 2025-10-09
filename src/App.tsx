@@ -14,7 +14,7 @@ import Settings from './pages/Settings';
 import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
-import SponsorEdit from './pages/SponsorEdit';
+import SponsorProfile from './pages/SponsorProfile'; // ✅ NOUVEAU - Remplace SponsorEdit
 import Communications from './pages/Communications';
 import Mailing from './pages/Mailing';
 
@@ -57,10 +57,13 @@ function App() {
             </>
           } 
         />
+        
+        {/* ❌ ANCIENNE ROUTE SUPPRIMÉE - Plus nécessaire avec le nouveau processus
         <Route 
           path="/sponsor-edit/:token" 
           element={<SponsorEdit />} 
         />
+        */}
         
         {/* Routes protégées AVEC Layout */}
         <Route
@@ -143,6 +146,19 @@ function App() {
             </Layout>
           }
         />
+
+        {/* ✅ NOUVELLE ROUTE - Profil sponsor (accessible uniquement aux Sponsors connectés) */}
+        <Route
+          path="/sponsor/profile"
+          element={
+            <Layout>
+              <ProtectedRoute requiredRole="Sponsor">
+                <SponsorProfile />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
         <Route
           path="/settings"
           element={
@@ -154,7 +170,7 @@ function App() {
           }
         />
 
-        {/* ============ NOUVELLES ROUTES DE RÉSERVATION ============ */}
+        {/* ============ ROUTES DE RÉSERVATION ============ */}
         
         {/* Gestion du matériel - Super Admins uniquement */}
         <Route
@@ -180,7 +196,7 @@ function App() {
           }
         />
 
-        {/* Ajout de la route Mailing - À ajouter avec les autres routes protégées */}
+        {/* Route Mailing - Super Admin, Club Admin et Sponsor */}
         <Route
           path="/mailing"
           element={

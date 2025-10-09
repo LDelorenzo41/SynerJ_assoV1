@@ -1,6 +1,6 @@
 // ============================================
 // SIDEBAR AVEC INTÉGRATION NOTIFICATIONS ET LIEN MAILING
-// Version avec debug pour identifier le problème d'affichage
+// Version avec support Sponsor et lien "Mon Profil"
 // ============================================
 
 import React from 'react';
@@ -228,6 +228,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </Link>
               );
             })}
+
+            {/* ============================================ */}
+            {/* LIEN MON PROFIL SPONSOR */}
+            {/* ============================================ */}
+            {(() => {
+              const userRole = profile?.role;
+              const isSponsor = userRole === 'Sponsor';
+              
+              if (!isSponsor) return null;
+              
+              const isActive = location.pathname === '/sponsor/profile';
+              
+              return (
+                <Link
+                  to="/sponsor/profile"
+                  onClick={() => handleNavItemClick('/sponsor/profile')}
+                  className={`
+                    group relative flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                    ${isActive 
+                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' 
+                      : 'dark-text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    }
+                    ${!isOpen ? 'lg:justify-center lg:px-2' : ''}
+                  `}
+                  title={!isOpen ? 'Mon Profil' : undefined}
+                >
+                  <Building className="h-5 w-5 flex-shrink-0" />
+                  <span className={`ml-3 transition-all duration-200 whitespace-nowrap ${
+                    isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 lg:opacity-0 lg:-translate-x-2'
+                  } overflow-hidden`}>
+                    Mon Profil
+                  </span>
+                  {!isOpen && (
+                    <div className="hidden lg:group-hover:block absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded whitespace-nowrap z-50 pointer-events-none">
+                      Mon Profil Sponsor
+                    </div>
+                  )}
+                </Link>
+              );
+            })()}
 
             {/* ============================================ */}
             {/* LIEN MAILING */}
