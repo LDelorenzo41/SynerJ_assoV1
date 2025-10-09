@@ -729,61 +729,91 @@ Style visuel : illustration vectorielle moderne, design plat (flat design), coul
         createdEventId = newEvent.id;
   
         if (createdEventId && profile?.club_id) {
-          try {
-            let recipientIds: string[] = [];
+  try {
+    let recipientIds: string[] = [];
+
+    if (eventData.visibility === 'Public') {
+  // ===== ÉVÉNEMENTS PUBLICS =====
+  console.log('📢 Événement PUBLIC : notification à tous les followers + sponsors');
   
-            if (eventData.visibility === 'Public') {
-              const { data: followers, error: followersError } = await supabase
-                .from('user_clubs')
-                .select('user_id')
-                .eq('club_id', profile.club_id);
+  // 1. Récupérer les followers classiques (via user_clubs)
+  const { data: followers, error: followersError } = await supabase
+    .from('user_clubs')
+    .select('user_id')
+    .eq('club_id', profile.club_id);
+
+  if (followersError) {
+    console.error('Error fetching followers:', followersError);
+  } else if (followers && followers.length > 0) {
+    recipientIds.push(...followers.map(f => f.user_id));
+    console.log(`✅ ${followers.length} follower(s) via user_clubs`);
+  }
+
+  // 2. ✅ NOUVEAU : Récupérer les Sponsors du club (via la table sponsors)
+  const { data: sponsors, error: sponsorsError } = await supabase
+    .from('sponsors')
+    .select('user_id')
+    .eq('club_id', profile.club_id)
+    .not('user_id', 'is', null);
+
+  if (sponsorsError) {
+    console.error('Error fetching sponsors:', sponsorsError);
+  } else if (sponsors && sponsors.length > 0) {
+    recipientIds.push(...sponsors.map(s => s.user_id!));
+    console.log(`✅ ${sponsors.length} sponsor(s) du club`);
+  }
+
+  // 3. Dédupliquer les IDs
+  recipientIds = [...new Set(recipientIds)];
+  console.log(`📊 Total destinataires (dédupliqués): ${recipientIds.length}`);
+
+} else {
+  // ===== ÉVÉNEMENTS PRIVÉS (Members Only) =====
+  console.log('🔒 Événement PRIVÉ : notification aux membres du club uniquement');
   
-              if (followersError) {
-                console.error('Error fetching followers:', followersError);
-              } else if (followers && followers.length > 0) {
-                recipientIds = followers.map(f => f.user_id);
-                console.log(`📢 Événement PUBLIC : ${recipientIds.length} follower(s) seront notifiés`);
-              }
-            } else {
-              const { data: members, error: membersError } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('club_id', profile.club_id)
-                .in('role', ['Member', 'Club Admin']);
-  
-              if (membersError) {
-                console.error('Error fetching club members:', membersError);
-              } else if (members && members.length > 0) {
-                recipientIds = members.map(m => m.id);
-                console.log(`🔒 Événement PRIVÉ : ${recipientIds.length} membre(s) seront notifiés`);
-              }
-            }
-  
-            if (recipientIds.length > 0) {
-              const { data: clubInfo, error: clubError } = await supabase
-                .from('clubs')
-                .select('name')
-                .eq('id', profile.club_id)
-                .single();
-  
-              if (!clubError && clubInfo) {
-                await NotificationService.notifyNewEvent(
-                  recipientIds,
-                  eventData.name,
-                  createdEventId,
-                  eventData.date,
-                  clubInfo.name
-                );
-  
-                console.log(`✅ Notifications envoyées pour l'événement "${eventData.name}" (${eventData.visibility})`);
-              }
-            } else {
-              console.log(`ℹ️ Aucun destinataire trouvé pour l'événement "${eventData.name}"`);
-            }
-          } catch (notificationError) {
-            console.error('Error sending notifications:', notificationError);
-          }
-        }
+  // Récupérer uniquement les membres du club (Member, Club Admin)
+  // ⚠️ Les Sponsors ne doivent PAS recevoir les notifications d'événements privés
+  // car ils ne sont pas membres à part entière du club
+  const { data: members, error: membersError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('club_id', profile.club_id)
+    .in('role', ['Member', 'Club Admin']);
+
+  if (membersError) {
+    console.error('Error fetching club members:', membersError);
+  } else if (members && members.length > 0) {
+    recipientIds = members.map(m => m.id);
+    console.log(`✅ ${recipientIds.length} membre(s) seront notifiés (pas les Sponsors pour les événements privés)`);
+  }
+}
+
+    // Envoyer les notifications si des destinataires sont trouvés
+    if (recipientIds.length > 0) {
+      const { data: clubInfo, error: clubError } = await supabase
+        .from('clubs')
+        .select('name')
+        .eq('id', profile.club_id)
+        .single();
+
+      if (!clubError && clubInfo) {
+        await NotificationService.notifyNewEvent(
+          recipientIds,
+          eventData.name,
+          createdEventId,
+          eventData.date,
+          clubInfo.name
+        );
+
+        console.log(`✅ Notifications envoyées pour l'événement "${eventData.name}" (${eventData.visibility})`);
+      }
+    } else {
+      console.log(`ℹ️ Aucun destinataire trouvé pour l'événement "${eventData.name}"`);
+    }
+  } catch (notificationError) {
+    console.error('Error sending notifications:', notificationError);
+  }
+}
       }
   
       setEventForm({

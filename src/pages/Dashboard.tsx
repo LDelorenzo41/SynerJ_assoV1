@@ -42,7 +42,7 @@ interface UpcomingEvent {
 
 export default function Dashboard() {
   const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew();
-  const location = useLocation();
+  const _location = useLocation(); // Préfixe _ = "je sais qu'elle n'est pas utilisée"
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
   const [followedClubs, setFollowedClubs] = useState<FollowedClub[]>([]);
@@ -387,14 +387,7 @@ export default function Dashboard() {
     });
   };
 
-  const formatEventDateShort = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short'
-    });
-  };
+  
 
   const groupEventsByDate = (events: UpcomingEvent[]) => {
     return events.reduce((groups, event) => {
@@ -947,11 +940,11 @@ export default function Dashboard() {
               {renderAssociationSection()}
 
               {/* AMÉLIORATION: Le carrousel des sponsors est caché sur desktop ici */}
-              {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-                <div className="hidden lg:block">
-                  <SponsorCarousel />
-                </div>
-              )}
+              {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor') && (
+  <div className="hidden lg:block">
+    <SponsorCarousel />
+  </div>
+)}
             </div>
 
             <div className="lg:col-span-2">
@@ -960,11 +953,11 @@ export default function Dashboard() {
           </div>
           
           {/* AMÉLIORATION: Le carrousel est affiché en dehors de la grille sur mobile pour un meilleur flux */}
-          {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-            <div className="lg:hidden mt-6">
-              <SponsorCarousel />
-            </div>
-          )}
+          {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor') && (
+  <div className="lg:hidden mt-6">
+    <SponsorCarousel />
+  </div>
+)}
         </div>
       </div>
 

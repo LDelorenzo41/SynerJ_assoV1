@@ -10,7 +10,6 @@ import {
   MessageSquare,
   Plus,
   Eye,
-  EyeOff,
   Edit,
   Trash2,
   AlertCircle,
@@ -21,7 +20,6 @@ import {
   ChevronDown,
   ChevronUp,
   Building,
-  Calendar,
   Clock,
   Pin,
   PinOff,
@@ -395,7 +393,7 @@ export default function Communications() {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `communications/${fileName}`;
 
-      const { data: uploadData, error } = await supabase.storage
+      const {  error } = await supabase.storage
         .from('communication-images')
         .upload(filePath, file);
 
@@ -566,19 +564,26 @@ export default function Communications() {
 
             if (communicationData.club_id) {
               if (communicationData.visibility === 'Public') {
-                const [{ data: clubMembers }, { data: followers }] = await Promise.all([
-                  supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('club_id', communicationData.club_id)
-                    .in('role', ['Member', 'Club Admin']),
-                  supabase
-                    .from('user_clubs')
-                    .select('user_id')
-                    .eq('club_id', communicationData.club_id)
-                ]);
+                const [{ data: clubMembers }, { data: followers }, { data: sponsors }] = await Promise.all([
+  supabase
+    .from('profiles')
+    .select('id')
+    .eq('club_id', communicationData.club_id)
+    .in('role', ['Member', 'Club Admin']),
+  supabase
+    .from('user_clubs')
+    .select('user_id')
+    .eq('club_id', communicationData.club_id),
+  supabase
+    .from('sponsors')
+    .select('user_id')
+    .eq('club_id', communicationData.club_id)
+    .not('user_id', 'is', null)
+]);
 
-                if (clubMembers) recipientIds.push(...clubMembers.map(m => m.id));
+if (clubMembers) recipientIds.push(...clubMembers.map(m => m.id));
+if (followers) recipientIds.push(...followers.map(f => f.user_id));
+if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                 if (followers) recipientIds.push(...followers.map(f => f.user_id));
               } else {
                 const { data: clubMembers } = await supabase
@@ -796,7 +801,7 @@ export default function Communications() {
     communicationId: string;
     isOpen: boolean;
     onClick: () => void;
-  }> = ({ communicationId, isOpen, onClick }) => {
+  }> = ({ communicationId, onClick }) => {
     const { stats } = useCommunicationCommentStats(communicationId);
 
     return (

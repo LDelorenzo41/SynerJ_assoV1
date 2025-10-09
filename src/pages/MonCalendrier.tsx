@@ -325,7 +325,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     type="radio"
                     value="tu"
                     checked={formality === 'tu'}
-                    onChange={(e) => setFormality('tu')}
+                    onChange={() => setFormality('tu')}
                     className="mr-2"
                   />
                   <span className="text-sm dark:text-gray-300">Tutoiement (tu)</span>
@@ -335,7 +335,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     type="radio"
                     value="vous"
                     checked={formality === 'vous'}
-                    onChange={(e) => setFormality('vous')}
+                    onChange={() => setFormality('vous')}
                     className="mr-2"
                   />
                   <span className="text-sm dark:text-gray-300">Vouvoiement (vous)</span>
