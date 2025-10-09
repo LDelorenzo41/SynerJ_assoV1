@@ -76,7 +76,10 @@ export default function Sponsors() {
     if (!profile) return;
     
     try {
-      if (profile.role === 'Member' || profile.role === 'Supporter') {
+      // ✅ AJOUTER 'Sponsor' dans la condition
+      if (profile.role === 'Member' || profile.role === 'Supporter' || profile.role === 'Sponsor') {
+        console.log(`🔍 [${profile.role}] Récupération des clubs suivis...`);
+        
         const { data: userClubs, error } = await supabase
           .from('user_clubs')
           .select('club_id')
@@ -86,6 +89,7 @@ export default function Sponsors() {
           console.error('Error fetching followed clubs:', error);
         } else {
           const clubIds = userClubs?.map(uc => uc.club_id) || [];
+          console.log(`✅ [${profile.role}] Clubs suivis trouvés:`, clubIds.length);
           setFollowedClubIds(clubIds);
         }
       }
@@ -148,7 +152,31 @@ export default function Sponsors() {
           query = query.eq('association_id', profile.association_id);
         }
         
-      } else {
+      } 
+      // ✅ AJOUTER CE BLOC POUR LES SPONSORS
+      else if (profile.role === 'Sponsor' && profile.association_id) {
+        console.log('🔍 [Sponsor] Chargement des sponsors...');
+        console.log('📋 [Sponsor] Clubs suivis:', followedClubIds);
+
+        // Les Sponsors voient :
+        // 1. Les sponsors de leur club principal (s'ils sont sponsor de club)
+        // 2. Les sponsors des clubs qu'ils suivent
+        // 3. Les sponsors de l'association
+
+        if (followedClubIds.length > 0) {
+          // Cas 1 : Le Sponsor suit des clubs
+          const clubConditions = followedClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+          query = query.or(`${clubConditions},association_id.eq.${profile.association_id}`);
+          console.log('✅ [Sponsor] Requête avec clubs suivis:', clubConditions);
+        } else {
+          // Cas 2 : Le Sponsor ne suit aucun club (uniquement sponsors d'association)
+          query = query.eq('association_id', profile.association_id);
+          console.log('✅ [Sponsor] Requête uniquement sponsors d\'association');
+        }
+        
+      }
+      else {
+        // Aucun rôle valide
         setSponsors([]);
         setLoading(false);
         return;
@@ -161,6 +189,7 @@ export default function Sponsors() {
         throw fetchError;
       }
 
+      console.log(`✅ [${profile.role}] Sponsors chargés:`, data?.length || 0);
       setSponsors(data || []);
     } catch (err: any) {
       console.error('Error loading sponsors:', err);

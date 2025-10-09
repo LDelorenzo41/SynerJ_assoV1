@@ -22,56 +22,81 @@ export const SponsorBanner: React.FC = () => {
   }, [profile]);
 
   const loadSponsors = async () => {
-    if (!profile) return;
+  if (!profile) return;
 
-    try {
-      const allSponsors: Sponsor[] = [];
+  try {
+    console.log(`🔍 [SponsorBanner] Chargement pour rôle: ${profile.role}`);
+    console.log(`📋 [SponsorBanner] Profile club_id:`, profile.club_id);
+    
+    const allSponsors: Sponsor[] = [];
 
-      // 1. Récupérer les sponsors de la structure (si l'utilisateur a une association_id)
-      if (profile.association_id) {
-        const { data: structureSponsors } = await supabase
-          .from('sponsors')
-          .select('id, name, logo_url, club_id, association_id')
-          .eq('association_id', profile.association_id)
-          .is('club_id', null) // Sponsors de la structure uniquement (pas liés à un club)
-          .eq('is_confirmed', true);
+    // 1. Récupérer les sponsors de l'association
+    if (profile.association_id) {
+      const { data: structureSponsors } = await supabase
+        .from('sponsors')
+        .select('id, name, logo_url, club_id, association_id')
+        .eq('association_id', profile.association_id)
+        .is('club_id', null)
+        .eq('is_confirmed', true);
 
-        if (structureSponsors) {
-          allSponsors.push(...structureSponsors);
-        }
+      if (structureSponsors) {
+        console.log(`✅ [SponsorBanner] Sponsors d'association: ${structureSponsors.length}`);
+        allSponsors.push(...structureSponsors);
       }
+    }
 
-      // 2. Récupérer les sponsors des clubs suivis
+    // 2. Construire la liste complète des clubs à récupérer
+    const clubIdsToFetch: string[] = [];
+
+    // 2A. Ajouter le club principal du Sponsor (si existe)
+    if (profile.club_id) {
+      clubIdsToFetch.push(profile.club_id);
+      console.log(`✅ [SponsorBanner] Club principal ajouté:`, profile.club_id);
+    }
+
+    // 2B. Ajouter les clubs suivis (via user_clubs)
+    if (profile.role === 'Member' || profile.role === 'Supporter' || profile.role === 'Sponsor') {
       const { data: userClubs } = await supabase
         .from('user_clubs')
         .select('club_id')
         .eq('user_id', profile.id);
 
       const followedClubIds = userClubs?.map(uc => uc.club_id) || [];
+      console.log(`📋 [SponsorBanner] Clubs suivis (user_clubs): ${followedClubIds.length}`);
       
-      if (followedClubIds.length > 0) {
-        const clubConditions = followedClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
-        const { data: clubSponsors } = await supabase
-          .from('sponsors')
-          .select('id, name, logo_url, club_id, association_id')
-          .or(clubConditions)
-          .eq('is_confirmed', true);
-
-        if (clubSponsors) {
-          allSponsors.push(...clubSponsors);
-        }
-      }
-
-      // 3. Dédupliquer les sponsors par ID (au cas où un sponsor serait lié à plusieurs clubs)
-      const uniqueSponsors = Array.from(
-        new Map(allSponsors.map(sponsor => [sponsor.id, sponsor])).values()
-      );
-
-      setSponsors(uniqueSponsors);
-    } catch (err) {
-      console.error('Error loading sponsors for banner:', err);
+      clubIdsToFetch.push(...followedClubIds);
     }
-  };
+
+    // 2C. Dédupliquer les IDs de clubs
+    const uniqueClubIds = [...new Set(clubIdsToFetch)];
+    console.log(`✅ [SponsorBanner] Total clubs uniques à récupérer: ${uniqueClubIds.length}`);
+
+    // 3. Récupérer les sponsors de tous ces clubs
+    if (uniqueClubIds.length > 0) {
+      const clubConditions = uniqueClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+      const { data: clubSponsors } = await supabase
+        .from('sponsors')
+        .select('id, name, logo_url, club_id, association_id')
+        .or(clubConditions)
+        .eq('is_confirmed', true);
+
+      if (clubSponsors) {
+        console.log(`✅ [SponsorBanner] Sponsors de clubs trouvés: ${clubSponsors.length}`);
+        allSponsors.push(...clubSponsors);
+      }
+    }
+
+    // 4. Dédupliquer les sponsors par ID
+    const uniqueSponsors = Array.from(
+      new Map(allSponsors.map(sponsor => [sponsor.id, sponsor])).values()
+    );
+
+    console.log(`✅ [SponsorBanner] Total sponsors uniques: ${uniqueSponsors.length}`);
+    setSponsors(uniqueSponsors);
+  } catch (err) {
+    console.error('Error loading sponsors for banner:', err);
+  }
+};
 
   if (sponsors.length === 0) return null;
 

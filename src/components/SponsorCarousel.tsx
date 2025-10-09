@@ -20,7 +20,8 @@ export const SponsorCarousel: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (profile && (profile.role === 'Member' || profile.role === 'Supporter')) {
+    // ✅ CORRECTION : Ajouter 'Sponsor' dans la condition
+    if (profile && (profile.role === 'Member' || profile.role === 'Supporter' || profile.role === 'Sponsor')) {
       loadSponsors();
     } else {
       setLoading(false);
@@ -38,37 +39,81 @@ export const SponsorCarousel: React.FC = () => {
   }, [sponsors.length]);
 
   const loadSponsors = async () => {
-    if (!profile) return;
+  if (!profile) return;
 
-    try {
-      // Récupérer les clubs suivis
-      const { data: userClubs } = await supabase
-        .from('user_clubs')
-        .select('club_id')
-        .eq('user_id', profile.id);
+  try {
+    console.log(`🔍 [SponsorCarousel] Chargement pour rôle: ${profile.role}`);
+    console.log(`📋 [SponsorCarousel] Profile club_id:`, profile.club_id);
+    
+    const allSponsors: Sponsor[] = [];
 
-      const followedClubIds = userClubs?.map(uc => uc.club_id) || [];
-      
-      if (followedClubIds.length === 0) {
-        setLoading(false);
-        return;
+    // 1. Récupérer les sponsors de l'association
+    if (profile.association_id) {
+      const { data: associationSponsors } = await supabase
+        .from('sponsors')
+        .select('id, name, logo_url, visual_url, website, description, club_id')
+        .eq('association_id', profile.association_id)
+        .is('club_id', null)
+        .eq('is_confirmed', true);
+
+      if (associationSponsors) {
+        console.log(`✅ [SponsorCarousel] Sponsors d'association: ${associationSponsors.length}`);
+        allSponsors.push(...associationSponsors);
       }
+    }
 
-      // Récupérer les sponsors des clubs suivis
-      const clubConditions = followedClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
-      const { data: sponsorData } = await supabase
+    // 2. Construire la liste complète des clubs à récupérer
+    const clubIdsToFetch: string[] = [];
+
+    // 2A. Ajouter le club principal du Sponsor (si existe)
+    if (profile.club_id) {
+      clubIdsToFetch.push(profile.club_id);
+      console.log(`✅ [SponsorCarousel] Club principal ajouté:`, profile.club_id);
+    }
+
+    // 2B. Ajouter les clubs suivis (via user_clubs)
+    const { data: userClubs } = await supabase
+      .from('user_clubs')
+      .select('club_id')
+      .eq('user_id', profile.id);
+
+    const followedClubIds = userClubs?.map(uc => uc.club_id) || [];
+    console.log(`📋 [SponsorCarousel] Clubs suivis (user_clubs): ${followedClubIds.length}`);
+    
+    clubIdsToFetch.push(...followedClubIds);
+
+    // 2C. Dédupliquer les IDs de clubs
+    const uniqueClubIds = [...new Set(clubIdsToFetch)];
+    console.log(`✅ [SponsorCarousel] Total clubs uniques à récupérer: ${uniqueClubIds.length}`);
+
+    // 3. Récupérer les sponsors de tous ces clubs
+    if (uniqueClubIds.length > 0) {
+      const clubConditions = uniqueClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+      const { data: clubSponsors } = await supabase
         .from('sponsors')
         .select('id, name, logo_url, visual_url, website, description, club_id')
         .or(clubConditions)
         .eq('is_confirmed', true);
 
-      setSponsors(sponsorData || []);
-    } catch (err) {
-      console.error('Error loading sponsors for carousel:', err);
-    } finally {
-      setLoading(false);
+      if (clubSponsors) {
+        console.log(`✅ [SponsorCarousel] Sponsors de clubs trouvés: ${clubSponsors.length}`);
+        allSponsors.push(...clubSponsors);
+      }
     }
-  };
+
+    // 4. Dédupliquer les sponsors par ID
+    const uniqueSponsors = Array.from(
+      new Map(allSponsors.map(sponsor => [sponsor.id, sponsor])).values()
+    );
+
+    console.log(`✅ [SponsorCarousel] Total sponsors uniques: ${uniqueSponsors.length}`);
+    setSponsors(uniqueSponsors);
+  } catch (err) {
+    console.error('Error loading sponsors for carousel:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading || sponsors.length === 0) return null;
 

@@ -12,7 +12,8 @@ import {
   Package,
   Clipboard,
   Heart,
-  MessageSquare
+  MessageSquare,
+  User as UserIcon // ✅ Renommé pour éviter le conflit
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { SponsorBanner } from './SponsorBanner';
@@ -127,6 +128,9 @@ const getNavigationItems = (): NavigationItem[] => {
     { path: '/communications', label: 'Communications', icon: MessageSquare },
     { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
     { path: '/clubs', label: 'Clubs', icon: Users },
+    { path: '/sponsors', label: 'Sponsors', icon: Heart }, // ✅ AJOUTÉ
+    { path: '/sponsor/profile', label: 'Mon Profil Sponsor', icon: UserIcon }, // ✅
+    { path: '/settings', label: 'Paramètres', icon: Settings }, // ✅ AJOUTÉ
   ];
 }
 
