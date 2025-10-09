@@ -318,7 +318,7 @@ export default function Events() {
 }, [profile?.id, clubId]);
 
   const fetchUserCalendarEvents = async () => {
-    if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
+    if (!profile?.id || !['Member', 'Supporter', 'Sponsor'].includes(profile.role)) return;
 
     try {
       const { data, error } = await supabase
@@ -336,7 +336,7 @@ export default function Events() {
   };
 
   const toggleEventInCalendar = async (eventId: string) => {
-    if (!profile?.id || (profile.role !== 'Member' && profile.role !== 'Supporter')) return;
+    if (!profile?.id || !['Member', 'Supporter', 'Sponsor'].includes(profile.role)) return;
 
     setAddingToCalendarId(eventId);
     const isInCalendar = userCalendarEvents.includes(eventId);
@@ -372,12 +372,24 @@ export default function Events() {
     }
   };
 
-  const fetchEvents = async () => {
+  // ============================================
+// MODIFICATION DANS Events.tsx
+// ============================================
+// Remplacer la fonction fetchEvents existante (vers ligne 125-160) par celle-ci
+
+const fetchEvents = async () => {
   try {
     if (!profile) {
       setLoading(false);
       return;
     }
+
+    console.log('🔍 DEBUG - Profile:', {
+      id: profile.id,
+      role: profile.role,
+      club_id: profile.club_id,
+      association_id: profile.association_id
+    });
 
     if (profile.role === 'Supporter' && !profile.association_id) {
       setEvents([]);
@@ -386,7 +398,6 @@ export default function Events() {
     }
 
     const now = new Date();
-
     let query = supabase
       .from('events')
       .select(`
@@ -394,7 +405,73 @@ export default function Events() {
         clubs (id, name, slug, association_id, logo_url)
       `);
 
-    if (clubId) {
+    // ===== LOGIQUE SPONSOR AVEC DEBUG =====
+    if (profile.role === 'Sponsor') {
+      console.log('🎯 Mode Sponsor détecté');
+      
+      // 1. Récupérer le club sponsorisé (depuis la table sponsors)
+      const { data: sponsorData, error: sponsorError } = await supabase
+        .from('sponsors')
+        .select('club_id, association_id, id, name')
+        .eq('user_id', profile.id)
+        .maybeSingle();
+
+      console.log('📊 Sponsor Data:', {
+        data: sponsorData,
+        error: sponsorError
+      });
+
+      if (sponsorError) {
+        console.error('❌ Erreur récupération sponsor:', sponsorError);
+      }
+
+      // 2. Récupérer les clubs suivis (via user_clubs)
+      const { data: userClubs, error: clubsError } = await supabase
+        .from('user_clubs')
+        .select('club_id')
+        .eq('user_id', profile.id);
+
+      console.log('👥 User Clubs:', {
+        data: userClubs,
+        error: clubsError
+      });
+
+      if (clubsError) {
+        console.error('❌ Erreur récupération clubs suivis:', clubsError);
+      }
+
+      const followedClubIds = userClubs?.map(uc => uc.club_id) || [];
+
+      // 3. Combiner le club sponsorisé + clubs suivis
+      const allClubIds = [
+        ...(sponsorData?.club_id ? [sponsorData.club_id] : []),
+        ...followedClubIds
+      ];
+
+      // Éliminer les doublons
+      const uniqueClubIds = [...new Set(allClubIds)];
+
+      console.log('🎪 Clubs à interroger:', {
+        sponsoredClub: sponsorData?.club_id,
+        followedClubs: followedClubIds,
+        allClubs: uniqueClubIds
+      });
+
+      if (uniqueClubIds.length > 0) {
+        // Créer une condition OR pour Supabase
+        const clubConditions = uniqueClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
+        console.log('🔧 Condition OR:', clubConditions);
+        query = query.or(clubConditions);
+      } else {
+        // Si le sponsor ne sponsorise aucun club et ne suit aucun club, retourner vide
+        console.warn('⚠️ Aucun club trouvé pour ce sponsor');
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+    } 
+    // ===== LOGIQUE EXISTANTE POUR LES AUTRES RÔLES =====
+    else if (clubId) {
       if (clubId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
         query = query.eq('club_id', clubId);
       } else {
@@ -411,13 +488,20 @@ export default function Events() {
     }
 
     query = query.gte('date', now.toISOString());
-
+    
+    console.log('🚀 Exécution de la requête...');
     const { data, error } = await query.order('date', { ascending: true });
+
+    console.log('📦 Résultat requête:', {
+      eventsCount: data?.length || 0,
+      error: error,
+      events: data
+    });
 
     if (error) throw error;
     setEvents(data || []);
   } catch (error) {
-    console.error('Error fetching events:', error);
+    console.error('💥 Erreur dans fetchEvents:', error);
   } finally {
     setLoading(false);
   }
@@ -1301,7 +1385,7 @@ Style visuel : illustration vectorielle moderne, design plat (flat design), coul
                             </>
                           )}
                           
-                          {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+                          {['Member', 'Supporter', 'Sponsor'].includes(profile?.role || '') && (
                             <button
                               onClick={() => toggleEventInCalendar(event.id)}
                               disabled={addingToCalendarId === event.id}

@@ -87,7 +87,7 @@ export default function Dashboard() {
   const fetchUpcomingEvents = async () => {
     if (!profile?.id) return;
     
-    if (profile.role !== 'Member' && profile.role !== 'Supporter' && profile.role !== 'Club Admin') return;
+    if (!['Member', 'Supporter', 'Sponsor', 'Club Admin'].includes(profile.role)) return;
 
     setEventsLoading(true);
     try {
@@ -204,7 +204,7 @@ export default function Dashboard() {
         }
       }
 
-      if (profile.role === 'Supporter' || profile.role === 'Member' || profile.role === 'Club Admin') {
+      if (['Supporter', 'Member', 'Sponsor', 'Club Admin'].includes(profile.role)) {
         if (profile.role !== 'Club Admin') {
           const { data: userClubs, error: userClubsError } = await supabase
             .from('user_clubs')
@@ -358,6 +358,7 @@ export default function Dashboard() {
       case 'Club Admin': return 'Admin Club';
       case 'Member': return 'Membre';
       case 'Supporter': return 'Supporter';
+      case 'Sponsor': return 'Sponsor';
       default: return role;
     }
   };
@@ -440,7 +441,7 @@ export default function Dashboard() {
   };
 
   const renderUpcomingEventsWidget = () => {
-    if (profile?.role !== 'Member' && profile?.role !== 'Supporter' && profile?.role !== 'Club Admin') return null;
+    if (!['Member', 'Supporter', 'Sponsor', 'Club Admin'].includes(profile?.role || '')) return null;
 
     const groupedEvents = groupEventsByDate(upcomingEvents);
 
@@ -538,16 +539,16 @@ export default function Dashboard() {
                             </span>
                           )}
                           {event.visibility === 'Public' ? (
-  <div className="flex items-center gap-1">
-    <Eye className="h-4 w-4 text-green-600 dark:text-green-400"/>
-    <span className="text-xs text-green-600 dark:text-green-400">Public</span>
-  </div>
-) : (
-  <div className="flex items-center gap-1">
-    <Users className="h-4 w-4 text-orange-600 dark:text-orange-400"/>
-    <span className="text-xs text-orange-600 dark:text-orange-400">Membres</span>
-  </div>
-)}
+                            <div className="flex items-center gap-1">
+                              <Eye className="h-4 w-4 text-green-600 dark:text-green-400"/>
+                              <span className="text-xs text-green-600 dark:text-green-400">Public</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <Users className="h-4 w-4 text-orange-600 dark:text-orange-400"/>
+                              <span className="text-xs text-orange-600 dark:text-orange-400">Membres</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -996,23 +997,24 @@ export default function Dashboard() {
             )}
 
             {/* ✅ NOUVELLE SECTION POUR LES SPONSORS */}
-{profile?.role === 'Sponsor' && (
-  <>
-    <QuickActionLink to="/sponsor/profile" icon={Building} title="Mon Profil" subtitle="Gérer mes informations" colorClass="orange" />
-    <QuickActionLink to="/mailing" icon={MessageCircle} title="Mes Campagnes" subtitle="Gérer mon mailing" colorClass="teal" />
-    <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
-    <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Découvrir les clubs" colorClass="green" />
-  </>
-)}
+            {profile?.role === 'Sponsor' && (
+              <>
+                <QuickActionLink to="/sponsor/profile" icon={Building} title="Mon Profil" subtitle="Gérer mes informations" colorClass="orange" />
+                <QuickActionLink to="/mailing" icon={MessageCircle} title="Mes Campagnes" subtitle="Gérer mon mailing" colorClass="teal" />
+                <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
+                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Mes événements" colorClass="purple" /> {/* ← AJOUTER */}
+                <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Découvrir les clubs" colorClass="green" />
+              </>
+            )}
 
-{(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-  <>
-    <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
-    <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Gérer mes événements" colorClass="purple" />
-    <QuickActionLink to="/clubs" icon={Users} title="Découvrir Clubs" subtitle="Explorer et suivre" colorClass="yellow" />
-    <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
-  </>
-)}
+            {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+              <>
+                <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
+                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Gérer mes événements" colorClass="purple" />
+                <QuickActionLink to="/clubs" icon={Users} title="Découvrir Clubs" subtitle="Explorer et suivre" colorClass="yellow" />
+                <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
+              </>
+            )}
           </div>
         </div>
       </div>
