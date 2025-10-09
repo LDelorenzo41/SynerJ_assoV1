@@ -90,46 +90,58 @@ export default function Layout({ children }: LayoutProps) {
     window.location.href = '/';
   };
 
-  const getNavigationItems = (): NavigationItem[] => {
-    if (!isAuthenticated || !profile) return [];
+  // Dans Layout.tsx, remplacer la fonction getNavigationItems par celle-ci :
 
-    const items = [
-      { path: '/dashboard', label: 'Tableau de bord', icon: Home },
-    ];
+const getNavigationItems = (): NavigationItem[] => {
+  if (!isAuthenticated || !profile) return [];
 
-    if (profile.role === 'Super Admin') {
-      items.push(
-        { path: '/associations', label: 'Association', icon: Building },
-        { path: '/clubs', label: 'Clubs', icon: Users },
-        { path: '/communications', label: 'Communications', icon: MessageSquare },
-        { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
-        { path: '/sponsors', label: 'Sponsors', icon: Heart },
-      );
-    }
+  const items = [
+    { path: '/dashboard', label: 'Tableau de bord', icon: Home },
+  ];
 
-    if (profile.role === 'Club Admin') {
-      items.push(
-        { path: '/my-club', label: 'Mon Club', icon: Users },
-        { path: '/events', label: 'Événements', icon: Calendar },
-        { path: '/communications', label: 'Communications', icon: MessageSquare },
-        { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
-        { path: '/sponsors', label: 'Sponsors', icon: Heart },
-      );
-    }
+  if (profile.role === 'Super Admin') {
+    items.push(
+      { path: '/associations', label: 'Association', icon: Building },
+      { path: '/clubs', label: 'Clubs', icon: Users },
+      { path: '/communications', label: 'Communications', icon: MessageSquare },
+      { path: '/equipment-management', label: 'Gestion Matériel', icon: Package },
+      { path: '/sponsors', label: 'Sponsors', icon: Heart },
+    );
+  }
 
-    if (profile.role === 'Member' || profile.role === 'Supporter') {
-      items.push(
-        { path: '/events', label: 'Événements', icon: Calendar },
-        { path: '/communications', label: 'Communications', icon: MessageSquare },
-        { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
-        { path: '/clubs', label: 'Clubs', icon: Users },
-        { path: '/sponsors', label: 'Sponsors', icon: Heart },
-      );
-    }
+  if (profile.role === 'Club Admin') {
+    items.push(
+      { path: '/my-club', label: 'Mon Club', icon: Users },
+      { path: '/events', label: 'Événements', icon: Calendar },
+      { path: '/communications', label: 'Communications', icon: MessageSquare },
+      { path: '/equipment-reservation', label: 'Réserver Matériel', icon: Clipboard },
+      { path: '/sponsors', label: 'Sponsors', icon: Heart },
+    );
+  }
 
-    items.push({ path: '/settings', label: 'Paramètres', icon: Settings });
-    return items;
-  };
+  // ✅ NOUVELLE SECTION POUR LES SPONSORS
+  if (profile.role === 'Sponsor') {
+    items.push(
+      { path: '/events', label: 'Événements', icon: Calendar },
+      { path: '/communications', label: 'Communications', icon: MessageSquare },
+      { path: '/clubs', label: 'Clubs', icon: Users },
+      { path: '/sponsors', label: 'Sponsors', icon: Heart },
+    );
+  }
+
+  if (profile.role === 'Member' || profile.role === 'Supporter') {
+    items.push(
+      { path: '/events', label: 'Événements', icon: Calendar },
+      { path: '/communications', label: 'Communications', icon: MessageSquare },
+      { path: '/calendrier', label: 'Mon Calendrier', icon: CalendarDays },
+      { path: '/clubs', label: 'Clubs', icon: Users },
+      { path: '/sponsors', label: 'Sponsors', icon: Heart },
+    );
+  }
+
+  items.push({ path: '/settings', label: 'Paramètres', icon: Settings });
+  return items;
+};
 
   const toggleSidebar = () => {
     if (windowWidth < 1024) {

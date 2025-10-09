@@ -16,7 +16,7 @@ import {
 import ProfilePictureUpload from './ProfilePictureUpload';
 import { NotificationService } from '../services/notificationService';
 
-type FormType = 'association' | 'club' | 'user' | null;
+type FormType = 'association' | 'club' | 'user' | 'sponsor' | null;
 type SubscriptionPlan = '1-4' | '5-10' | '11-15' | '16-25' | '25+';
 
 interface AssociationForm {
@@ -55,6 +55,17 @@ interface UserForm {
     municipality: boolean;
     sponsors: boolean;
   };
+}
+
+interface SponsorForm {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  company_name: string;
+  phone: string;
+  sponsor_code: string; // Code sponsors_asso ou sponsors_club
+  avatar_url: string;
 }
 
 const SUBSCRIPTION_PLANS = [
@@ -170,6 +181,29 @@ export default function RegistrationForms() {
       municipality: false,
       sponsors: false
     }
+  });
+
+  const [sponsorForm, setSponsorForm] = useState<SponsorForm>({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    company_name: '',
+    phone: '',
+    sponsor_code: '',
+    avatar_url: ''
+  });
+  
+  const [sponsorValidation, setSponsorValidation] = useState<{
+    loading: boolean;
+    valid: boolean | null;
+    entityName: string;
+    entityType: 'club' | 'association' | null;
+  }>({
+    loading: false,
+    valid: null,
+    entityName: '',
+    entityType: null
   });
 
   const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
@@ -341,6 +375,83 @@ export default function RegistrationForms() {
       reader.readAsDataURL(file);
     } else {
       setClubForm({ ...clubForm, logo_url: '' });
+    }
+  };
+
+  const validateSponsorCode = async (code: string) => {
+    if (!code || code.length < 10) {
+      setSponsorValidation({ loading: false, valid: null, entityName: '', entityType: null });
+      return;
+    }
+  
+    setSponsorValidation({ loading: true, valid: null, entityName: '', entityType: null });
+  
+    try {
+      const cleanCode = code.trim().toUpperCase();
+      
+      if (cleanCode.startsWith('SPONSO-ASSO-')) {
+        const { data: association, error } = await supabase
+          .from('associations')
+          .select('name, id')
+          .eq('sponsors_code', cleanCode)
+          .single();
+  
+        if (error || !association) {
+          setSponsorValidation({ loading: false, valid: false, entityName: '', entityType: null });
+        } else {
+          setSponsorValidation({ 
+            loading: false, 
+            valid: true, 
+            entityName: association.name,
+            entityType: 'association'
+          });
+        }
+      }
+      else if (cleanCode.startsWith('SPONSO-CLUB-')) {
+        const { data: club, error } = await supabase
+          .from('clubs')
+          .select('name, id, association_id')
+          .eq('sponsors_code', cleanCode)
+          .single();
+  
+        if (error || !club) {
+          setSponsorValidation({ loading: false, valid: false, entityName: '', entityType: null });
+        } else {
+          setSponsorValidation({ 
+            loading: false, 
+            valid: true, 
+            entityName: club.name,
+            entityType: 'club'
+          });
+        }
+      }
+      else {
+        setSponsorValidation({ loading: false, valid: false, entityName: '', entityType: null });
+      }
+    } catch (err) {
+      setSponsorValidation({ loading: false, valid: false, entityName: '', entityType: null });
+    }
+  };
+  
+  const handleSponsorCodeChange = (code: string) => {
+    setSponsorForm({ ...sponsorForm, sponsor_code: code });
+    
+    const timeoutId = setTimeout(() => {
+      validateSponsorCode(code);
+    }, 500);
+  
+    return () => clearTimeout(timeoutId);
+  };
+  
+  const handleSponsorAvatarSelect = (file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSponsorForm({ ...sponsorForm, avatar_url: e.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSponsorForm({ ...sponsorForm, avatar_url: '' });
     }
   };
 
@@ -756,6 +867,189 @@ export default function RegistrationForms() {
     }
   };
 
+  const handleSponsorRegistration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+  
+    try {
+      if (!sponsorValidation.valid || !sponsorValidation.entityType) {
+        throw new Error('Code sponsor invalide');
+      }
+  
+      const cleanCode = sponsorForm.sponsor_code.trim().toUpperCase();
+      let clubId = null;
+      let associationId = null;
+      let sponsorType: 'club' | 'association' = sponsorValidation.entityType;
+  
+      if (sponsorValidation.entityType === 'association') {
+        const { data: association, error } = await supabase
+          .from('associations')
+          .select('id')
+          .eq('sponsors_code', cleanCode)
+          .single();
+  
+        if (error || !association) {
+          throw new Error('Association introuvable');
+        }
+        associationId = association.id;
+      } else {
+        const { data: club, error } = await supabase
+          .from('clubs')
+          .select('id, association_id')
+          .eq('sponsors_code', cleanCode)
+          .single();
+  
+        if (error || !club) {
+          throw new Error('Club introuvable');
+        }
+        clubId = club.id;
+        associationId = club.association_id;
+      }
+  
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: sponsorForm.email,
+        password: sponsorForm.password,
+        options: {
+          data: {
+            first_name: sponsorForm.first_name,
+            last_name: sponsorForm.last_name,
+          }
+        }
+      });
+  
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("Impossible de créer l'utilisateur sponsor.");
+  
+      let avatarUrl = null;
+      if (sponsorForm.avatar_url && sponsorForm.avatar_url.startsWith('data:')) {
+        try {
+          const response = await fetch(sponsorForm.avatar_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+  
+          const fileExt = file.type.split('/')[1];
+          const fileName = `${authData.user.id}-${Date.now()}.${fileExt}`;
+          const filePath = `avatars/${fileName}`;
+  
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file);
+  
+          if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(filePath);
+            avatarUrl = publicUrl;
+          }
+        } catch (uploadError) {
+          console.error('Erreur upload avatar:', uploadError);
+        }
+      }
+  
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: sponsorForm.first_name,
+          last_name: sponsorForm.last_name,
+          company_name: sponsorForm.company_name,
+          role: 'Sponsor',
+          sponsor_type: sponsorType,
+          club_id: clubId,
+          association_id: associationId,
+          avatar_url: avatarUrl,
+        })
+        .eq('id', authData.user.id);
+  
+      if (profileError) throw profileError;
+      // Dans RegistrationForms.tsx, dans la fonction handleSponsorRegistration
+
+// 4. Lier automatiquement le sponsor existant au nouveau compte utilisateur
+// 4. Lier automatiquement le sponsor existant au nouveau compte utilisateur
+try {
+  const cleanCode = sponsorForm.sponsor_code.trim().toUpperCase();
+  console.log('Code sponsor reçu:', cleanCode);
+  console.log('Email sponsor:', sponsorForm.email);
+  
+  // D'abord, trouver le club via le code sponsor
+  let clubId = null;
+  if (cleanCode.startsWith('SPONSO-CLUB-')) {
+    const { data: club, error: clubError } = await supabase
+      .from('clubs')
+      .select('id')
+      .eq('sponsors_code', cleanCode)
+      .single();
+    
+    console.log('Recherche club - Data:', club, 'Error:', clubError);
+    clubId = club?.id;
+  }
+
+  console.log('Club ID trouvé:', clubId);
+
+  // Ensuite, chercher le sponsor par email ET club_id
+  const { data: existingSponsor, error: findError } = await supabase
+    .from('sponsors')
+    .select('id, name')
+    .eq('contact_email', sponsorForm.email)
+    .eq('club_id', clubId)
+    .maybeSingle();
+
+  console.log('Recherche sponsor - Data:', existingSponsor, 'Error:', findError);
+
+  if (existingSponsor && !findError) {
+    console.log('Tentative de liaison pour sponsor:', existingSponsor.id);
+    
+    const { error: linkError, data: updateData } = await supabase
+      .from('sponsors')
+      .update({ user_id: authData.user.id })
+      .eq('id', existingSponsor.id)
+      .select();
+    
+    console.log('Résultat liaison - Data:', updateData, 'Error:', linkError);
+    
+    if (linkError) {
+      console.error('Erreur lors de la liaison du sponsor existant:', linkError);
+    } else {
+      console.log('Sponsor existant lié avec succès au nouveau compte:', existingSponsor.id);
+    }
+  } else {
+    console.log('Aucun sponsor existant trouvé avec email et club correspondants');
+    console.log('Paramètres recherche - Email:', sponsorForm.email, 'Club ID:', clubId);
+  }
+} catch (linkError) {
+  console.error('Erreur lors de la tentative de liaison sponsor:', linkError);
+}
+// Le reste du code continue normalement...
+  
+      setMessage({
+        type: 'success',
+        text: `Inscription sponsor réussie ! Vous êtes maintenant sponsor de "${sponsorValidation.entityName}". Veuillez vérifier vos e-mails pour confirmer votre compte.`,
+      });
+  
+      setSponsorForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        company_name: '',
+        phone: '',
+        sponsor_code: '',
+        avatar_url: ''
+      });
+      setSponsorValidation({ loading: false, valid: null, entityName: '', entityType: null });
+  
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+  
+    } catch (error: any) {
+      console.error('Erreur inscription sponsor:', error);
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderUserFormStep = () => {
     switch (userStep) {
       case 1:
@@ -946,7 +1240,7 @@ export default function RegistrationForms() {
               
               {clubValidation.valid === true && (
                 <p className="mt-2 text-sm text-green-600 flex items-center">
-                  <Check className="w-4 w-4 mr-2" />
+                  <Check className="w-4 h-4 mr-2" />
                   Club trouvé : {clubValidation.clubName}
                 </p>
               )}
@@ -1109,7 +1403,7 @@ export default function RegistrationForms() {
         </div>
 
         {!activeForm && (
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div 
               onClick={() => setActiveForm('association')}
               className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-blue-200"
@@ -1167,6 +1461,26 @@ export default function RegistrationForms() {
                   et rester connecté avec vos communautés.
                 </p>
                 <div className="inline-flex items-center text-purple-600 font-semibold group-hover:text-purple-700">
+                  Commencer
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => setActiveForm('sponsor')}
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-orange-200"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-r from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Star className="h-10 w-10 text-orange-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Inscription Sponsor</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Devenez sponsor d'un club ou d'une association et accédez à des outils 
+                  de communication pour promouvoir votre entreprise.
+                </p>
+                <div className="inline-flex items-center text-orange-600 font-semibold group-hover:text-orange-700">
                   Commencer
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -1517,6 +1831,182 @@ export default function RegistrationForms() {
           <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
             <form onSubmit={handleUserRegistration}>
               {renderUserFormStep()}
+            </form>
+          </div>
+        )}
+
+        {/* Sponsor Form */}
+        {activeForm === 'sponsor' && (
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Inscription Sponsor</h2>
+            <form onSubmit={handleSponsorRegistration} className="space-y-6">
+              
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-orange-600 mr-3 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-orange-900 mb-1">Information importante</h3>
+                    <p className="text-sm text-orange-800">
+                      Pour vous inscrire en tant que sponsor, vous devez avoir reçu un code sponsor 
+                      de la part du club ou de l'association que vous souhaitez sponsoriser.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Prénom *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={sponsorForm.first_name}
+                    onChange={(e) => setSponsorForm({ ...sponsorForm, first_name: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Jean"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nom *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={sponsorForm.last_name}
+                    onChange={(e) => setSponsorForm({ ...sponsorForm, last_name: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Dupont"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom de l'entreprise *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={sponsorForm.company_name}
+                  onChange={(e) => setSponsorForm({ ...sponsorForm, company_name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Entreprise SAS"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Téléphone
+                </label>
+                <input
+                  type="tel"
+                  value={sponsorForm.phone}
+                  onChange={(e) => setSponsorForm({ ...sponsorForm, phone: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="01 23 45 67 89"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Courriel *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={sponsorForm.email}
+                  onChange={(e) => setSponsorForm({ ...sponsorForm, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="contact@entreprise.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mot de passe *
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={sponsorForm.password}
+                  onChange={(e) => setSponsorForm({ ...sponsorForm, password: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Minimum 6 caractères"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Photo de profil
+                </label>
+                <ProfilePictureUpload
+                  onImageSelect={handleSponsorAvatarSelect}
+                  currentImage={sponsorForm.avatar_url}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Code Sponsor *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={sponsorForm.sponsor_code}
+                  onChange={(e) => handleSponsorCodeChange(e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                    sponsorValidation.valid === true ? 'border-green-500' :
+                    sponsorValidation.valid === false ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="SPONSO-ASSO-XXXXXXXX ou SPONSO-CLUB-XXXXXXXX"
+                />
+                
+                {sponsorValidation.loading && (
+                  <p className="mt-2 text-sm text-blue-600 flex items-center">
+                    <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
+                    Vérification du code...
+                  </p>
+                )}
+                
+                {sponsorValidation.valid === true && (
+                  <p className="mt-2 text-sm text-green-600 flex items-center">
+                    <Check className="w-4 h-4 mr-2" />
+                    Code valide : {sponsorValidation.entityType === 'association' ? 'Sponsor d\'association' : 'Sponsor de club'} - {sponsorValidation.entityName}
+                  </p>
+                )}
+                
+                {sponsorValidation.valid === false && sponsorForm.sponsor_code && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Code sponsor invalide
+                  </p>
+                )}
+                
+                <p className="mt-2 text-sm text-gray-500">
+                  Demandez le code sponsor au club ou à l'association que vous souhaitez sponsoriser.
+                </p>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveForm(null)}
+                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Retour
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading || !sponsorValidation.valid}
+                  className="flex-1 py-3 px-6 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Inscription...' : 'S\'inscrire en tant que Sponsor'}
+                </button>
+              </div>
             </form>
           </div>
         )}

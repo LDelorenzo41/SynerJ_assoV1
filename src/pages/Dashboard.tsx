@@ -995,15 +995,24 @@ export default function Dashboard() {
               </>
             )}
 
-            {(profile?.role === 'Member' || profile?.role === 'Supporter') && (
-              <>
-                <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
-                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Gérer mes événements" colorClass="purple" />
-                <QuickActionLink to="/clubs" icon={Users} title="Découvrir Clubs" subtitle="Explorer et suivre" colorClass="yellow" />
-              </>
-            )}
-            
-            <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
+            {/* ✅ NOUVELLE SECTION POUR LES SPONSORS */}
+{profile?.role === 'Sponsor' && (
+  <>
+    <QuickActionLink to="/sponsor/profile" icon={Building} title="Mon Profil" subtitle="Gérer mes informations" colorClass="orange" />
+    <QuickActionLink to="/mailing" icon={MessageCircle} title="Mes Campagnes" subtitle="Gérer mon mailing" colorClass="teal" />
+    <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
+    <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Découvrir les clubs" colorClass="green" />
+  </>
+)}
+
+{(profile?.role === 'Member' || profile?.role === 'Supporter') && (
+  <>
+    <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
+    <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Gérer mes événements" colorClass="purple" />
+    <QuickActionLink to="/clubs" icon={Users} title="Découvrir Clubs" subtitle="Explorer et suivre" colorClass="yellow" />
+    <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
+  </>
+)}
           </div>
         </div>
       </div>

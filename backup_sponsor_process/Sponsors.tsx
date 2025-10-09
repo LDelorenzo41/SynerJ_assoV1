@@ -1,4 +1,4 @@
-// Sponsors.tsx - Version corrigée avec Edge Function
+// Sponsors.tsx - Version corrigée avec la balise div manquante ajoutée
 
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
@@ -19,6 +19,7 @@ interface Sponsor {
   association_id: string | null;
   club_id: string | null;
   created_at: string;
+  edit_token?: string;
   is_confirmed?: boolean;
 }
 
@@ -41,6 +42,7 @@ export default function Sponsors() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'association' | 'club'>('association');
   
+  // === NOUVEAU: État pour les clubs suivis ===
   const [followedClubIds, setFollowedClubIds] = useState<string[]>([]);
   
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -50,10 +52,7 @@ export default function Sponsors() {
   const [uploadingVisual, setUploadingVisual] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
-  const [createdSponsor, setCreatedSponsor] = useState<{
-    sponsor: Sponsor, 
-    credentials: { email: string, password: string }
-  } | null>(null);
+  const [createdSponsor, setCreatedSponsor] = useState<{sponsor: Sponsor, token: string} | null>(null);
   const [formData, setFormData] = useState<SponsorFormData>({
     name: '',
     logo_url: '',
@@ -68,14 +67,17 @@ export default function Sponsors() {
 
   useEffect(() => {
     if (profile) {
+      // === NOUVEAU: Charger d'abord les clubs suivis, puis les sponsors ===
       loadFollowedClubs();
     }
   }, [profile]);
 
+  // === NOUVELLE FONCTION: Charger les clubs suivis ===
   const loadFollowedClubs = async () => {
     if (!profile) return;
     
     try {
+      // Pour Members et Supporters, récupérer les clubs suivis
       if (profile.role === 'Member' || profile.role === 'Supporter') {
         const { data: userClubs, error } = await supabase
           .from('user_clubs')
@@ -90,10 +92,11 @@ export default function Sponsors() {
         }
       }
       
+      // Maintenant charger les sponsors
       await loadSponsors();
     } catch (err) {
       console.error('Error in loadFollowedClubs:', err);
-      await loadSponsors();
+      await loadSponsors(); // Charger les sponsors même si erreur
     }
   };
 
@@ -111,6 +114,7 @@ export default function Sponsors() {
     });
   };
 
+  // === FONCTION MODIFIÉE: Logique de chargement des sponsors corrigée ===
   const loadSponsors = async () => {
     if (!profile) return;
 
@@ -124,27 +128,35 @@ export default function Sponsors() {
         .order('created_at', { ascending: false });
 
       if (profile.role === 'Super Admin' && profile.association_id) {
+        // Super Admin: tous les sponsors de son association
         query = query.eq('association_id', profile.association_id);
         
       } else if (profile.role === 'Club Admin' && profile.club_id) {
+        // Club Admin: sponsors de son club + sponsors de l'association
         query = query.or(`club_id.eq.${profile.club_id},association_id.eq.${profile.association_id}`);
         
       } else if (profile.role === 'Member' && profile.club_id) {
+        // === LOGIQUE CORRIGÉE POUR MEMBER ===
+        // Member: sponsors de son club + sponsors des clubs qu'il suit + sponsors de l'association
         const allowedClubIds = [profile.club_id, ...followedClubIds];
-        const uniqueClubIds = [...new Set(allowedClubIds)];
+        const uniqueClubIds = [...new Set(allowedClubIds)]; // Éliminer les doublons
         
         if (uniqueClubIds.length > 0) {
           const clubConditions = uniqueClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
           query = query.or(`${clubConditions},association_id.eq.${profile.association_id}`);
         } else {
+          // Si pas de clubs, juste les sponsors de l'association
           query = query.eq('association_id', profile.association_id);
         }
         
       } else if (profile.role === 'Supporter' && profile.association_id) {
+        // === LOGIQUE CORRIGÉE POUR SUPPORTER ===
+        // Supporter: sponsors des clubs qu'il suit + sponsors de l'association
         if (followedClubIds.length > 0) {
           const clubConditions = followedClubIds.map(clubId => `club_id.eq.${clubId}`).join(',');
           query = query.or(`${clubConditions},association_id.eq.${profile.association_id}`);
         } else {
+          // Si pas de clubs suivis, juste les sponsors de l'association
           query = query.eq('association_id', profile.association_id);
         }
         
@@ -224,11 +236,12 @@ export default function Sponsors() {
     }
   };
 
-  const generateEmailContent = (
-    sponsor: Sponsor, 
-    credentials: { email: string, password: string }
-  ) => {
-    const subject = `Bienvenue sur SynerJ - Vos identifiants sponsor - ${sponsor.name}`;
+  const generateEditToken = () => {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  };
+
+  const generateEmailContent = (sponsor: Sponsor, editToken: string, sponsorCode: string) => {
+    const subject = `Merci pour votre soutien – Accès à votre espace sponsor - ${sponsor.name}`;
     
     const sponsorTypeLimits: Record<string, string> = {
       'Platine': '4 campagnes par mois',
@@ -237,53 +250,82 @@ export default function Sponsors() {
       'Bronze': '1 campagne par mois',
       'Partenaire': '1 campagne par mois'
     };
-
+  
     const body = `Bonjour,
+  
+  Nous tenons à vous remercier chaleureusement pour votre soutien en tant que sponsor ${sponsor.sponsor_type}. 🙏
+  
+  Afin de mettre en valeur votre entreprise dans nos communications, voici les informations que nous avons actuellement :
+  
+  Vos informations actuelles :
+  - Nom : ${sponsor.name}
+  - Email : ${sponsor.contact_email}
+  - Niveau de sponsoring : ${sponsor.sponsor_type}
+  ${sponsor.description ? `- Description : ${sponsor.description}` : ''}
+  
+  📧 INSCRIPTION SUR LA PLATEFORME SYNERJ
+  
+  Vous pouvez maintenant vous inscrire sur notre plateforme pour :
+  ✓ Gérer vos informations sponsor (logo, description, coordonnées)
+  ✓ Envoyer des campagnes de mailing à nos membres (${sponsorTypeLimits[sponsor.sponsor_type]})
+  ✓ Accéder à des outils de communication dédiés
+  
+  🔑 Votre code d'inscription sponsor : ${sponsorCode}
+  
+  👉 Pour vous inscrire :
+  1. Rendez-vous sur ${window.location.origin}
+  2. Cliquez sur "Inscription Sponsor"
+  3. Utilisez le code ci-dessus pour créer votre compte
+  
+  📝 VALIDER VOTRE PROFIL PUBLIC
 
-Nous tenons à vous remercier chaleureusement pour votre soutien en tant que sponsor ${sponsor.sponsor_type}. 🙏
-
-🎉 VOTRE COMPTE A ÉTÉ CRÉÉ !
-
-Vous pouvez maintenant accéder à votre espace sponsor sur notre plateforme SynerJ.
-
-🔑 VOS IDENTIFIANTS DE CONNEXION :
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Email : ${credentials.email}
-Mot de passe temporaire : ${credentials.password}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚠️ IMPORTANT : Pour votre sécurité, nous vous recommandons de changer ce mot de passe dès votre première connexion.
-
-🌐 SE CONNECTER :
-👉 ${window.location.origin}/login
-
-✨ CE QUE VOUS POUVEZ FAIRE :
-✓ Gérer votre profil sponsor (logo, description, coordonnées)
-✓ Envoyer des campagnes de mailing à nos membres (${sponsorTypeLimits[sponsor.sponsor_type]})
-✓ Accéder à des outils de communication dédiés
-
-📝 VOS INFORMATIONS ACTUELLES :
-- Nom : ${sponsor.name}
-- Email : ${sponsor.contact_email}
-- Niveau de sponsoring : ${sponsor.sponsor_type}
-${sponsor.description ? `- Description : ${sponsor.description}` : ''}
-
-Pour toute question, n'hésitez pas à me contacter.
-Encore merci pour votre confiance et votre engagement à nos côtés. 💙
-
-Cordialement,
-${profile?.first_name} ${profile?.last_name}`;
-
+Vous devez maintenant valider votre profil public (logo, description détaillée, coordonnées) via ce lien :
+  ${window.location.origin}/sponsor-edit/${editToken}
+  
+  Pour toute question, n'hésitez pas à me contacter.
+  Encore merci pour votre confiance et votre engagement à nos côtés. 💙
+  
+  Cordialement,
+  ${profile?.first_name} ${profile?.last_name}`;
+  
     return { subject, body };
   };
 
-  const openMailClient = (
-    sponsor: Sponsor, 
-    credentials: { email: string, password: string }
-  ) => {
-    const { subject, body } = generateEmailContent(sponsor, credentials);
-    const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
+  const openMailClient = (sponsor: Sponsor, editToken: string) => {
+    // Récupérer le code sponsor selon le type
+    let sponsorCode = '';
+    
+    if (sponsor.club_id && profile?.role === 'Club Admin') {
+      // Récupérer le sponsors_code du club
+      supabase
+        .from('clubs')
+        .select('sponsors_code')
+        .eq('id', sponsor.club_id)
+        .single()
+        .then(({ data }) => {
+          if (data?.sponsors_code) {
+            sponsorCode = data.sponsors_code;
+            const { subject, body } = generateEmailContent(sponsor, editToken, sponsorCode);
+            const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+          }
+        });
+    } else if (sponsor.association_id && profile?.role === 'Super Admin') {
+      // Récupérer le sponsors_code de l'association
+      supabase
+        .from('associations')
+        .select('sponsors_code')
+        .eq('id', sponsor.association_id)
+        .single()
+        .then(({ data }) => {
+          if (data?.sponsors_code) {
+            sponsorCode = data.sponsors_code;
+            const { subject, body } = generateEmailContent(sponsor, editToken, sponsorCode);
+            const mailtoLink = `mailto:${sponsor.contact_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+          }
+        });
+    }
   };
 
   const deleteSponsor = async (sponsorId: string) => {
@@ -380,54 +422,31 @@ ${profile?.first_name} ${profile?.last_name}`;
     try {
       setSubmitting(true);
       
-      // Préparer les données du sponsor
+      const editToken = generateEditToken();
+      
       const sponsorData = {
-        name: formData.name,
-        logo_url: formData.logo_url || null,
-        visual_url: formData.visual_url || null,
-        website: formData.website.startsWith('http') ? formData.website : (formData.website ? `https://${formData.website}` : null),
-        description: formData.description || null,
-        contact_email: formData.contact_email,
-        contact_phone: formData.contact_phone || null,
-        address: formData.address || null,
-        sponsor_type: formData.sponsor_type,
-        association_id: profile.association_id,
+        ...formData,
+        website: formData.website.startsWith('http') ? formData.website : (formData.website ? `https://${formData.website}` : ''),
         club_id: profile.role === 'Club Admin' ? profile.club_id : null,
+        association_id: profile.association_id,
+        edit_token: editToken,
+        is_confirmed: false,
+        created_by: profile.id
       };
 
-      // Appeler l'Edge Function pour créer le sponsor + compte utilisateur
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
-        'create-sponsor-user',
-        {
-          body: {
-            sponsorData,
-            createdBy: profile.id
-          }
-        }
-      );
+      const { data, error } = await supabase
+        .from('sponsors')
+        .insert([sponsorData])
+        .select()
+        .single();
 
-      if (functionError) {
-        console.error('Error calling edge function:', functionError);
-        throw new Error(functionError.message || 'Erreur lors de la création du sponsor');
-      }
-
-      if (!functionData.success) {
-        throw new Error(functionData.error || 'Erreur lors de la création du sponsor');
-      }
-
-      console.log('✅ Sponsor créé avec succès:', functionData.sponsor);
-      console.log('🔑 Identifiants générés:', functionData.credentials);
-
-      // Stocker les identifiants pour l'email
-      setCreatedSponsor({
-        sponsor: functionData.sponsor,
-        credentials: functionData.credentials
-      });
+      if (error) throw error;
 
       setShowCreateForm(false);
       await loadSponsors();
       
-      setSuccessMessage('Sponsor et compte utilisateur créés avec succès ! Vous pouvez maintenant lui envoyer ses identifiants par email.');
+      setCreatedSponsor({ sponsor: data, token: editToken });
+      setSuccessMessage('Sponsor créé avec succès ! Vous pouvez maintenant lui envoyer l\'email d\'invitation.');
 
     } catch (error: any) {
       console.error('Error creating sponsor:', error);
@@ -437,10 +456,12 @@ ${profile?.first_name} ${profile?.last_name}`;
     }
   };
 
+  // === FONCTION DE FILTRAGE AMÉLIORÉE ===
   const filteredSponsors = sponsors.filter(sponsor => {
     if (filter === 'all') return true;
     if (filter === 'association') return sponsor.association_id === profile?.association_id && !sponsor.club_id;
     if (filter === 'club') {
+      // Afficher les sponsors du club de l'utilisateur OU des clubs qu'il suit
       if (profile?.club_id && sponsor.club_id === profile.club_id) return true;
       return followedClubIds.includes(sponsor.club_id || '');
     }
@@ -542,17 +563,12 @@ ${profile?.first_name} ${profile?.last_name}`;
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-green-900 dark:text-green-300">Sponsor et compte créés !</h3>
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Cliquez pour envoyer les identifiants de connexion par email à {createdSponsor.sponsor.name}
-              </p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                Email : {createdSponsor.credentials.email} | Mot de passe : {createdSponsor.credentials.password}
-              </p>
+              <h3 className="font-medium text-green-900 dark:text-green-300">Sponsor créé !</h3>
+              <p className="text-sm text-green-700 dark:text-green-300">Cliquez pour envoyer l'email d'invitation à {createdSponsor.sponsor.name}</p>
             </div>
             <button
               onClick={() => {
-                openMailClient(createdSponsor.sponsor, createdSponsor.credentials);
+                openMailClient(createdSponsor.sponsor, createdSponsor.token);
                 setCreatedSponsor(null);
                 setSuccessMessage('');
               }}
@@ -620,7 +636,7 @@ ${profile?.first_name} ${profile?.last_name}`;
                 <div>
                   <label className="block text-sm font-medium dark-text-muted mb-2">Email de contact *</label>
                   <input type="email" required value={formData.contact_email} onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })} className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" placeholder="contact@entreprise.com" />
-                  <p className="text-xs dark-text-muted mt-1">Un compte utilisateur sera automatiquement créé avec cet email</p>
+                  <p className="text-xs dark-text-muted mt-1">Un email sera envoyé à cette adresse pour permettre au sponsor de valider et compléter ses informations</p>
                 </div>
 
                 <div>
@@ -705,7 +721,7 @@ ${profile?.first_name} ${profile?.last_name}`;
                   </button>
                   <button type="submit" disabled={submitting || !formData.name || !formData.contact_email} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {submitting ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div> : <Send className="h-4 w-4 mr-2" />}
-                    {submitting ? 'Création en cours...' : 'Créer le sponsor'}
+                    {submitting ? 'Ajout en cours...' : 'Ajouter le sponsor'}
                   </button>
                 </div>
               </form>
@@ -827,7 +843,6 @@ ${profile?.first_name} ${profile?.last_name}`;
           </div>
         </div>
       )}
-
       {filteredSponsors.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSponsors.map((sponsor) => (
@@ -851,6 +866,7 @@ ${profile?.first_name} ${profile?.last_name}`;
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold dark-text flex items-center flex-wrap gap-2">
                         {sponsor.name}
+                        {/* Badge niveau de sponsor */}
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           sponsor.sponsor_type === 'Platine' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
                           sponsor.sponsor_type === 'Or' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
