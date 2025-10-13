@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { 
@@ -14,7 +14,10 @@ import {
   Edit,
   Save,
   X,
-  Globe // Ajout de l'icône Globe pour le site web
+  Globe,
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface ClubData {
@@ -23,9 +26,9 @@ interface ClubData {
   description: string;
   club_email: string;
   contact_email: string | null;
-  website_url: string | null; // AJOUTÉ : Champ website_url
+  website_url: string | null;
   club_code: string;
-  sponsors_code: string; // AJOUTÉ : Champ sponsors_code
+  sponsors_code: string;
   logo_url?: string;
   created_at: string;
   association: {
@@ -38,6 +41,7 @@ interface ClubMember {
   id: string;
   first_name: string;
   last_name: string;
+  email: string | null;
   role: string;
   avatar_url?: string;
   created_at: string;
@@ -48,6 +52,222 @@ interface ClubStats {
   totalEvents: number;
   upcomingEvents: number;
   totalSponsors: number;
+}
+
+// Composant de pagination des membres
+function MembersList({ members }: { members: ClubMember[] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [membersPerPage, setMembersPerPage] = useState(10);
+
+  // Filtrage des membres selon la recherche
+  const filteredMembers = useMemo(() => {
+    if (!searchTerm.trim()) return members;
+    
+    const search = searchTerm.toLowerCase();
+    return members.filter(member => 
+      member.first_name.toLowerCase().includes(search) ||
+      member.last_name.toLowerCase().includes(search) ||
+      (member.email && member.email.toLowerCase().includes(search))
+    );
+  }, [members, searchTerm]);
+
+  // Calcul de la pagination
+  const totalPages = membersPerPage === -1 ? 1 : Math.ceil(filteredMembers.length / membersPerPage);
+  const startIndex = (currentPage - 1) * (membersPerPage === -1 ? filteredMembers.length : membersPerPage);
+  const endIndex = membersPerPage === -1 ? filteredMembers.length : startIndex + membersPerPage;
+  const currentMembers = filteredMembers.slice(startIndex, endIndex);
+
+  // Réinitialiser à la page 1 quand on fait une recherche ou change le nombre par page
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, membersPerPage]);
+
+  return (
+    <div className="space-y-4">
+      {/* Barre de recherche et sélecteur */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, prénom ou email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="dark-input w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+          />
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <label className="text-sm dark-text-muted whitespace-nowrap">
+            Afficher :
+          </label>
+          <select
+            value={membersPerPage}
+            onChange={(e) => setMembersPerPage(Number(e.target.value))}
+            className="dark-input px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={-1}>Tous</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Info de pagination */}
+      <div className="flex items-center justify-between text-sm dark-text-muted">
+        <p>
+          {filteredMembers.length > 0 ? (
+            <>
+              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredMembers.length)} sur {filteredMembers.length} membre{filteredMembers.length > 1 ? 's' : ''}
+              {searchTerm && ' (filtré)'}
+            </>
+          ) : (
+            'Aucun membre trouvé'
+          )}
+        </p>
+      </div>
+
+      {/* Liste des membres */}
+      {currentMembers.length > 0 ? (
+        <div className="space-y-3">
+          {currentMembers.map((member) => (
+            <div key={member.id} className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+              {member.avatar_url ? (
+                <img
+                  src={member.avatar_url}
+                  alt={`${member.first_name} ${member.last_name}`}
+                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 dark:bg-slate-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Users className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium dark-text">
+                  {member.first_name} {member.last_name}
+                </p>
+                <p className="text-sm dark-text-muted truncate">
+                  {member.email || 'Email non disponible'}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                  member.role === 'Club Admin' 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                }`}>
+                  {member.role === 'Club Admin' ? 'Admin' : 'Membre'}
+                </span>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Depuis {new Date(member.created_at).toLocaleDateString('fr-FR')}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8 bg-gray-50 dark:bg-slate-800 rounded-lg">
+          <Users className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="dark-text-muted">
+            {searchTerm ? 'Aucun membre ne correspond à votre recherche' : 'Aucun membre pour le moment'}
+          </p>
+          {!searchTerm && (
+            <p className="text-sm dark-text-muted mt-2">
+              Partagez le code d'invitation pour inviter des membres
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Contrôles de pagination */}
+      {totalPages > 1 && membersPerPage !== -1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="flex items-center px-4 py-2 text-sm font-medium dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Précédent
+          </button>
+          
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {totalPages <= 7 ? (
+              Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === page
+                      ? 'bg-green-600 text-white dark:bg-green-500'
+                      : 'bg-white dark:bg-slate-700 dark-text-muted border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))
+            ) : (
+              <>
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === 1
+                      ? 'bg-green-600 text-white dark:bg-green-500'
+                      : 'bg-white dark:bg-slate-700 dark-text-muted border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  1
+                </button>
+                
+                {currentPage > 3 && <span className="text-gray-500">...</span>}
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => page > 1 && page < totalPages && Math.abs(page - currentPage) <= 1)
+                  .map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-green-600 text-white dark:bg-green-500'
+                          : 'bg-white dark:bg-slate-700 dark-text-muted border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                
+                {currentPage < totalPages - 2 && <span className="text-gray-500">...</span>}
+                
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === totalPages
+                      ? 'bg-green-600 text-white dark:bg-green-500'
+                      : 'bg-white dark:bg-slate-700 dark-text-muted border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="flex items-center px-4 py-2 text-sm font-medium dark-text-muted bg-white dark:bg-slate-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Suivant
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MyClub() {
@@ -63,7 +283,7 @@ export default function MyClub() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [copiedSponsorCode, setCopiedSponsorCode] = useState(false); // AJOUTÉ : État pour le code sponsor
+  const [copiedSponsorCode, setCopiedSponsorCode] = useState(false);
   
   // États pour l'édition des informations du club
   const [isEditing, setIsEditing] = useState(false);
@@ -72,7 +292,7 @@ export default function MyClub() {
     name: '',
     description: '',
     contact_email: '',
-    website_url: '' // AJOUTÉ : Champ website_url dans l'état du formulaire d'édition
+    website_url: ''
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -108,13 +328,13 @@ export default function MyClub() {
         name: club.name || '',
         description: club.description || '',
         contact_email: club.contact_email || '',
-        website_url: club.website_url || '' // AJOUTÉ : Initialisation de website_url
+        website_url: club.website_url || ''
       });
 
-      // Récupérer les membres du club - Solution sécurisée au niveau applicatif
+      // Récupérer les membres du club avec l'email
       const { data: allMembers, error: membersError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, role, avatar_url, created_at, club_id')
+        .select('id, first_name, last_name, email, role, avatar_url, created_at, club_id')
         .eq('club_id', profile?.club_id);
 
       if (membersError) throw membersError;
@@ -164,7 +384,6 @@ export default function MyClub() {
     }
   };
 
-  // AJOUTÉ : Fonction pour copier le code sponsor
   const copySponsorCode = async () => {
     if (clubData?.sponsors_code) {
       try {
@@ -191,7 +410,7 @@ export default function MyClub() {
           name: editForm.name.trim(),
           description: editForm.description.trim() || null,
           contact_email: editForm.contact_email.trim() || null,
-          website_url: editForm.website_url.trim() || null // AJOUTÉ : Mise à jour de website_url
+          website_url: editForm.website_url.trim() || null
         })
         .eq('id', clubData.id);
 
@@ -203,7 +422,7 @@ export default function MyClub() {
         name: editForm.name.trim(),
         description: editForm.description.trim(),
         contact_email: editForm.contact_email.trim() || null,
-        website_url: editForm.website_url.trim() || null // AJOUTÉ : Mise à jour locale de website_url
+        website_url: editForm.website_url.trim() || null
       });
 
       setIsEditing(false);
@@ -232,7 +451,7 @@ export default function MyClub() {
       name: clubData?.name || '',
       description: clubData?.description || '',
       contact_email: clubData?.contact_email || '',
-      website_url: clubData?.website_url || '' // AJOUTÉ : Restauration de website_url
+      website_url: clubData?.website_url || ''
     });
   };
 
@@ -424,7 +643,6 @@ export default function MyClub() {
                 </p>
               </div>
 
-              {/* AJOUTÉ : Champ Site web du club */}
               <div>
                 <label className="block text-sm font-medium dark-text-muted mb-2">
                   Site web du club
@@ -521,7 +739,7 @@ export default function MyClub() {
         </div>
       </div>
 
-      {/* AJOUTÉ : Section Code Sponsor */}
+      {/* Section Code Sponsor */}
       <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
           <h2 className="text-xl font-semibold dark-text flex items-center">
@@ -620,7 +838,7 @@ export default function MyClub() {
             <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg space-y-2">
               <Mail className="h-6 w-6 text-green-600 dark:text-green-400 mb-2" />
               <div>
-                <p className="font-medium dark-text">Contact du Club</p> {/* Titre ajusté */}
+                <p className="font-medium dark-text">Contact du Club</p>
                 <p className="text-xs dark-text-muted truncate">
                   <strong>Connexion :</strong> {clubData.club_email}
                 </p>
@@ -634,10 +852,9 @@ export default function MyClub() {
                     Aucun email de contact défini
                   </p>
                 )}
-                {/* AJOUTÉ : Affichage du site web */}
                 {clubData.website_url && (
                   <p className="text-xs dark-text-muted truncate flex items-center mt-1">
-                    <Globe className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" /> {/* Icône Globe */}
+                    <Globe className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" />
                     <strong>Site web :</strong> 
                     <a 
                       href={clubData.website_url} 
@@ -645,7 +862,7 @@ export default function MyClub() {
                       rel="noopener noreferrer" 
                       className="text-green-700 dark:text-green-400 hover:underline ml-1"
                     >
-                      {clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]} {/* Affiche une version simplifiée de l'URL */}
+                      {clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]}
                     </a>
                   </p>
                 )}
@@ -660,7 +877,7 @@ export default function MyClub() {
         </div>
       </div>
 
-      {/* Liste des membres */}
+      {/* Liste des membres avec pagination */}
       <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
@@ -671,51 +888,7 @@ export default function MyClub() {
           </div>
         </div>
         <div className="p-6">
-          {clubMembers.length > 0 ? (
-            <div className="space-y-4">
-              {clubMembers.map((member) => (
-                <div key={member.id} className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
-                  {member.avatar_url ? (
-                    <img
-                      src={member.avatar_url}
-                      alt={`${member.first_name} ${member.last_name}`}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-gray-200 dark:bg-slate-600 rounded-full flex items-center justify-center">
-                      <Users className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <p className="font-medium dark-text">
-                      {member.first_name} {member.last_name}
-                    </p>
-                    <p className="text-sm dark-text-muted">ID: {member.id.substring(0, 8)}...</p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      member.role === 'Club Admin' 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                    }`}>
-                      {member.role === 'Club Admin' ? 'Admin' : 'Membre'}
-                    </span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Depuis {new Date(member.created_at).toLocaleDateString('fr-FR')}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <p className="dark-text-muted">Aucun membre pour le moment</p>
-              <p className="text-sm dark-text-muted mt-2">
-                Partagez le code d'invitation pour inviter des membres
-              </p>
-            </div>
-          )}
+          <MembersList members={clubMembers} />
         </div>
       </div>
     </div>
