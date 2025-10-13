@@ -15,6 +15,7 @@ import {
   Save,
   X,
   Globe,
+  ExternalLink,
   Search,
   ChevronLeft,
   ChevronRight
@@ -535,12 +536,25 @@ export default function MyClub() {
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold dark-text">{clubData.name}</h1>
-                <p className="dark-text-muted">Tableau de bord de votre club</p>
-                <p className="text-sm dark-text-muted">
-                  Membre de l'association : {clubData.association.name}
-                </p>
-              </div>
+  <h1 className="text-3xl font-bold dark-text">{clubData.name}</h1>
+  <p className="dark-text-muted">Tableau de bord de votre club</p>
+  <p className="text-sm dark-text-muted">
+    Membre de l'association : {clubData.association.name}
+  </p>
+  {/* ✅ NOUVEAU: Affichage du site web dans l'en-tête */}
+  {clubData.website_url && (
+    <a 
+      href={clubData.website_url.startsWith('http') ? clubData.website_url : `https://${clubData.website_url}`}
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
+    >
+      <Globe className="h-4 w-4 mr-1" />
+      <span className="truncate">Site web du club</span>
+      <ExternalLink className="h-3 w-3 ml-1" />
+    </a>
+  )}
+</div>
             </div>
             <div className="flex items-center space-x-3">
               {!isEditing && (

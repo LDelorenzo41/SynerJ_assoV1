@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X } from 'lucide-react';
+// ✅ MODIFICATION 1: Ajout de ExternalLink dans les imports
+import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X, ExternalLink } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 import WelcomeModal from '../components/WelcomeModal';
 
@@ -12,12 +13,15 @@ interface AssociationInfo {
   logo_url: string | null;
 }
 
+// ✅ MODIFICATION 2: Ajout de website_url dans ClubInfo
 interface ClubInfo {
   id: string;
   name: string;
   logo_url: string | null;
+  website_url?: string | null;
 }
 
+// ✅ MODIFICATION 3: Ajout de website_url dans FollowedClub
 interface FollowedClub {
   id: string;
   name: string;
@@ -25,6 +29,7 @@ interface FollowedClub {
   logo_url: string | null;
   description: string | null;
   contact_email?: string | null;
+  website_url?: string | null;
 }
 
 interface UpcomingEvent {
@@ -42,7 +47,7 @@ interface UpcomingEvent {
 
 export default function Dashboard() {
   const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew();
-  const _location = useLocation(); // Préfixe _ = "je sais qu'elle n'est pas utilisée"
+  const _location = useLocation();
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
   const [followedClubs, setFollowedClubs] = useState<FollowedClub[]>([]);
@@ -185,10 +190,11 @@ export default function Dashboard() {
         if (!assocError && association) setAssociationInfo(association);
       }
 
+      // ✅ MODIFICATION 4: Ajout de website_url dans la requête club
       if (profile.club_id) {
         const { data: club, error: clubError } = await supabase
           .from('clubs')
-          .select('id, name, logo_url')
+          .select('id, name, logo_url, website_url')
           .eq('id', profile.club_id)
           .single();
         if (!clubError && club) setClubInfo(club);
@@ -206,11 +212,12 @@ export default function Dashboard() {
 
       if (['Supporter', 'Member', 'Sponsor', 'Club Admin'].includes(profile.role)) {
         if (profile.role !== 'Club Admin') {
+          // ✅ MODIFICATION 5: Ajout de website_url dans la requête user_clubs
           const { data: userClubs, error: userClubsError } = await supabase
             .from('user_clubs')
             .select(`
               club_id,
-              clubs(id, name, slug, logo_url, description, contact_email)
+              clubs(id, name, slug, logo_url, description, contact_email, website_url)
             `)
             .eq('user_id', profile.id);
 
@@ -387,8 +394,6 @@ export default function Dashboard() {
     });
   };
 
-  
-
   const groupEventsByDate = (events: UpcomingEvent[]) => {
     return events.reduce((groups, event) => {
       const dateKey = new Date(event.date).toDateString();
@@ -494,8 +499,6 @@ export default function Dashboard() {
                   
                   <div className="space-y-2 pl-4 sm:pl-10">
                     {events.map((event) => (
-                      // AMÉLIORATION: La mise en page de l'événement est rendue plus flexible
-                      // pour gérer les petits écrans sans écraser le contenu.
                       <div key={event.id} className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
                         <div className="flex items-center w-full">
                           <LogoDisplay 
@@ -570,8 +573,8 @@ export default function Dashboard() {
     );
   };
 
+  // ✅ MODIFICATION 6: Ajout du lien vers le site web dans la section Club
   const renderClubSection = () => {
-    // AMÉLIORATION: Padding et tailles de texte ajustés pour mobile
     const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       return (
@@ -614,9 +617,21 @@ export default function Dashboard() {
               fallbackIcon={Building}
               iconColor="text-green-600 dark:text-green-400"
             />
-            <div className="ml-3 min-w-0">
+            <div className="ml-3 min-w-0 flex-1">
               <p className="text-xs sm:text-sm dark-text-muted">Club</p>
               <p className="text-base sm:text-lg font-semibold dark-text truncate">{clubInfo.name}</p>
+              {/* ✅ NOUVEAU: Affichage du lien vers le site web */}
+              {clubInfo.website_url && (
+                <a 
+                  href={clubInfo.website_url.startsWith('http') ? clubInfo.website_url : `https://${clubInfo.website_url}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
+                >
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  <span className="truncate">Site web</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -626,7 +641,6 @@ export default function Dashboard() {
   };
   
   const renderAssociationSection = () => {
-    // AMÉLIORATION: Padding et tailles de texte ajustés pour mobile
     const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       const hasAssociation = !!associationInfo;
@@ -747,6 +761,7 @@ export default function Dashboard() {
     return null;
   };
 
+  // ✅ MODIFICATION 7: Ajout du bouton "Site web" dans les clubs suivis
   const renderFollowedClubsSection = () => {
     if ((profile?.role !== 'Supporter' && profile?.role !== 'Member') || followedClubs.length === 0) {
       return null;
@@ -761,7 +776,6 @@ export default function Dashboard() {
           </h2>
         </div>
         <div className="p-4 sm:p-6">
-          {/* AMÉLIORATION: La grille passe à 1 colonne sur mobile pour une meilleure lisibilité */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {followedClubs.map((club) => (
               <div key={club.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
@@ -791,6 +805,19 @@ export default function Dashboard() {
                         <Calendar className="h-3 w-3 mr-1" />
                         Événements
                       </a>
+                      {/* ✅ NOUVEAU: Bouton Site web pour les clubs suivis */}
+                      {club.website_url && (
+                        <a
+                          href={club.website_url.startsWith('http') ? club.website_url : `https://${club.website_url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-colors"
+                          title="Visiter le site web"
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Site web
+                        </a>
+                      )}
                       <a
                         href={`/clubs/${club.id}/communication`}
                         className="inline-flex items-center text-xs px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/70 transition-colors"
@@ -831,8 +858,6 @@ export default function Dashboard() {
   }
 
   const QuickActionLink = ({ to, icon: Icon, title, subtitle, colorClass }: { to: string, icon: React.ElementType, title: string, subtitle: string, colorClass: string }) => {
-    // AMÉLIORATION: Composant réutilisable pour les actions rapides pour garantir la cohérence
-    // et appliquer le style responsive une seule fois.
     const colors: { [key: string]: { bg: string, iconBg: string, text: string } } = {
         blue: { bg: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30', iconBg: 'bg-blue-600', text: 'text-blue-800 dark:text-blue-200' },
         green: { bg: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30', iconBg: 'bg-green-600', text: 'text-green-800 dark:text-green-200' },
@@ -870,7 +895,6 @@ export default function Dashboard() {
 
       <div className="dark-card overflow-hidden shadow-sm rounded-lg">
         {associationInfo && (
-          // AMÉLIORATION: Padding et tailles de texte adaptatifs
           <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <LogoDisplay 
@@ -918,8 +942,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* AMÉLIORATION MAJEURE: La grille principale est simplifiée et plus robuste.
-              Elle passe de 1 colonne (mobile) à 3 colonnes (desktop) avec une meilleure distribution. */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-1 space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
@@ -939,7 +961,6 @@ export default function Dashboard() {
               {renderClubSection()}
               {renderAssociationSection()}
 
-              {/* AMÉLIORATION: Le carrousel des sponsors est caché sur desktop ici */}
               {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor' || profile?.role === 'Club Admin') && (
                 <div className="hidden lg:block">
                   <SponsorCarousel />
@@ -952,7 +973,6 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* AMÉLIORATION: Le carrousel est affiché en dehors de la grille sur mobile pour un meilleur flux */}
           {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor' || profile?.role === 'Club Admin') && (
             <div className="lg:hidden mt-6">
               <SponsorCarousel />
@@ -971,7 +991,6 @@ export default function Dashboard() {
           </h2>
         </div>
         <div className="p-4 sm:p-6">
-          {/* AMÉLIORATION: Grille adaptative pour les actions, de 1 à 4 colonnes. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {isSuperAdmin && (
               <>
@@ -990,13 +1009,12 @@ export default function Dashboard() {
               </>
             )}
 
-            {/* ✅ NOUVELLE SECTION POUR LES SPONSORS */}
             {profile?.role === 'Sponsor' && (
               <>
                 <QuickActionLink to="/sponsor/profile" icon={Building} title="Mon Profil" subtitle="Gérer mes informations" colorClass="orange" />
                 <QuickActionLink to="/mailing" icon={MessageCircle} title="Mes Campagnes" subtitle="Gérer mon mailing" colorClass="teal" />
                 <QuickActionLink to="/events" icon={Eye} title="Événements" subtitle="Voir les événements" colorClass="indigo" />
-                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Mes événements" colorClass="purple" /> {/* ← AJOUTER */}
+                <QuickActionLink to="/calendrier" icon={CalendarDays} title="Mon Calendrier" subtitle="Mes événements" colorClass="purple" />
                 <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Découvrir les clubs" colorClass="green" />
               </>
             )}
@@ -1013,7 +1031,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* AMÉLIORATION: Les modales sont maintenant full-width sur mobile avec un padding de sécurité */}
       {showChangeConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="dark-card p-4 sm:p-6 rounded-lg w-full max-w-md">
