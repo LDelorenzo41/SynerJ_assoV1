@@ -940,11 +940,11 @@ export default function Dashboard() {
               {renderAssociationSection()}
 
               {/* AMÉLIORATION: Le carrousel des sponsors est caché sur desktop ici */}
-              {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor') && (
-  <div className="hidden lg:block">
-    <SponsorCarousel />
-  </div>
-)}
+              {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor' || profile?.role === 'Club Admin') && (
+                <div className="hidden lg:block">
+                  <SponsorCarousel />
+                </div>
+              )}
             </div>
 
             <div className="lg:col-span-2">
@@ -953,11 +953,11 @@ export default function Dashboard() {
           </div>
           
           {/* AMÉLIORATION: Le carrousel est affiché en dehors de la grille sur mobile pour un meilleur flux */}
-          {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor') && (
-  <div className="lg:hidden mt-6">
-    <SponsorCarousel />
-  </div>
-)}
+          {(profile?.role === 'Member' || profile?.role === 'Supporter' || profile?.role === 'Sponsor' || profile?.role === 'Club Admin') && (
+            <div className="lg:hidden mt-6">
+              <SponsorCarousel />
+            </div>
+          )}
         </div>
       </div>
 
@@ -986,6 +986,7 @@ export default function Dashboard() {
                 <QuickActionLink to="/my-club" icon={Users} title="Mon Club" subtitle="Gérer mon club" colorClass="green" />
                 <QuickActionLink to="/events" icon={Calendar} title="Événements" subtitle="Créer et gérer" colorClass="indigo" />
                 <QuickActionLink to="/communications" icon={MessageCircle} title="Communications" subtitle="Gérer les communications" colorClass="teal" />
+                <QuickActionLink to="/sponsors" icon={Building} title="Nos Sponsors" subtitle="Découvrir qui nous soutient" colorClass="orange" />
               </>
             )}
 
