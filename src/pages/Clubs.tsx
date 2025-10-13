@@ -1,11 +1,12 @@
-// Clubs.tsx - Version adaptée au Dark Mode
-// Ne remplacez que les parties MODIFIÉES pour tester progressivement
+// Clubs.tsx - Version adaptée au Dark Mode avec website_url
 
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Users, Calendar, MapPin, Mail, Plus, Eye, UserPlus, Shield, AlertCircle, Building2, ChevronDown, ChevronUp } from 'lucide-react';
+// ✅ MODIFICATION 1: Ajout de ExternalLink dans les imports
+import { Users, Calendar, MapPin, Mail, Plus, Eye, UserPlus, Shield, AlertCircle, Building2, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
+// ✅ MODIFICATION 2: Ajout de website_url dans l'interface Club
 interface Club {
   id: string;
   name: string;
@@ -13,6 +14,7 @@ interface Club {
   club_email: string;
   contact_email?: string | null;
   logo_url?: string | null;
+  website_url?: string | null;
   club_code: string;
   created_at: string;
   association_id: string;
@@ -123,9 +125,10 @@ export default function Clubs() {
   const fetchClubs = async () => {
     try {
       setLoading(true);
+      // ✅ MODIFICATION 3: Ajout de website_url dans la requête
       const { data, error } = await supabase
         .from('clubs')
-        .select('*, contact_email, logo_url')
+        .select('*, contact_email, logo_url, website_url')
         .eq('association_id', profile?.association_id)
         .order('created_at', { ascending: false });
 
@@ -345,11 +348,25 @@ export default function Clubs() {
                       <h3 className="text-xl font-semibold dark-text mb-2 truncate">
                         {club.name}
                       </h3>
-                      <div className="flex items-center dark-text-muted text-sm mb-2">
-                        <Mail className="h-4 w-4 mr-1 flex-shrink-0" />
-                        <span className="truncate">
-                          {club.contact_email || "Contact via l'association"}
-                        </span>
+                      <div className="space-y-1">
+                        <div className="flex items-center dark-text-muted text-sm">
+                          <Mail className="h-4 w-4 mr-1 flex-shrink-0" />
+                          <span className="truncate">
+                            {club.contact_email || "Contact via l'association"}
+                          </span>
+                        </div>
+                        {/* ✅ MODIFICATION 4: Affichage du lien vers le site web */}
+                        {club.website_url && (
+                          <a
+                            href={club.website_url.startsWith('http') ? club.website_url : `https://${club.website_url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1 flex-shrink-0" />
+                            <span className="truncate">Site web</span>
+                          </a>
+                        )}
                       </div>
                     </div>
                     <div className="ml-2 flex-shrink-0">
