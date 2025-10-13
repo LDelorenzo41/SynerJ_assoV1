@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
 import { Camera, Lock, Save, User, AlertCircle, Building2, Mail, Globe, Check } from 'lucide-react';
+import WebsiteGenerator from '../components/WebsiteGenerator';
 
 interface Message {
   type: 'success' | 'error';
@@ -1001,6 +1002,22 @@ const fetchEmailPreferences = async () => {
                   {clubLoading ? 'Sauvegarde...' : 'Mettre à jour les informations'}
                 </button>
               </form>
+
+              {/* Section Générateur de Site Web */}
+              {profile?.role === 'Club Admin' && clubData && (
+                <div className="mt-8">
+                  <WebsiteGenerator
+                    clubId={clubData.id}
+                    clubName={clubData.name}
+                    currentWebsiteUrl={clubData.website_url}
+                    onSuccess={(websiteUrl) => {
+                      // Mettre à jour les données locales après génération
+                      setClubData({ ...clubData, website_url: websiteUrl });
+                      setClubForm({ ...clubForm, website_url: websiteUrl });
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
 
