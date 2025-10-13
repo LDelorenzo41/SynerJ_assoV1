@@ -17,6 +17,7 @@ import PublicHeader from './components/PublicHeader';
 import SponsorProfile from './pages/SponsorProfile'; // ✅ NOUVEAU - Remplace SponsorEdit
 import Communications from './pages/Communications';
 import Mailing from './pages/Mailing';
+import ClubWebsite from './pages/ClubWebsite'; // ✅ AJOUT - Page site web du club
 
 // Import des nouveaux composants de réservation
 import EquipmentManagement from './components/equipment/EquipmentManagement';
@@ -65,6 +66,12 @@ function App() {
         />
         */}
         
+        {/* ✅ ROUTE PUBLIQUE - Site web du club (SANS Layout ni Header) */}
+        <Route 
+          path="/club/:clubId/website" 
+          element={<ClubWebsite />} 
+        />
+        
         {/* Routes protégées AVEC Layout */}
         <Route
           path="/dashboard"
@@ -77,15 +84,15 @@ function App() {
           }
         />
         <Route 
-  path="/calendrier" 
-  element={
-    <ProtectedRoute allowedRoles={['Member', 'Supporter', 'Sponsor']}> {/* ← Ajouter 'Sponsor' */}
-      <Layout>
-        <MonCalendrier />
-      </Layout>
-    </ProtectedRoute>
-  } 
-/>
+          path="/calendrier" 
+          element={
+            <ProtectedRoute allowedRoles={['Member', 'Supporter', 'Sponsor']}> {/* ← Ajouter 'Sponsor' */}
+              <Layout>
+                <MonCalendrier />
+              </Layout>
+            </ProtectedRoute>
+          } 
+        />
         <Route
           path="/events"
           element={
