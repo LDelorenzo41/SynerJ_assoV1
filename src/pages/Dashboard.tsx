@@ -2,10 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-// ✅ MODIFICATION 1: Ajout de ExternalLink dans les imports
 import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X, ExternalLink } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 import WelcomeModal from '../components/WelcomeModal';
+
+// Helper pour gérer les URLs de sites web (externes ou internes)
+const getWebsiteUrl = (websiteUrl: string | null | undefined): string | null => {
+  if (!websiteUrl) return null;
+  
+  // Si l'URL commence par http:// ou https://, c'est une URL externe
+  if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+    return websiteUrl;
+  }
+  
+  // Si l'URL commence par /, c'est une URL relative (site généré)
+  if (websiteUrl.startsWith('/')) {
+    return window.location.origin + websiteUrl;
+  }
+  
+  // Sinon, on considère que c'est un domaine sans protocole (ancien système)
+  return `https://${websiteUrl}`;
+};
 
 interface AssociationInfo {
   id: string;
@@ -13,7 +30,6 @@ interface AssociationInfo {
   logo_url: string | null;
 }
 
-// ✅ MODIFICATION 2: Ajout de website_url dans ClubInfo
 interface ClubInfo {
   id: string;
   name: string;
@@ -21,7 +37,6 @@ interface ClubInfo {
   website_url?: string | null;
 }
 
-// ✅ MODIFICATION 3: Ajout de website_url dans FollowedClub
 interface FollowedClub {
   id: string;
   name: string;
@@ -190,7 +205,6 @@ export default function Dashboard() {
         if (!assocError && association) setAssociationInfo(association);
       }
 
-      // ✅ MODIFICATION 4: Ajout de website_url dans la requête club
       if (profile.club_id) {
         const { data: club, error: clubError } = await supabase
           .from('clubs')
@@ -212,7 +226,6 @@ export default function Dashboard() {
 
       if (['Supporter', 'Member', 'Sponsor', 'Club Admin'].includes(profile.role)) {
         if (profile.role !== 'Club Admin') {
-          // ✅ MODIFICATION 5: Ajout de website_url dans la requête user_clubs
           const { data: userClubs, error: userClubsError } = await supabase
             .from('user_clubs')
             .select(`
@@ -573,7 +586,6 @@ export default function Dashboard() {
     );
   };
 
-  // ✅ MODIFICATION 6: Ajout du lien vers le site web dans la section Club
   const renderClubSection = () => {
     const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
@@ -620,10 +632,9 @@ export default function Dashboard() {
             <div className="ml-3 min-w-0 flex-1">
               <p className="text-xs sm:text-sm dark-text-muted">Club</p>
               <p className="text-base sm:text-lg font-semibold dark-text truncate">{clubInfo.name}</p>
-              {/* ✅ NOUVEAU: Affichage du lien vers le site web */}
               {clubInfo.website_url && (
                 <a 
-                  href={clubInfo.website_url.startsWith('http') ? clubInfo.website_url : `https://${clubInfo.website_url}`} 
+                  href={getWebsiteUrl(clubInfo.website_url) || '#'}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
@@ -761,7 +772,6 @@ export default function Dashboard() {
     return null;
   };
 
-  // ✅ MODIFICATION 7: Ajout du bouton "Site web" dans les clubs suivis
   const renderFollowedClubsSection = () => {
     if ((profile?.role !== 'Supporter' && profile?.role !== 'Member') || followedClubs.length === 0) {
       return null;
@@ -805,10 +815,9 @@ export default function Dashboard() {
                         <Calendar className="h-3 w-3 mr-1" />
                         Événements
                       </a>
-                      {/* ✅ NOUVEAU: Bouton Site web pour les clubs suivis */}
                       {club.website_url && (
                         <a
-                          href={club.website_url.startsWith('http') ? club.website_url : `https://${club.website_url}`}
+                          href={getWebsiteUrl(club.website_url) || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-colors"

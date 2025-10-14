@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy } from 'lucide-react';
+import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface WebsiteGeneratorProps {
   clubId: string;
@@ -35,6 +35,9 @@ export default function WebsiteGenerator({
   const [uploadingIllustration, setUploadingIllustration] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(currentWebsiteUrl || null);
+  
+  // ✅ NOUVEAU : État pour gérer l'ouverture/fermeture du formulaire
+  const [isExpanded, setIsExpanded] = useState(!currentWebsiteUrl); // Replié si site déjà généré
 
   const heroInputRef = useRef<HTMLInputElement>(null);
   const illustrationInputRef = useRef<HTMLInputElement>(null);
@@ -156,6 +159,9 @@ export default function WebsiteGenerator({
         text: '🎉 Site web généré avec succès ! Cliquez sur le lien pour le voir.',
       });
 
+      // ✅ NOUVEAU : Replier le formulaire après génération
+      setIsExpanded(false);
+
       if (onSuccess) {
         onSuccess(data.websiteUrl);
       }
@@ -249,178 +255,190 @@ export default function WebsiteGenerator({
         </div>
       )}
 
-      {/* Formulaire */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Image Hero */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Image de couverture * <span className="text-xs text-gray-500">(Paysage 16:9)</span>
-          </label>
-          <div className="flex items-center space-x-4">
-            <button
-              type="button"
-              onClick={() => heroInputRef.current?.click()}
-              disabled={loading}
-              className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {uploadingHero ? 'Upload...' : 'Choisir une image'}
-            </button>
-            {heroImagePreview && (
-              <img
-                src={heroImagePreview}
-                alt="Preview hero"
-                className="h-16 w-28 object-cover rounded border border-gray-300 dark:border-gray-600"
-              />
-            )}
-          </div>
-          <input
-            ref={heroInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleHeroImageChange}
-            className="hidden"
-          />
-          <p className="text-xs dark-text-muted mt-1">
-            Format recommandé : 1920x1080px. Max 5MB.
-          </p>
-        </div>
+      {/* ✅ NOUVEAU : Bouton pour déplier/replier le formulaire */}
+      <button
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full mb-6 flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-600"
+      >
+        <span className="font-medium dark-text">
+          {generatedUrl ? 'Modifier / Regénérer le site' : 'Créer votre site web'}
+        </span>
+        {isExpanded ? (
+          <ChevronUp className="h-5 w-5 dark-text-muted" />
+        ) : (
+          <ChevronDown className="h-5 w-5 dark-text-muted" />
+        )}
+      </button>
 
-        {/* Image Illustration (optionnelle) */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Image d'illustration <span className="text-xs text-gray-500">(Optionnel)</span>
-          </label>
-          <div className="flex items-center space-x-4">
-            <button
-              type="button"
-              onClick={() => illustrationInputRef.current?.click()}
-              disabled={loading}
-              className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {uploadingIllustration ? 'Upload...' : 'Choisir une image'}
-            </button>
-            {illustrationImagePreview && (
-              <img
-                src={illustrationImagePreview}
-                alt="Preview illustration"
-                className="h-16 w-16 object-cover rounded border border-gray-300 dark:border-gray-600"
-              />
-            )}
-          </div>
-          <input
-            ref={illustrationInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleIllustrationImageChange}
-            className="hidden"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Description du club *
-          </label>
-          <textarea
-            rows={4}
-            required
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-            placeholder="Décrivez votre club, vos activités, votre philosophie..."
-          />
-        </div>
-
-        {/* Horaires */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Horaires <span className="text-xs text-gray-500">(Optionnel)</span>
-          </label>
-          <input
-            type="text"
-            value={formData.schedule}
-            onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-            className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-            placeholder="Ex: Mardi et Jeudi 19h-21h"
-          />
-        </div>
-
-        {/* Lieu */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Lieu / Adresse <span className="text-xs text-gray-500">(Optionnel)</span>
-          </label>
-          <input
-            type="text"
-            value={formData.location}
-            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-            placeholder="Ex: Gymnase municipal, 123 rue du Sport"
-          />
-        </div>
-
-        {/* Tarifs */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Tarifs <span className="text-xs text-gray-500">(Optionnel)</span>
-          </label>
-          <input
-            type="text"
-            value={formData.pricing}
-            onChange={(e) => setFormData({ ...formData, pricing: e.target.value })}
-            className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-            placeholder="Ex: Cotisation annuelle : 150€"
-          />
-        </div>
-
-        {/* Couleur thème */}
-        <div>
-          <label className="block text-sm font-medium dark-text-muted mb-2">
-            Couleur du thème
-          </label>
-          <div className="flex items-center space-x-4">
+      {/* ✅ NOUVEAU : Formulaire conditionnel (affiché uniquement si isExpanded) */}
+      {isExpanded && (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Image Hero */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Image de couverture * <span className="text-xs text-gray-500">(Paysage 16:9)</span>
+            </label>
+            <div className="flex items-center space-x-4">
+              <button
+                type="button"
+                onClick={() => heroInputRef.current?.click()}
+                disabled={loading}
+                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {uploadingHero ? 'Upload...' : 'Choisir une image'}
+              </button>
+              {heroImagePreview && (
+                <img
+                  src={heroImagePreview}
+                  alt="Preview hero"
+                  className="h-16 w-28 object-cover rounded border border-gray-300 dark:border-gray-600"
+                />
+              )}
+            </div>
             <input
-              type="color"
-              value={formData.themeColor}
-              onChange={(e) => setFormData({ ...formData, themeColor: e.target.value })}
-              className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+              ref={heroInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleHeroImageChange}
+              className="hidden"
             />
-            <span className="text-sm dark-text-muted">{formData.themeColor}</span>
-            <Palette className="h-5 w-5 text-gray-400" />
+            <p className="text-xs dark-text-muted mt-1">
+              Format recommandé : 1920x1080px. Max 5MB.
+            </p>
           </div>
-        </div>
 
-        {/* Bouton de génération */}
-        <div className="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-          >
-            {loading ? (
-              <>
-                <Loader className="h-5 w-5 mr-2 animate-spin" />
-                Génération en cours...
-              </>
-            ) : (
-              <>
-                <Globe className="h-5 w-5 mr-2" />
-                {generatedUrl ? 'Regénérer le site' : 'Générer mon site web'}
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+          {/* Image Illustration (optionnelle) */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Image d'illustration <span className="text-xs text-gray-500">(Optionnel)</span>
+            </label>
+            <div className="flex items-center space-x-4">
+              <button
+                type="button"
+                onClick={() => illustrationInputRef.current?.click()}
+                disabled={loading}
+                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {uploadingIllustration ? 'Upload...' : 'Choisir une image'}
+              </button>
+              {illustrationImagePreview && (
+                <img
+                  src={illustrationImagePreview}
+                  alt="Preview illustration"
+                  className="h-16 w-16 object-cover rounded border border-gray-300 dark:border-gray-600"
+                />
+              )}
+            </div>
+            <input
+              ref={illustrationInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleIllustrationImageChange}
+              className="hidden"
+            />
+          </div>
 
-      {/* Info coûts */}
-      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-        <p className="text-xs dark-text-muted">
-          💡 <strong>Info:</strong> La génération d'un site web coûte environ $0.006 (moins d'1 centime).
-          Vous pouvez regénérer votre site autant de fois que nécessaire.
-        </p>
-      </div>
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Description du club *
+            </label>
+            <textarea
+              rows={4}
+              required
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Décrivez votre club, vos activités, votre philosophie..."
+            />
+          </div>
+
+          {/* Horaires */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Horaires <span className="text-xs text-gray-500">(Optionnel)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.schedule}
+              onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Ex: Mardi et Jeudi 19h-21h"
+            />
+          </div>
+
+          {/* Lieu */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Lieu / Adresse <span className="text-xs text-gray-500">(Optionnel)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Ex: Gymnase municipal, 123 rue du Sport"
+            />
+          </div>
+
+          {/* Tarifs */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Tarifs <span className="text-xs text-gray-500">(Optionnel)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.pricing}
+              onChange={(e) => setFormData({ ...formData, pricing: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Ex: Cotisation annuelle : 150€"
+            />
+          </div>
+
+          {/* Couleur thème */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Couleur du thème
+            </label>
+            <div className="flex items-center space-x-4">
+              <input
+                type="color"
+                value={formData.themeColor}
+                onChange={(e) => setFormData({ ...formData, themeColor: e.target.value })}
+                className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+              />
+              <span className="text-sm dark-text-muted">{formData.themeColor}</span>
+              <Palette className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+
+          {/* Bouton de génération */}
+          <div className="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {loading ? (
+                <>
+                  <Loader className="h-5 w-5 mr-2 animate-spin" />
+                  Génération en cours...
+                </>
+              ) : (
+                <>
+                  <Globe className="h-5 w-5 mr-2" />
+                  {generatedUrl ? 'Regénérer le site' : 'Générer mon site web'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ✅ SUPPRIMÉ : Section Info coûts */}
     </div>
   );
 }

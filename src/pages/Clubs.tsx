@@ -3,10 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-// ✅ MODIFICATION 1: Ajout de ExternalLink dans les imports
 import { Users, Calendar, MapPin, Mail, Plus, Eye, UserPlus, Shield, AlertCircle, Building2, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
-// ✅ MODIFICATION 2: Ajout de website_url dans l'interface Club
+// Helper pour gérer les URLs de sites web (externes ou internes)
+const getWebsiteUrl = (websiteUrl: string | null | undefined): string | null => {
+  if (!websiteUrl) return null;
+  
+  // Si l'URL commence par http:// ou https://, c'est une URL externe
+  if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+    return websiteUrl;
+  }
+  
+  // Si l'URL commence par /, c'est une URL relative (site généré)
+  if (websiteUrl.startsWith('/')) {
+    return window.location.origin + websiteUrl;
+  }
+  
+  // Sinon, on considère que c'est un domaine sans protocole (ancien système)
+  return `https://${websiteUrl}`;
+};
+
 interface Club {
   id: string;
   name: string;
@@ -125,7 +141,6 @@ export default function Clubs() {
   const fetchClubs = async () => {
     try {
       setLoading(true);
-      // ✅ MODIFICATION 3: Ajout de website_url dans la requête
       const { data, error } = await supabase
         .from('clubs')
         .select('*, contact_email, logo_url, website_url')
@@ -355,10 +370,10 @@ export default function Clubs() {
                             {club.contact_email || "Contact via l'association"}
                           </span>
                         </div>
-                        {/* ✅ MODIFICATION 4: Affichage du lien vers le site web */}
+                        {/* ✅ MODIFICATION CORRIGÉE: Utilisation de getWebsiteUrl() */}
                         {club.website_url && (
                           <a
-                            href={club.website_url.startsWith('http') ? club.website_url : `https://${club.website_url}`}
+                            href={getWebsiteUrl(club.website_url) || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
