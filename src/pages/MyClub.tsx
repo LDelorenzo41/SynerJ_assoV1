@@ -21,6 +21,24 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+// Helper pour gérer les URLs de sites web (externes ou internes)
+const getWebsiteUrl = (websiteUrl: string | null | undefined): string | null => {
+  if (!websiteUrl) return null;
+  
+  // Si l'URL commence par http:// ou https://, c'est une URL externe
+  if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+    return websiteUrl;
+  }
+  
+  // Si l'URL commence par /, c'est une URL relative (site généré)
+  if (websiteUrl.startsWith('/')) {
+    return window.location.origin + websiteUrl;
+  }
+  
+  // Sinon, on considère que c'est un domaine sans protocole (ancien système)
+  return `https://${websiteUrl}`;
+};
+
 interface ClubData {
   id: string;
   name: string;
@@ -536,25 +554,25 @@ export default function MyClub() {
                 </div>
               )}
               <div>
-  <h1 className="text-3xl font-bold dark-text">{clubData.name}</h1>
-  <p className="dark-text-muted">Tableau de bord de votre club</p>
-  <p className="text-sm dark-text-muted">
-    Membre de l'association : {clubData.association.name}
-  </p>
-  {/* ✅ NOUVEAU: Affichage du site web dans l'en-tête */}
-  {clubData.website_url && (
-    <a 
-      href={clubData.website_url.startsWith('http') ? clubData.website_url : `https://${clubData.website_url}`}
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
-    >
-      <Globe className="h-4 w-4 mr-1" />
-      <span className="truncate">Site web du club</span>
-      <ExternalLink className="h-3 w-3 ml-1" />
-    </a>
-  )}
-</div>
+                <h1 className="text-3xl font-bold dark-text">{clubData.name}</h1>
+                <p className="dark-text-muted">Tableau de bord de votre club</p>
+                <p className="text-sm dark-text-muted">
+                  Membre de l'association : {clubData.association.name}
+                </p>
+                {/* ✅ MODIFICATION CORRIGÉE: Utilisation de getWebsiteUrl() */}
+                {clubData.website_url && (
+                  <a 
+                    href={getWebsiteUrl(clubData.website_url) || '#'}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
+                  >
+                    <Globe className="h-4 w-4 mr-1" />
+                    <span className="truncate">Site web du club</span>
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-3">
               {!isEditing && (
@@ -866,17 +884,21 @@ export default function MyClub() {
                     Aucun email de contact défini
                   </p>
                 )}
+                {/* ✅ MODIFICATION FINALE: Gestion correcte du texte du lien */}
                 {clubData.website_url && (
                   <p className="text-xs dark-text-muted truncate flex items-center mt-1">
                     <Globe className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" />
                     <strong>Site web :</strong> 
                     <a 
-                      href={clubData.website_url} 
+                      href={getWebsiteUrl(clubData.website_url) || '#'}
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="text-green-700 dark:text-green-400 hover:underline ml-1"
                     >
-                      {clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]}
+                      {clubData.website_url.startsWith('/') 
+                        ? 'Site généré' 
+                        : clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]
+                      }
                     </a>
                   </p>
                 )}

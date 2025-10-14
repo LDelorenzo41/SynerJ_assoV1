@@ -1003,13 +1003,14 @@ const fetchEmailPreferences = async () => {
                 </button>
               </form>
 
-              {/* Section Générateur de Site Web */}
+              {/* ✅ CORRECTION : Section Générateur de Site Web */}
+              {/* Ne passer currentWebsiteUrl que si c'est un site GÉNÉRÉ (commence par /) */}
               {profile?.role === 'Club Admin' && clubData && (
                 <div className="mt-8">
                   <WebsiteGenerator
                     clubId={clubData.id}
                     clubName={clubData.name}
-                    currentWebsiteUrl={clubData.website_url}
+                    currentWebsiteUrl={clubData.website_url?.startsWith('/') ? clubData.website_url : null}
                     onSuccess={(websiteUrl) => {
                       // Mettre à jour les données locales après génération
                       setClubData({ ...clubData, website_url: websiteUrl });
