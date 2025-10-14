@@ -1,8 +1,9 @@
 // src/components/WebsiteGenerator.tsx
+// ✅ AJOUT : Champ "tagline" pour la phrase d'accroche du hero
 
 import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
 
 interface WebsiteGeneratorProps {
   clubId: string;
@@ -18,12 +19,16 @@ export default function WebsiteGenerator({
   onSuccess 
 }: WebsiteGeneratorProps) {
   const [formData, setFormData] = useState({
+    tagline: '', // ✅ NOUVEAU : Phrase d'accroche courte pour le hero
     description: '',
-    schedule: '',
-    location: '',
-    pricing: '',
+    phone: '',
     themeColor: '#10b981',
   });
+
+  // États pour les champs multiples
+  const [schedules, setSchedules] = useState<string[]>(['']);
+  const [locations, setLocations] = useState<string[]>(['']);
+  const [pricings, setPricings] = useState<string[]>(['']);
 
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
@@ -35,12 +40,61 @@ export default function WebsiteGenerator({
   const [uploadingIllustration, setUploadingIllustration] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(currentWebsiteUrl || null);
-  
-  // ✅ NOUVEAU : État pour gérer l'ouverture/fermeture du formulaire
-  const [isExpanded, setIsExpanded] = useState(!currentWebsiteUrl); // Replié si site déjà généré
+  const [isExpanded, setIsExpanded] = useState(!currentWebsiteUrl);
 
   const heroInputRef = useRef<HTMLInputElement>(null);
   const illustrationInputRef = useRef<HTMLInputElement>(null);
+
+  // Gestion des horaires multiples
+  const addSchedule = () => {
+    setSchedules([...schedules, '']);
+  };
+
+  const removeSchedule = (index: number) => {
+    if (schedules.length > 1) {
+      setSchedules(schedules.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateSchedule = (index: number, value: string) => {
+    const newSchedules = [...schedules];
+    newSchedules[index] = value;
+    setSchedules(newSchedules);
+  };
+
+  // Gestion des lieux multiples
+  const addLocation = () => {
+    setLocations([...locations, '']);
+  };
+
+  const removeLocation = (index: number) => {
+    if (locations.length > 1) {
+      setLocations(locations.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateLocation = (index: number, value: string) => {
+    const newLocations = [...locations];
+    newLocations[index] = value;
+    setLocations(newLocations);
+  };
+
+  // Gestion des tarifs multiples
+  const addPricing = () => {
+    setPricings([...pricings, '']);
+  };
+
+  const removePricing = (index: number) => {
+    if (pricings.length > 1) {
+      setPricings(pricings.filter((_, i) => i !== index));
+    }
+  };
+
+  const updatePricing = (index: number, value: string) => {
+    const newPricings = [...pricings];
+    newPricings[index] = value;
+    setPricings(newPricings);
+  };
 
   // Upload d'image dans Supabase Storage
   const uploadImage = async (file: File, type: 'hero' | 'illustration'): Promise<string> => {
@@ -107,6 +161,10 @@ export default function WebsiteGenerator({
 
     try {
       // Validation
+      if (!formData.tagline.trim()) {
+        throw new Error('La phrase d\'accroche est requise');
+      }
+
       if (!formData.description.trim()) {
         throw new Error('La description est requise');
       }
@@ -131,16 +189,24 @@ export default function WebsiteGenerator({
         setUploadingIllustration(false);
       }
 
+      // Filtrer les champs vides
+      const filteredSchedules = schedules.filter(s => s.trim());
+      const filteredLocations = locations.filter(l => l.trim());
+      const filteredPricings = pricings.filter(p => p.trim());
+
       // Appel à l'Edge Function
       const { data, error } = await supabase.functions.invoke('generate-club-website', {
         body: {
+          clubId,
           clubName,
+          tagline: formData.tagline, // ✅ NOUVEAU
           description: formData.description,
+          phone: formData.phone || null,
           heroImageUrl,
           illustrationImageUrl,
-          schedule: formData.schedule || undefined,
-          location: formData.location || undefined,
-          pricing: formData.pricing || undefined,
+          schedules: filteredSchedules.length > 0 ? filteredSchedules : undefined,
+          locations: filteredLocations.length > 0 ? filteredLocations : undefined,
+          pricings: filteredPricings.length > 0 ? filteredPricings : undefined,
           themeColor: formData.themeColor,
         },
       });
@@ -153,17 +219,16 @@ export default function WebsiteGenerator({
         throw new Error(data.error || 'Erreur lors de la génération du site');
       }
 
-      setGeneratedUrl(data.websiteUrl);
+      setGeneratedUrl(data.url);
       setMessage({
         type: 'success',
         text: '🎉 Site web généré avec succès ! Cliquez sur le lien pour le voir.',
       });
 
-      // ✅ NOUVEAU : Replier le formulaire après génération
       setIsExpanded(false);
 
       if (onSuccess) {
-        onSuccess(data.websiteUrl);
+        onSuccess(data.url);
       }
     } catch (error: any) {
       console.error('Erreur:', error);
@@ -189,7 +254,7 @@ export default function WebsiteGenerator({
         </div>
       </div>
 
-      {/* URL actuelle si existe - VERSION AMÉLIORÉE */}
+      {/* URL actuelle si existe */}
       {generatedUrl && (
         <div className="mb-6 p-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
           <div className="flex items-start">
@@ -206,7 +271,6 @@ export default function WebsiteGenerator({
                 Votre site web est maintenant accessible en ligne.
               </p>
               
-              {/* Boutons d'action */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={window.location.origin + generatedUrl}
@@ -230,7 +294,6 @@ export default function WebsiteGenerator({
                 </button>
               </div>
 
-              {/* URL affichée */}
               <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-green-200 dark:border-green-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">URL de votre site :</p>
                 <code className="text-sm text-green-700 dark:text-green-300 break-all">
@@ -255,7 +318,7 @@ export default function WebsiteGenerator({
         </div>
       )}
 
-      {/* ✅ NOUVEAU : Bouton pour déplier/replier le formulaire */}
+      {/* Bouton pour déplier/replier */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -271,9 +334,28 @@ export default function WebsiteGenerator({
         )}
       </button>
 
-      {/* ✅ NOUVEAU : Formulaire conditionnel (affiché uniquement si isExpanded) */}
+      {/* Formulaire */}
       {isExpanded && (
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* ✅ NOUVEAU : Phrase d'accroche */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Phrase d'accroche * <span className="text-xs text-gray-500">(Affichée dans le hero)</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.tagline}
+              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Ex: La passion de la marche et des rencontres"
+              maxLength={100}
+            />
+            <p className="text-xs dark-text-muted mt-1">
+              Une phrase courte et percutante (max 100 caractères)
+            </p>
+          </div>
+
           {/* Image Hero */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
@@ -309,7 +391,7 @@ export default function WebsiteGenerator({
             </p>
           </div>
 
-          {/* Image Illustration (optionnelle) */}
+          {/* Image Illustration */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Image d'illustration <span className="text-xs text-gray-500">(Optionnel)</span>
@@ -344,7 +426,7 @@ export default function WebsiteGenerator({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
-              Description du club *
+              Description complète du club * <span className="text-xs text-gray-500">(Affichée dans la section "À propos")</span>
             </label>
             <textarea
               rows={4}
@@ -352,50 +434,139 @@ export default function WebsiteGenerator({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-              placeholder="Décrivez votre club, vos activités, votre philosophie..."
+              placeholder="Décrivez votre club, vos activités, votre philosophie en détail..."
+            />
+          </div>
+          {/* ✅ AJOUTER CETTE SECTION COMPLÈTE */}
+          {/* Téléphone */}
+          <div>
+            <label className="block text-sm font-medium dark-text-muted mb-2">
+              Numéro de téléphone <span className="text-xs text-gray-500">(Optionnel)</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              placeholder="Ex: 06 12 34 56 78"
             />
           </div>
 
-          {/* Horaires */}
+          {/* Horaires multiples */}
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Horaires <span className="text-xs text-gray-500">(Optionnel)</span>
-            </label>
-            <input
-              type="text"
-              value={formData.schedule}
-              onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-              placeholder="Ex: Mardi et Jeudi 19h-21h"
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium dark-text-muted">
+                Horaires <span className="text-xs text-gray-500">(Optionnel)</span>
+              </label>
+              <button
+                type="button"
+                onClick={addSchedule}
+                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter un horaire
+              </button>
+            </div>
+            <div className="space-y-2">
+              {schedules.map((schedule, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={schedule}
+                    onChange={(e) => updateSchedule(index, e.target.value)}
+                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    placeholder={`Ex: ${index === 0 ? 'Lundi et Mercredi 18h-20h' : 'Samedi 10h-12h'}`}
+                  />
+                  {schedules.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSchedule(index)}
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Lieu */}
+          {/* Lieux multiples */}
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Lieu / Adresse <span className="text-xs text-gray-500">(Optionnel)</span>
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-              placeholder="Ex: Gymnase municipal, 123 rue du Sport"
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium dark-text-muted">
+                Lieux / Adresses <span className="text-xs text-gray-500">(Optionnel)</span>
+              </label>
+              <button
+                type="button"
+                onClick={addLocation}
+                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter un lieu
+              </button>
+            </div>
+            <div className="space-y-2">
+              {locations.map((location, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => updateLocation(index, e.target.value)}
+                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    placeholder={`Ex: ${index === 0 ? 'Gymnase municipal, 123 rue du Sport' : 'Salle annexe, 45 avenue des Loisirs'}`}
+                  />
+                  {locations.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeLocation(index)}
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Tarifs */}
+          {/* Tarifs multiples */}
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Tarifs <span className="text-xs text-gray-500">(Optionnel)</span>
-            </label>
-            <input
-              type="text"
-              value={formData.pricing}
-              onChange={(e) => setFormData({ ...formData, pricing: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
-              placeholder="Ex: Cotisation annuelle : 150€"
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium dark-text-muted">
+                Tarifs <span className="text-xs text-gray-500">(Optionnel)</span>
+              </label>
+              <button
+                type="button"
+                onClick={addPricing}
+                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter un tarif
+              </button>
+            </div>
+            <div className="space-y-2">
+              {pricings.map((pricing, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={pricing}
+                    onChange={(e) => updatePricing(index, e.target.value)}
+                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    placeholder={`Ex: ${index === 0 ? 'Adultes : 150€/an' : 'Enfants (-12 ans) : 80€/an'}`}
+                  />
+                  {pricings.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removePricing(index)}
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Couleur thème */}
@@ -437,8 +608,6 @@ export default function WebsiteGenerator({
           </div>
         </form>
       )}
-
-      {/* ✅ SUPPRIMÉ : Section Info coûts */}
     </div>
   );
 }
