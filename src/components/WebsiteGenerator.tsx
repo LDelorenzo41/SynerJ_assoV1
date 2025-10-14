@@ -1,9 +1,8 @@
 // src/components/WebsiteGenerator.tsx
-// ✅ AJOUT : Champ "tagline" pour la phrase d'accroche du hero
 
 import React, { useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
+import { Globe, Upload, Palette, Loader, ExternalLink, Check, Copy, ChevronDown, ChevronUp, Plus, X, FileText } from 'lucide-react';
 
 interface WebsiteGeneratorProps {
   clubId: string;
@@ -19,16 +18,16 @@ export default function WebsiteGenerator({
   onSuccess 
 }: WebsiteGeneratorProps) {
   const [formData, setFormData] = useState({
-    tagline: '', // ✅ NOUVEAU : Phrase d'accroche courte pour le hero
+    tagline: '',
     description: '',
     phone: '',
     themeColor: '#10b981',
   });
 
-  // États pour les champs multiples
   const [schedules, setSchedules] = useState<string[]>(['']);
   const [locations, setLocations] = useState<string[]>(['']);
   const [pricings, setPricings] = useState<string[]>(['']);
+  const [documents, setDocuments] = useState<{name: string, url: string}[]>([{name: '', url: ''}]);
 
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
@@ -45,58 +44,46 @@ export default function WebsiteGenerator({
   const heroInputRef = useRef<HTMLInputElement>(null);
   const illustrationInputRef = useRef<HTMLInputElement>(null);
 
-  // Gestion des horaires multiples
-  const addSchedule = () => {
-    setSchedules([...schedules, '']);
-  };
-
+  const addSchedule = () => setSchedules([...schedules, '']);
   const removeSchedule = (index: number) => {
-    if (schedules.length > 1) {
-      setSchedules(schedules.filter((_, i) => i !== index));
-    }
+    if (schedules.length > 1) setSchedules(schedules.filter((_, i) => i !== index));
   };
-
   const updateSchedule = (index: number, value: string) => {
     const newSchedules = [...schedules];
     newSchedules[index] = value;
     setSchedules(newSchedules);
   };
 
-  // Gestion des lieux multiples
-  const addLocation = () => {
-    setLocations([...locations, '']);
-  };
-
+  const addLocation = () => setLocations([...locations, '']);
   const removeLocation = (index: number) => {
-    if (locations.length > 1) {
-      setLocations(locations.filter((_, i) => i !== index));
-    }
+    if (locations.length > 1) setLocations(locations.filter((_, i) => i !== index));
   };
-
   const updateLocation = (index: number, value: string) => {
     const newLocations = [...locations];
     newLocations[index] = value;
     setLocations(newLocations);
   };
 
-  // Gestion des tarifs multiples
-  const addPricing = () => {
-    setPricings([...pricings, '']);
-  };
-
+  const addPricing = () => setPricings([...pricings, '']);
   const removePricing = (index: number) => {
-    if (pricings.length > 1) {
-      setPricings(pricings.filter((_, i) => i !== index));
-    }
+    if (pricings.length > 1) setPricings(pricings.filter((_, i) => i !== index));
   };
-
   const updatePricing = (index: number, value: string) => {
     const newPricings = [...pricings];
     newPricings[index] = value;
     setPricings(newPricings);
   };
 
-  // Upload d'image dans Supabase Storage
+  const addDocument = () => setDocuments([...documents, {name: '', url: ''}]);
+  const removeDocument = (index: number) => {
+    if (documents.length > 1) setDocuments(documents.filter((_, i) => i !== index));
+  };
+  const updateDocument = (index: number, field: 'name' | 'url', value: string) => {
+    const newDocuments = [...documents];
+    newDocuments[index][field] = value;
+    setDocuments(newDocuments);
+  };
+
   const uploadImage = async (file: File, type: 'hero' | 'illustration'): Promise<string> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${clubId}/${type}-${Date.now()}.${fileExt}`;
@@ -119,7 +106,6 @@ export default function WebsiteGenerator({
     return data.publicUrl;
   };
 
-  // Gestion de la sélection d'image hero
   const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -136,7 +122,6 @@ export default function WebsiteGenerator({
     }
   };
 
-  // Gestion de la sélection d'image illustration
   const handleIllustrationImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -153,14 +138,12 @@ export default function WebsiteGenerator({
     }
   };
 
-  // Soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
     try {
-      // Validation
       if (!formData.tagline.trim()) {
         throw new Error('La phrase d\'accroche est requise');
       }
@@ -173,7 +156,6 @@ export default function WebsiteGenerator({
         throw new Error('L\'image hero est requise');
       }
 
-      // Upload des images
       let heroImageUrl = heroImagePreview;
       let illustrationImageUrl = illustrationImagePreview;
 
@@ -189,17 +171,16 @@ export default function WebsiteGenerator({
         setUploadingIllustration(false);
       }
 
-      // Filtrer les champs vides
       const filteredSchedules = schedules.filter(s => s.trim());
       const filteredLocations = locations.filter(l => l.trim());
       const filteredPricings = pricings.filter(p => p.trim());
+      const filteredDocuments = documents.filter(d => d.name.trim() && d.url.trim());
 
-      // Appel à l'Edge Function
       const { data, error } = await supabase.functions.invoke('generate-club-website', {
         body: {
           clubId,
           clubName,
-          tagline: formData.tagline, // ✅ NOUVEAU
+          tagline: formData.tagline,
           description: formData.description,
           phone: formData.phone || null,
           heroImageUrl,
@@ -207,6 +188,7 @@ export default function WebsiteGenerator({
           schedules: filteredSchedules.length > 0 ? filteredSchedules : undefined,
           locations: filteredLocations.length > 0 ? filteredLocations : undefined,
           pricings: filteredPricings.length > 0 ? filteredPricings : undefined,
+          documents: filteredDocuments.length > 0 ? filteredDocuments : undefined,
           themeColor: formData.themeColor,
         },
       });
@@ -254,7 +236,6 @@ export default function WebsiteGenerator({
         </div>
       </div>
 
-      {/* URL actuelle si existe */}
       {generatedUrl && (
         <div className="mb-6 p-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
           <div className="flex items-start">
@@ -305,7 +286,6 @@ export default function WebsiteGenerator({
         </div>
       )}
 
-      {/* Messages */}
       {message && (
         <div
           className={`mb-6 p-4 rounded-lg border ${
@@ -318,7 +298,6 @@ export default function WebsiteGenerator({
         </div>
       )}
 
-      {/* Bouton pour déplier/replier */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -334,10 +313,8 @@ export default function WebsiteGenerator({
         )}
       </button>
 
-      {/* Formulaire */}
       {isExpanded && (
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ✅ NOUVEAU : Phrase d'accroche */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Phrase d'accroche * <span className="text-xs text-gray-500">(Affichée dans le hero)</span>
@@ -356,7 +333,6 @@ export default function WebsiteGenerator({
             </p>
           </div>
 
-          {/* Image Hero */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Image de couverture * <span className="text-xs text-gray-500">(Paysage 16:9)</span>
@@ -391,7 +367,6 @@ export default function WebsiteGenerator({
             </p>
           </div>
 
-          {/* Image Illustration */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Image d'illustration <span className="text-xs text-gray-500">(Optionnel)</span>
@@ -423,7 +398,6 @@ export default function WebsiteGenerator({
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Description complète du club * <span className="text-xs text-gray-500">(Affichée dans la section "À propos")</span>
@@ -437,8 +411,7 @@ export default function WebsiteGenerator({
               placeholder="Décrivez votre club, vos activités, votre philosophie en détail..."
             />
           </div>
-          {/* ✅ AJOUTER CETTE SECTION COMPLÈTE */}
-          {/* Téléphone */}
+
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Numéro de téléphone <span className="text-xs text-gray-500">(Optionnel)</span>
@@ -452,7 +425,6 @@ export default function WebsiteGenerator({
             />
           </div>
 
-          {/* Horaires multiples */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium dark-text-muted">
@@ -491,7 +463,6 @@ export default function WebsiteGenerator({
             </div>
           </div>
 
-          {/* Lieux multiples */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium dark-text-muted">
@@ -530,7 +501,6 @@ export default function WebsiteGenerator({
             </div>
           </div>
 
-          {/* Tarifs multiples */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium dark-text-muted">
@@ -569,7 +539,78 @@ export default function WebsiteGenerator({
             </div>
           </div>
 
-          {/* Couleur thème */}
+          {/* ✅ NOUVELLE SECTION : Documents */}
+          <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
+            <div className="flex items-start gap-3 mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  📄 Comment ajouter des documents à télécharger ?
+                </h3>
+                <div className="text-xs text-blue-800 dark:text-blue-200 space-y-2">
+                  <p>
+                    Vous pouvez proposer des documents (formulaires, fiches médicales, règlement, etc.) en téléchargement sur votre site.
+                  </p>
+                  <p className="font-medium">📤 Étapes :</p>
+                  <ol className="list-decimal list-inside space-y-1 ml-2">
+                    <li>Uploadez votre document sur <strong>Google Drive</strong>, <strong>Dropbox</strong> ou <strong>OneDrive</strong></li>
+                    <li>Cliquez sur "Partager" et configurez en <strong>"Tous les utilisateurs avec le lien"</strong></li>
+                    <li>Copiez le lien partagé et collez-le ci-dessous</li>
+                  </ol>
+                  <p className="text-blue-700 dark:text-blue-300 font-medium mt-2">
+                    💡 Nous n'hébergeons pas vos fichiers - ils restent sur votre espace cloud !
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-medium dark-text-muted">
+                Documents à télécharger <span className="text-xs text-gray-500">(Optionnel)</span>
+              </label>
+              <button
+                type="button"
+                onClick={addDocument}
+                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter un document
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {documents.map((doc, index) => (
+                <div key={index} className="flex items-start gap-2 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <div className="flex-1 space-y-3">
+                    <input
+                      type="text"
+                      value={doc.name}
+                      onChange={(e) => updateDocument(index, 'name', e.target.value)}
+                      className="dark-input w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
+                      placeholder="Nom du document (ex: Formulaire d'inscription 2025)"
+                    />
+                    <input
+                      type="url"
+                      value={doc.url}
+                      onChange={(e) => updateDocument(index, 'url', e.target.value)}
+                      className="dark-input w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
+                      placeholder="Lien du document (ex: https://drive.google.com/file/d/.../view)"
+                    />
+                  </div>
+                  {documents.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeDocument(index)}
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium dark-text-muted mb-2">
               Couleur du thème
@@ -586,7 +627,6 @@ export default function WebsiteGenerator({
             </div>
           </div>
 
-          {/* Bouton de génération */}
           <div className="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-600">
             <button
               type="submit"
