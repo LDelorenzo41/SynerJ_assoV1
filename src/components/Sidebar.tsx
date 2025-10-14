@@ -1,6 +1,7 @@
 // ============================================
 // SIDEBAR AVEC INTÉGRATION NOTIFICATIONS ET LIEN MAILING
 // Version avec support Sponsor et lien "Mon Profil"
+// Version STICKY - La sidebar reste en haut lors du scroll
 // ============================================
 
 import React from 'react';
@@ -113,11 +114,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
       
-      {/* Sidebar */}
+      {/* Sidebar - STICKY sur desktop */}
       <div className={`
         fixed left-0 top-0 h-full dark-bg-secondary border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 ease-in-out
         ${isOpen ? 'w-64' : 'w-16'}
-        lg:relative lg:z-auto
+        lg:sticky lg:top-0 lg:h-screen lg:z-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         
@@ -228,9 +229,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </Link>
               );
             })}
-
-            {/* ============================================ */}
-            
 
             {/* ============================================ */}
             {/* LIEN MAILING */}
