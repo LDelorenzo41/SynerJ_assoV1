@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase';
 import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X, ExternalLink } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 import WelcomeModal from '../components/WelcomeModal';
+import PlanUpgrade from '../components/PlanUpgrade';
+import { usePlanLimit } from '../hooks/usePlanLimit';
 
 // Helper pour gérer les URLs de sites web (externes ou internes)
 const getWebsiteUrl = (websiteUrl: string | null | undefined): string | null => {
@@ -62,7 +64,7 @@ interface UpcomingEvent {
 
 export default function Dashboard() {
   const { profile, isSuperAdmin, isClubAdmin, updateProfile } = useAuthNew();
-  const _location = useLocation();
+  
   const [associationInfo, setAssociationInfo] = useState<AssociationInfo | null>(null);
   const [clubInfo, setClubInfo] = useState<ClubInfo | null>(null);
   const [followedClubs, setFollowedClubs] = useState<FollowedClub[]>([]);
@@ -86,6 +88,10 @@ export default function Dashboard() {
   });
 
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  // Hook pour surveiller la limite de clubs (Super Admin uniquement)
+const { planLimitData, loading: planLoading } = usePlanLimit(
+  isSuperAdmin ? profile?.association_id || null : null
+);
 
   useEffect(() => {
     if (profile && profile.first_login_completed === false) {
@@ -894,15 +900,25 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {showWelcomeModal && profile && (
-        <WelcomeModal
-          userFirstName={profile.first_name}
-          onClose={handleCloseWelcomeModal}
-        />
-      )}
+  <div className="space-y-6 sm:space-y-8">
+    {showWelcomeModal && profile && (
+      <WelcomeModal
+        userFirstName={profile.first_name}
+        onClose={handleCloseWelcomeModal}
+      />
+    )}
 
-      <div className="dark-card overflow-hidden shadow-sm rounded-lg">
+    {/* Système de détection de limite de clubs pour Super Admin */}
+    {isSuperAdmin && planLimitData && !planLoading && (
+      <PlanUpgrade
+        currentPlan={planLimitData.currentPlan}
+        currentClubCount={planLimitData.currentClubCount}
+        associationId={profile?.association_id || ''}
+        onUpgrade={() => window.location.reload()}
+      />
+    )}
+
+    <div className="dark-card overflow-hidden shadow-sm rounded-lg">
         {associationInfo && (
           <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
             <div className="flex items-center space-x-3 sm:space-x-4">
