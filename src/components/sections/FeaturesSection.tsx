@@ -10,7 +10,7 @@ export default function FeaturesSection() {
             Tout ce dont vous avez besoin
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            SynerJ simplifie la gestion de vos organisations avec des outils puissants et intuitifs
+            SynerJ simplifie la gestion de la communication de vos organisations avec des outils puissants et intuitifs
           </p>
         </div>
 
