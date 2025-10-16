@@ -11,12 +11,13 @@ import {
   Crown,
   Star,
   Building2,
-  Zap
+  Zap,
+  Sparkles
 } from 'lucide-react';
 import ProfilePictureUpload from './ProfilePictureUpload';
 import { NotificationService } from '../services/notificationService';
 
-type FormType = 'association' | 'club' | 'user' | null;
+type FormType = 'association' | 'club' | 'user' | 'custom-plan' | null;
 type SubscriptionPlan = '1-4' | '5-10' | '11-15' | '16-25' | '25+';
 
 interface AssociationForm {
@@ -30,88 +31,82 @@ interface AssociationForm {
   password: string;
 }
 
-interface ClubForm {
+interface CustomPlanRequest {
   name: string;
+  city: string;
+  email: string;
+  phone: string;
   description: string;
-  club_email: string;
-  contact_email: string;
-  website_url?: string;
-  association_code: string;
-  logo_url: string;
-  password: string;
+  estimated_clubs: string;
+  specific_needs: string;
 }
 
-interface UserForm {
-  first_name: string;
-  last_name: string;
-  pseudo: string;
-  email: string;
-  password: string;
-  club_code: string;
-  avatar_url: string;
-  email_consents: {
-    clubs: boolean;
-    association: boolean;
-    municipality: boolean;
-    sponsors: boolean;
-  };
-}
+// Fonctionnalités communes à tous les plans
+const COMMON_FEATURES = [
+  'Gestion des événements (IA disponible)',
+  'Gestion des communications (IA disponible)',
+  'Accès sponsors et campagne de mailing',
+  'Système de réservation de matériel mutualisé',
+  'Support 7/7',
+  'Création page web de club'
+];
 
 const SUBSCRIPTION_PLANS = [
   {
     id: '1-4' as SubscriptionPlan,
-    name: 'Starter',
+    name: 'Essentiel',
     description: '1 à 4 clubs',
     price: '29€',
     period: '/mois',
-    features: ['Jusqu\'à 4 clubs', 'Gestion des événements', 'Support email', 'Tableau de bord basique'],
+    features: ['1 à 4 clubs', ...COMMON_FEATURES],
     icon: Building2,
-    color: 'from-green-400 to-green-600',
+    color: 'from-blue-400 to-blue-600',
     popular: false
   },
   {
     id: '5-10' as SubscriptionPlan,
-    name: 'Growth',
+    name: 'Standard',
     description: '5 à 10 clubs',
     price: '59€',
     period: '/mois',
-    features: ['Jusqu\'à 10 clubs', 'Analytics avancées', 'Support prioritaire', 'Personnalisation'],
+    features: ['5 à 10 clubs', ...COMMON_FEATURES],
     icon: Star,
-    color: 'from-blue-400 to-blue-600',
-    popular: true
+    color: 'from-green-400 to-green-600',
+    popular: false
   },
   {
     id: '11-15' as SubscriptionPlan,
-    name: 'Professional',
+    name: 'Avancé',
     description: '11 à 15 clubs',
     price: '89€',
     period: '/mois',
-    features: ['Jusqu\'à 15 clubs', 'API complète', 'Support dédié', 'Intégrations avancées'],
+    features: ['11 à 15 clubs', ...COMMON_FEATURES],
     icon: Crown,
     color: 'from-purple-400 to-purple-600',
     popular: false
   },
   {
     id: '16-25' as SubscriptionPlan,
-    name: 'Enterprise',
+    name: 'Premium',
     description: '16 à 25 clubs',
-    price: '149€',
+    price: '129€',
     period: '/mois',
-    features: ['Jusqu\'à 25 clubs', 'Support 24/7', 'Formation personnalisée', 'SLA garanti'],
-    icon: Building,
+    features: ['16 à 25 clubs', ...COMMON_FEATURES],
+    icon: Zap,
     color: 'from-orange-400 to-orange-600',
     popular: false
   },
   {
     id: '25+' as SubscriptionPlan,
-    name: 'Ultimate',
+    name: 'Sur mesure',
     description: 'Plus de 25 clubs',
-    price: 'Sur mesure',
+    price: 'Contact',
     period: '',
-    features: ['Clubs illimités', 'Solutions sur mesure', 'Account manager dédié', 'Infrastructure dédiée'],
-    icon: Zap,
-    color: 'from-red-400 to-red-600',
-    popular: false
+    features: ['Plus de 25 clubs', ...COMMON_FEATURES, 'Account manager dédié', 'Solutions personnalisées'],
+    icon: Sparkles,
+    color: 'from-pink-400 to-pink-600',
+    popular: false,
+    isCustom: true
   }
 ];
 
@@ -126,6 +121,22 @@ export default function RegistrationForms() {
     loading: false,
     valid: null,
     clubName: ''
+  });
+  
+  const [associationValidation, setAssociationValidation] = useState<{
+    loading: boolean, 
+    valid: boolean | null, 
+    associationName: string,
+    currentClubs: number,
+    maxClubs: number,
+    canAddClub: boolean
+  }>({
+    loading: false,
+    valid: null,
+    associationName: '',
+    currentClubs: 0,
+    maxClubs: 0,
+    canAddClub: true
   });
 
   const [pseudoAvailable, setPseudoAvailable] = useState<boolean | null>(null);
@@ -145,7 +156,17 @@ export default function RegistrationForms() {
     password: '',
   });
 
-  const [clubForm, setClubForm] = useState<ClubForm>({
+  const [customPlanForm, setCustomPlanForm] = useState<CustomPlanRequest>({
+    name: '',
+    city: '',
+    email: '',
+    phone: '',
+    description: '',
+    estimated_clubs: '',
+    specific_needs: ''
+  });
+
+  const [clubForm, setClubForm] = useState({
     name: '',
     description: '',
     club_email: '',
@@ -156,7 +177,7 @@ export default function RegistrationForms() {
     password: '',
   });
 
-  const [userForm, setUserForm] = useState<UserForm>({
+  const [userForm, setUserForm] = useState({
     first_name: '',
     last_name: '',
     pseudo: '',
@@ -171,6 +192,105 @@ export default function RegistrationForms() {
       sponsors: false
     }
   });
+
+  // Gérer le clic sur un plan
+  const handlePlanSelect = (planId: SubscriptionPlan) => {
+    const selectedPlan = SUBSCRIPTION_PLANS.find(p => p.id === planId);
+    
+    if (selectedPlan?.isCustom) {
+      // Pour le plan Sur mesure, afficher le formulaire de demande de devis
+      setActiveForm('custom-plan');
+    } else {
+      // Pour les autres plans, sélectionner normalement
+      setAssociationForm({ ...associationForm, subscription_plan: planId });
+    }
+  };
+
+  // Soumettre une demande de plan sur mesure
+  // Soumettre une demande de plan sur mesure
+  const handleCustomPlanRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      // 1. Enregistrer dans Supabase
+      const { error } = await supabase
+        .from('custom_plan_requests')
+        .insert([{
+          name: customPlanForm.name,
+          city: customPlanForm.city,
+          email: customPlanForm.email,
+          phone: customPlanForm.phone,
+          estimated_clubs: customPlanForm.estimated_clubs,
+          description: customPlanForm.description,
+          specific_needs: customPlanForm.specific_needs,
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+      
+      // 2. Préparer l'email avec les infos du formulaire
+      const subject = encodeURIComponent('Demande de plan sur mesure - SynerJ');
+      const body = encodeURIComponent(`Bonjour,
+
+Je souhaite obtenir un devis pour un plan sur mesure pour ma structure.
+
+=== INFORMATIONS DE LA STRUCTURE ===
+
+Nom de la structure : ${customPlanForm.name}
+Ville : ${customPlanForm.city || 'Non renseignée'}
+Email : ${customPlanForm.email}
+Téléphone : ${customPlanForm.phone}
+
+=== BESOIN ===
+
+Nombre de clubs estimé : ${customPlanForm.estimated_clubs}
+
+Description de la structure :
+${customPlanForm.description || 'Non renseignée'}
+
+Besoins spécifiques :
+${customPlanForm.specific_needs || 'Non renseignés'}
+
+---
+Merci de me recontacter pour établir un devis personnalisé.
+
+Cordialement,
+${customPlanForm.name}`);
+      
+      // 3. Ouvrir le client mail du prospect
+      window.location.href = `mailto:contact-synerj@teachtech.fr?subject=${subject}&body=${body}`;
+      
+      setMessage({
+        type: 'success',
+        text: 'Votre demande a été enregistrée ! Votre client mail s\'est ouvert avec les informations pré-remplies. Cliquez sur "Envoyer" pour finaliser votre demande.',
+      });
+
+      setCustomPlanForm({
+        name: '',
+        city: '',
+        email: '',
+        phone: '',
+        description: '',
+        estimated_clubs: '',
+        specific_needs: ''
+      });
+
+      setTimeout(() => {
+        setActiveForm(null);
+      }, 8000);
+
+    } catch (error: any) {
+      console.error('Erreur:', error);
+      setMessage({ 
+        type: 'error', 
+        text: 'Erreur lors de l\'enregistrement. Veuillez réessayer ou nous contacter directement à contact-synerj@teachtech.fr' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const uploadLogo = async (file: File, type: 'association' | 'club', entityId: string): Promise<string | null> => {
     try {
@@ -284,6 +404,103 @@ export default function RegistrationForms() {
       setCheckingPseudo(false);
       setPseudoAvailable(null);
     }
+  };
+
+  const validateAssociationCode = async (code: string) => {
+    if (!code || code.length < 8) {
+      setAssociationValidation({ 
+        loading: false, 
+        valid: null, 
+        associationName: '',
+        currentClubs: 0,
+        maxClubs: 0,
+        canAddClub: true
+      });
+      return;
+    }
+  
+    setAssociationValidation({ 
+      loading: true, 
+      valid: null, 
+      associationName: '',
+      currentClubs: 0,
+      maxClubs: 0,
+      canAddClub: true
+    });
+  
+    try {
+      const cleanCode = code.trim().toUpperCase();
+      
+      // Récupérer l'association
+      const { data: association, error: assocError } = await supabase
+        .from('associations')
+        .select('id, name, subscription_plan')
+        .eq('association_code', cleanCode)
+        .single();
+  
+      if (assocError || !association) {
+        setAssociationValidation({ 
+          loading: false, 
+          valid: false, 
+          associationName: '',
+          currentClubs: 0,
+          maxClubs: 0,
+          canAddClub: false
+        });
+        return;
+      }
+  
+      // Compter le nombre de clubs
+      const { count, error: countError } = await supabase
+        .from('clubs')
+        .select('*', { count: 'exact', head: true })
+        .eq('association_id', association.id);
+  
+      if (countError) throw countError;
+  
+      // Déterminer la limite selon le plan
+      const planLimits: Record<string, number> = {
+        '1-4': 4,
+        '5-10': 10,
+        '11-15': 15,
+        '16-25': 25,
+        '25+': 999
+      };
+  
+      const currentClubs = count || 0;
+      const maxClubs = planLimits[association.subscription_plan] || 0;
+      const canAddClub = currentClubs < maxClubs;
+  
+      setAssociationValidation({
+        loading: false,
+        valid: true,
+        associationName: association.name,
+        currentClubs,
+        maxClubs,
+        canAddClub
+      });
+  
+    } catch (err) {
+      console.error('Erreur validation association:', err);
+      setAssociationValidation({ 
+        loading: false, 
+        valid: false, 
+        associationName: '',
+        currentClubs: 0,
+        maxClubs: 0,
+        canAddClub: false
+      });
+    }
+  };
+
+  const handleAssociationCodeChange = (code: string) => {
+    setClubForm({ ...clubForm, association_code: code });
+    
+    const timeoutId = setTimeout(() => {
+      validateAssociationCode(code);
+    }, 500);
+  
+    return () => clearTimeout(timeoutId);
   };
 
   const handleClubCodeChange = (code: string) => {
@@ -1300,17 +1517,9 @@ export default function RegistrationForms() {
                           associationForm.subscription_plan === plan.id
                             ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
                             : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                        } ${plan.popular ? 'ring-2 ring-blue-200' : ''}`}
-                        onClick={() => setAssociationForm({ ...associationForm, subscription_plan: plan.id })}
+                        }`}
+                        onClick={() => handlePlanSelect(plan.id)}
                       >
-                        {plan.popular && (
-                          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                            <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                              Populaire
-                            </span>
-                          </div>
-                        )}
-                        
                         <div className="text-center">
                           <div className={`mx-auto w-12 h-12 bg-gradient-to-r ${plan.color} rounded-xl flex items-center justify-center mb-4`}>
                             <Icon className="h-6 w-6 text-white" />
@@ -1324,24 +1533,26 @@ export default function RegistrationForms() {
                             <span className="text-sm text-gray-500">{plan.period}</span>
                           </div>
                           
-                          <ul className="space-y-2 text-sm text-gray-600">
+                          <ul className="space-y-2 text-sm text-gray-600 text-left">
                             {plan.features.map((feature, index) => (
-                              <li key={index} className="flex items-center">
-                                <Check className="h-4 w-4 text-green-500 mr-2" />
-                                {feature}
+                              <li key={index} className="flex items-start">
+                                <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                <span>{feature}</span>
                               </li>
                             ))}
                           </ul>
                         </div>
                         
-                        <input
-                          type="radio"
-                          name="subscription_plan"
-                          value={plan.id}
-                          checked={associationForm.subscription_plan === plan.id}
-                          onChange={() => setAssociationForm({ ...associationForm, subscription_plan: plan.id })}
-                          className="sr-only"
-                        />
+                        {!plan.isCustom && (
+                          <input
+                            type="radio"
+                            name="subscription_plan"
+                            value={plan.id}
+                            checked={associationForm.subscription_plan === plan.id}
+                            onChange={() => setAssociationForm({ ...associationForm, subscription_plan: plan.id })}
+                            className="sr-only"
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -1362,6 +1573,144 @@ export default function RegistrationForms() {
                   className="flex-1 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
                   {loading ? 'Création...' : 'Créer la Structure'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Custom Plan Request Form */}
+        {activeForm === 'custom-plan' && (
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+            <div className="text-center mb-8">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center mb-4">
+                <Sparkles className="h-8 w-8 text-pink-600" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Plan Sur Mesure</h2>
+              <p className="text-gray-600">Recevez une offre personnalisée adaptée à vos besoins</p>
+            </div>
+            
+            <form onSubmit={handleCustomPlanRequest} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom de la Structure *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customPlanForm.name}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  placeholder="Nom de votre structure"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    value={customPlanForm.city}
+                    onChange={(e) => setCustomPlanForm({ ...customPlanForm, city: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    placeholder="Votre ville"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Téléphone *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={customPlanForm.phone}
+                    onChange={(e) => setCustomPlanForm({ ...customPlanForm, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    placeholder="01 23 45 67 89"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email de contact *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={customPlanForm.email}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  placeholder="contact@structure.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre de clubs estimé *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customPlanForm.estimated_clubs}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, estimated_clubs: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  placeholder="Ex: 30 clubs, 50+ clubs, etc."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description de votre structure
+                </label>
+                <textarea
+                  rows={3}
+                  value={customPlanForm.description}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  placeholder="Décrivez brièvement votre structure..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Besoins spécifiques
+                </label>
+                <textarea
+                  rows={4}
+                  value={customPlanForm.specific_needs}
+                  onChange={(e) => setCustomPlanForm({ ...customPlanForm, specific_needs: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  placeholder="Décrivez vos besoins particuliers : intégrations spécifiques, volumes de données, fonctionnalités personnalisées, etc."
+                />
+              </div>
+
+              <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-pink-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-pink-800">
+                    <p className="font-medium mb-1">Engagement personnalisé</p>
+                    <p>Notre équipe vous contactera sous 24-48h pour comprendre vos besoins et établir une offre sur mesure adaptée à votre structure.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveForm('association')}
+                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Retour aux plans
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 px-6 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Envoi...' : 'Demander un devis'}
                 </button>
               </div>
             </form>
@@ -1443,10 +1792,56 @@ export default function RegistrationForms() {
                   type="text"
                   required
                   value={clubForm.association_code}
-                  onChange={(e) => setClubForm({ ...clubForm, association_code: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  onChange={(e) => handleAssociationCodeChange(e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                    associationValidation.valid === true && associationValidation.canAddClub ? 'border-green-500' :
+                    associationValidation.valid === true && !associationValidation.canAddClub ? 'border-red-500' :
+                    associationValidation.valid === false ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="ASSOC-12345678"
                 />
+                  {/* Messages de validation */}
+                {associationValidation.loading && (
+                  <p className="mt-2 text-sm text-blue-600 flex items-center">
+                    <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
+                    Vérification du code...
+                  </p>
+                )}
+                
+                {associationValidation.valid === true && associationValidation.canAddClub && (
+                  <div className="mt-2">
+                    <p className="text-sm text-green-600 flex items-center">
+                      <Check className="w-4 h-4 mr-2" />
+                      Structure trouvée : {associationValidation.associationName}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      📊 {associationValidation.currentClubs}/{associationValidation.maxClubs} clubs utilisés
+                    </p>
+                  </div>
+                )}
+                
+                {associationValidation.valid === true && !associationValidation.canAddClub && (
+                  <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm text-red-700 flex items-center font-semibold">
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      Limite atteinte !
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      Cette structure a atteint sa limite de {associationValidation.maxClubs} clubs ({associationValidation.currentClubs}/{associationValidation.maxClubs}).
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      Le Super Admin doit upgrader son plan pour ajouter plus de clubs.
+                    </p>
+                  </div>
+                )}
+                
+                {associationValidation.valid === false && clubForm.association_code && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Code de structure invalide
+                  </p>
+                )}
+
                 <p className="mt-2 text-sm text-gray-500">
                   Demandez le code de structure au super admin de votre organisation
                 </p>
@@ -1502,10 +1897,12 @@ export default function RegistrationForms() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                  disabled={loading || (associationValidation.valid === true && !associationValidation.canAddClub)}
+                  className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {loading ? 'Création...' : 'Créer le Club'}
+                  {loading ? 'Création...' : 
+                  associationValidation.valid && !associationValidation.canAddClub ? '🚫 Limite atteinte' : 
+                  'Créer le Club'}
                 </button>
               </div>
             </form>
