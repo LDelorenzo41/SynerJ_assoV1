@@ -12,10 +12,13 @@ import {
   Star,
   Building2,
   Zap,
-  Sparkles
+  Sparkles,
+  Loader2 
 } from 'lucide-react';
 import ProfilePictureUpload from './ProfilePictureUpload';
 import { NotificationService } from '../services/notificationService';
+import { useCheckout } from '@/hooks/useCheckout';
+import { type PlanId } from '@/config/stripe';
 
 type FormType = 'association' | 'club' | 'user' | 'custom-plan' | null;
 type SubscriptionPlan = '1-4' | '5-10' | '11-15' | '16-25' | '25+';
@@ -116,6 +119,9 @@ export default function RegistrationForms() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const navigate = useNavigate();
 
+  // ✅ HOOK AJOUTÉ
+  const { createCheckoutSession, loading: checkoutLoading } = useCheckout();
+
   const [userStep, setUserStep] = useState(1);
   const [clubValidation, setClubValidation] = useState<{loading: boolean, valid: boolean | null, clubName: string}>({
     loading: false,
@@ -207,7 +213,6 @@ export default function RegistrationForms() {
   };
 
   // Soumettre une demande de plan sur mesure
-  // Soumettre une demande de plan sur mesure
   const handleCustomPlanRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -243,7 +248,7 @@ Ville : ${customPlanForm.city || 'Non renseignée'}
 Email : ${customPlanForm.email}
 Téléphone : ${customPlanForm.phone}
 
-=== BESOIN ===
+=== BESSOIN ===
 
 Nombre de clubs estimé : ${customPlanForm.estimated_clubs}
 
@@ -561,88 +566,101 @@ ${customPlanForm.name}`);
     }
   };
 
+  // 🎯 FONCTION MODIFIÉE
   const handleCreateAssociation = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!associationForm.name || !associationForm.email || !associationForm.password || !associationForm.city || !associationForm.subscription_plan) {
+        setMessage({ type: 'error', text: 'Veuillez remplir tous les champs obligatoires.' });
+        return;
+    }
+
     setLoading(true);
     setMessage(null);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: associationForm.email,
-        password: associationForm.password,
-        options: {
-          data: {
-            first_name: 'Super',
-            last_name: 'Admin'
-          }
-        }
-      });
+        // 1. Créer le compte utilisateur
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: associationForm.email,
+            password: associationForm.password,
+            options: {
+                data: {
+                    first_name: 'Super',
+                    last_name: 'Admin'
+                }
+            }
+        });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Impossible de créer l\'utilisateur Super Admin.');
+        if (authError) throw authError;
+        if (!authData.user) throw new Error('Erreur lors de la création du compte');
+        const userId = authData.user.id;
 
-      const userId = authData.user.id;
-
-      const { data: association, error: assocError } = await supabase
-        .from('associations')
-        .insert([{
-          name: associationForm.name,
-          city: associationForm.city,
-          email: associationForm.email,
-          phone: associationForm.phone,
-          description: associationForm.description,
-          subscription_plan: associationForm.subscription_plan,
-          logo_url: null
-        }])
-        .select()
-        .single();
-
-      if (assocError) throw assocError;
-
-      if (associationLogo) {
-        const logoUrl = await uploadLogo(associationLogo, 'association', association.id);
-        if (logoUrl) {
-          const { error: updateError } = await supabase
+        // 2. Créer l'association dans la base de données
+        const { data: association, error: dbError } = await supabase
             .from('associations')
-            .update({ logo_url: logoUrl })
-            .eq('id', association.id);
-            
-          if (updateError) console.error('Erreur mise à jour logo URL:', updateError);
+            .insert({
+                name: associationForm.name,
+                city: associationForm.city,
+                email: associationForm.email,
+                phone: associationForm.phone,
+                description: associationForm.description,
+                subscription_plan: associationForm.subscription_plan,
+            })
+            .select()
+            .single();
+
+        if (dbError) throw dbError;
+        if (!association) throw new Error("Erreur lors de la création de l'association");
+
+        // 3. Gérer l'upload du logo (fonctionnalité conservée)
+        if (associationLogo) {
+            const logoUrl = await uploadLogo(associationLogo, 'association', association.id);
+            if (logoUrl) {
+                const { error: updateError } = await supabase
+                    .from('associations')
+                    .update({ logo_url: logoUrl })
+                    .eq('id', association.id);
+                if (updateError) console.error('Erreur mise à jour logo URL:', updateError);
+            }
         }
-      }
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: 'Super',
-          last_name: 'Admin',
-          role: 'Super Admin',
-          association_id: association.id,
-        })
-        .eq('id', userId);
+        // 4. Mettre à jour le profil utilisateur (fonctionnalité conservée)
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({
+                first_name: 'Super',
+                last_name: 'Admin',
+                role: 'Super Admin',
+                association_id: association.id,
+            })
+            .eq('id', userId);
 
-      if (profileError) throw profileError;
-      
-      setMessage({
-        type: 'success',
-        text: `Structure créée avec succès ! Un e-mail de confirmation a été envoyé à ${associationForm.email}. Veuillez valider votre compte avant de vous connecter.`,
-      });
+        if (profileError) throw profileError;
 
-      setAssociationForm({
-        name: '', city: '', email: '', phone: '', description: '',
-        subscription_plan: '5-10', logo_url: '', password: '',
-      });
-      setAssociationLogo(null);
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+        // 5. Si c'est le plan "Sur mesure", pas de paiement
+        if (associationForm.subscription_plan === '25+') {
+            setMessage({ type: 'success', text: 'Demande envoyée ! Nous vous contacterons rapidement.' });
+            navigate('/dashboard');
+            return;
+        }
+
+        // 6. Rediriger vers le paiement Stripe pour les autres plans
+        setMessage({ type: 'success', text: 'Compte créé ! Redirection vers le paiement...' });
+
+        await createCheckoutSession({
+            planId: associationForm.subscription_plan as PlanId,
+            associationId: association.id,
+            associationEmail: associationForm.email,
+        });
+        // La redirection vers Stripe Checkout est automatique
 
     } catch (error: any) {
-      console.error('Erreur création structure:', error);
-      setMessage({ type: 'error', text: error.message });
-    } finally {
-      setLoading(false);
+        console.error('Registration error:', error);
+        setMessage({
+            type: 'error',
+            text: error instanceof Error ? error.message : "Erreur lors de l'inscription"
+        });
+        setLoading(false);
     }
   };
 
@@ -1567,12 +1585,25 @@ ${customPlanForm.name}`);
                 >
                   Retour
                 </button>
+                {/* 🔘 BOUTON MODIFIÉ */}
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-1 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  disabled={loading || checkoutLoading}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Création...' : 'Créer la Structure'}
+                  {checkoutLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Redirection vers le paiement...
+                    </span>
+                  ) : loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Création du compte...
+                    </span>
+                  ) : (
+                    'Créer la Structure et payer'
+                  )}
                 </button>
               </div>
             </form>
