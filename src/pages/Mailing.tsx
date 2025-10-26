@@ -246,9 +246,10 @@ if (sponsorError || !sponsorData) {
       if (userRole === 'SuperAdmin') {
         // Super Admin : tous les membres ayant consenti (association)
         const { count } = await supabase
-          .from('profiles')
-          .select('id', { count: 'exact', head: true })
-          .eq('email_consent_association', true);
+  .from('profiles')
+  .select('id', { count: 'exact', head: true })
+  .eq('association_id', profile.association_id)  // ✅ Filtre par association
+  .eq('email_consent_association', true);
         
         directMembers = count || 0;
         supporters = 0;

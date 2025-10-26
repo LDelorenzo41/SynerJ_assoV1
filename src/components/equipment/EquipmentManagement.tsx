@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthNew } from '../../hooks/useAuthNew';
 import { useEquipmentManagement } from '../../hooks/useEquipment';
 import { AdvancedStatsTab } from './AdvancedStatsTab';
+import { RequestsTabPaginated } from './RequestsTabPaginated';
 import { 
   Plus,
   Minus, 
@@ -203,7 +204,7 @@ export default function EquipmentManagement() {
       )}
 
       {activeTab === 'requests' && (
-        <RequestsTab
+        <RequestsTabPaginated
           requests={requests}
           items={items}
           onApproveRequest={approveRequest}
