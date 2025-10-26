@@ -100,29 +100,55 @@ export function RequestsTabPaginated({
     try {
       setProcessingRequest(requestId);
       
-      // Supprimer d'abord les items de la demande
-      const { error: itemsError } = await supabase
+      console.log('🗑️ Début suppression de la demande:', requestId);
+      
+      // Étape 1 : Supprimer les items de la demande
+      console.log('📦 Suppression des request_items...');
+      const { data: deletedItems, error: itemsError } = await supabase
         .from('request_items')
         .delete()
-        .eq('reservation_request_id', requestId);
+        .eq('reservation_request_id', requestId)
+        .select();
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('❌ Erreur suppression items:', itemsError);
+        throw itemsError;
+      }
+      
+      console.log('✅ Items supprimés:', deletedItems?.length || 0);
 
-      // Ensuite supprimer la demande
-      const { error: requestError } = await supabase
+      // Étape 2 : Supprimer la demande elle-même
+      console.log('📋 Suppression de la reservation_request...');
+      const { data: deletedRequest, error: requestError } = await supabase
         .from('reservation_requests')
         .delete()
-        .eq('id', requestId);
+        .eq('id', requestId)
+        .select();
 
-      if (requestError) throw requestError;
+      if (requestError) {
+        console.error('❌ Erreur suppression demande:', requestError);
+        throw requestError;
+      }
+      
+      console.log('✅ Demande supprimée:', deletedRequest);
 
-      // Rafraîchir les données
-      refresh();
+      // Étape 3 : Vérification que la suppression a réussi
+      if (!deletedRequest || deletedRequest.length === 0) {
+        throw new Error('La demande n\'a pas pu être supprimée. Vérifiez vos permissions.');
+      }
+
+      // Fermer la modale
       setDeletingRequest(null);
+      
+      // Rafraîchir les données
+      console.log('🔄 Rafraîchissement des données...');
+      refresh();
+      
+      console.log('✅ Suppression terminée avec succès');
 
     } catch (error: any) {
-      console.error('Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression de la demande: ' + error.message);
+      console.error('❌ Erreur lors de la suppression:', error);
+      alert(`Erreur lors de la suppression de la demande:\n\n${error.message}\n\nVérifiez vos permissions dans Supabase.`);
     } finally {
       setProcessingRequest(null);
     }
@@ -643,13 +669,47 @@ export function RequestsTabPaginated({
               <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               Confirmer la suppression
             </h3>
-            <p className="dark-text-muted mb-6">
-              Êtes-vous sûr de vouloir supprimer cette demande de matériel ? Cette action est irréversible.
-            </p>
+            
+            <div className="space-y-3 mb-6">
+              <p className="dark-text font-medium">
+                Êtes-vous sûr de vouloir supprimer cette demande de matériel ?
+              </p>
+              
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-2">
+                  ⚠️ Attention : Cette action est irréversible !
+                </p>
+                <ul className="text-sm text-red-600 dark:text-red-400 space-y-1 list-disc list-inside">
+                  <li>La demande sera <strong>définitivement supprimée</strong></li>
+                  <li>Tous les items associés seront supprimés</li>
+                  <li>Cette demande <strong>disparaîtra des statistiques</strong></li>
+                  <li>L'historique de cette demande sera perdu</li>
+                </ul>
+              </div>
+              
+              {(() => {
+                const request = requests.find((r: any) => r.id === deletingRequest);
+                return request && (
+                  <div className="bg-gray-50 dark:bg-slate-700/50 rounded-md p-3">
+                    <p className="text-sm dark-text-muted">
+                      <strong>Demande :</strong> {request.event_name}
+                    </p>
+                    <p className="text-sm dark-text-muted">
+                      <strong>Club :</strong> {request.club?.name}
+                    </p>
+                    <p className="text-sm dark-text-muted">
+                      <strong>Statut :</strong> {STATUS_LABELS.request[request.status as keyof typeof STATUS_LABELS.request]}
+                    </p>
+                  </div>
+                );
+              })()}
+            </div>
+            
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setDeletingRequest(null)}
-                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
+                disabled={processingRequest === deletingRequest}
+                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50"
               >
                 Annuler
               </button>
@@ -659,7 +719,7 @@ export function RequestsTabPaginated({
                 className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 rounded-md flex items-center gap-2"
               >
                 <Trash2 className="h-4 w-4" />
-                {processingRequest === deletingRequest ? 'Suppression...' : 'Supprimer'}
+                {processingRequest === deletingRequest ? 'Suppression...' : 'Oui, supprimer définitivement'}
               </button>
             </div>
           </div>
