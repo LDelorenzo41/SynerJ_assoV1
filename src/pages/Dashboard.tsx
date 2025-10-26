@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X, ExternalLink } from 'lucide-react';
+import { Calendar, Users, Building, Search, Eye, AlertCircle, MessageCircle, ArrowRight, CalendarDays, Clock, MapPin, ChevronRight, UserPlus, Check, X, ExternalLink, CreditCard } from 'lucide-react';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 import WelcomeModal from '../components/WelcomeModal';
 import PlanUpgrade from '../components/PlanUpgrade';
 import { usePlanLimit } from '../hooks/usePlanLimit';
+import { useCustomerPortal } from '../hooks/useCustomerPortal';
 
 // Helper pour gérer les URLs de sites web (externes ou internes)
 const getWebsiteUrl = (websiteUrl: string | null | undefined): string | null => {
@@ -92,6 +93,7 @@ export default function Dashboard() {
 const { planLimitData, loading: planLoading } = usePlanLimit(
   isSuperAdmin ? profile?.association_id || null : null
 );
+const { redirectToPortal, loading: portalLoading, error: portalError } = useCustomerPortal();
 
   useEffect(() => {
     if (profile && profile.first_login_completed === false) {
@@ -872,30 +874,68 @@ const { planLimitData, loading: planLoading } = usePlanLimit(
     );
   }
 
-  const QuickActionLink = ({ to, icon: Icon, title, subtitle, colorClass }: { to: string, icon: React.ElementType, title: string, subtitle: string, colorClass: string }) => {
+  interface QuickActionLinkProps {
+    to?: string;
+    onClick?: () => void;
+    icon: React.ElementType;
+    title: string;
+    subtitle: string;
+    colorClass: string;
+    loading?: boolean;
+  }
+  
+  const QuickActionLink: React.FC<QuickActionLinkProps> = ({ 
+    to, 
+    onClick,
+    icon: Icon, 
+    title, 
+    subtitle, 
+    colorClass,
+    loading = false
+  }) => {
     const colors: { [key: string]: { bg: string, iconBg: string, text: string } } = {
-        blue: { bg: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30', iconBg: 'bg-blue-600', text: 'text-blue-800 dark:text-blue-200' },
-        green: { bg: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30', iconBg: 'bg-green-600', text: 'text-green-800 dark:text-green-200' },
-        teal: { bg: 'bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30', iconBg: 'bg-teal-600', text: 'text-teal-800 dark:text-teal-200' },
-        indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30', iconBg: 'bg-indigo-600', text: 'text-indigo-800 dark:text-indigo-200' },
-        purple: { bg: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30', iconBg: 'bg-purple-600', text: 'text-purple-800 dark:text-purple-200' },
-        yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30', iconBg: 'bg-yellow-600', text: 'text-yellow-800 dark:text-yellow-200' },
-        orange: { bg: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30', iconBg: 'bg-orange-600', text: 'text-orange-800 dark:text-orange-200' },
+      blue: { bg: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30', iconBg: 'bg-blue-600', text: 'text-blue-800 dark:text-blue-200' },
+      green: { bg: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30', iconBg: 'bg-green-600', text: 'text-green-800 dark:text-green-200' },
+      teal: { bg: 'bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30', iconBg: 'bg-teal-600', text: 'text-teal-800 dark:text-teal-200' },
+      indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30', iconBg: 'bg-indigo-600', text: 'text-indigo-800 dark:text-indigo-200' },
+      purple: { bg: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30', iconBg: 'bg-purple-600', text: 'text-purple-800 dark:text-purple-200' },
+      yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30', iconBg: 'bg-yellow-600', text: 'text-yellow-800 dark:text-yellow-200' },
+      orange: { bg: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30', iconBg: 'bg-orange-600', text: 'text-orange-800 dark:text-orange-200' },
     };
     const c = colors[colorClass] || colors.blue;
-
+  
+    const content = (
+      <div className="flex items-center space-x-3">
+        <div className={`p-2 ${c.iconBg} rounded-lg flex-shrink-0`}>
+          {loading ? (
+            <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-2 border-white border-t-transparent" />
+          ) : (
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold dark-text text-sm sm:text-base">{title}</p>
+          <p className="text-xs sm:text-sm dark-text-muted truncate">{subtitle}</p>
+        </div>
+      </div>
+    );
+  
+    if (onClick) {
+      return (
+        <button
+          onClick={onClick}
+          disabled={loading}
+          className={`${c.bg} p-3 sm:p-4 rounded-lg transition-colors group w-full text-left disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {content}
+        </button>
+      );
+    }
+  
     return (
-        <Link to={to} className={`${c.bg} p-3 sm:p-4 rounded-lg transition-colors group`}>
-            <div className="flex items-center space-x-3">
-                <div className={`p-2 ${c.iconBg} rounded-lg flex-shrink-0`}>
-                    <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                </div>
-                <div className="min-w-0 flex-1">
-                    <p className={`font-semibold dark-text text-sm sm:text-base`}>{title}</p>
-                    <p className="text-xs sm:text-sm dark-text-muted truncate">{subtitle}</p>
-                </div>
-            </div>
-        </Link>
+      <Link to={to || '#'} className={`${c.bg} p-3 sm:p-4 rounded-lg transition-colors group`}>
+        {content}
+      </Link>
     );
   };
 
@@ -916,6 +956,22 @@ const { planLimitData, loading: planLoading } = usePlanLimit(
         associationId={profile?.association_id || ''}
         onUpgrade={() => window.location.reload()}
       />
+    )}
+
+    {portalError && (
+      <div className="dark-card p-4 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 rounded">
+        <div className="flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+          <div>
+            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+              Erreur d'accès au portail
+            </h3>
+            <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+              {portalError}
+            </p>
+          </div>
+        </div>
+      </div>
     )}
 
     <div className="dark-card overflow-hidden shadow-sm rounded-lg">
@@ -1022,6 +1078,14 @@ const { planLimitData, loading: planLoading } = usePlanLimit(
                 <QuickActionLink to="/associations" icon={Building} title="Structure" subtitle="Gérer la structure" colorClass="blue" />
                 <QuickActionLink to="/clubs" icon={Users} title="Clubs" subtitle="Gérer les clubs" colorClass="green" />
                 <QuickActionLink to="/communications" icon={MessageCircle} title="Communications" subtitle="Gérer les communications" colorClass="teal" />
+                <QuickActionLink 
+                  onClick={redirectToPortal}
+                  icon={CreditCard}
+                  title="Mon Abonnement" 
+                  subtitle="Gérer facturation et plan" 
+                  colorClass="purple"
+                  loading={portalLoading}
+                />
               </>
             )}
 
