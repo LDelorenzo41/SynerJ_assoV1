@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthNew } from '../hooks/useAuthNew';
 import { supabase } from '../lib/supabase';
-import { Building, Edit, Save, X, Users, Mail, Phone, MapPin, Calendar, Copy, Check, ExternalLink, Globe } from 'lucide-react';
+import { Building, Edit, Save, X, Users, Mail, Phone, MapPin, Calendar, Copy, Check, ExternalLink, Globe, Trash2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Database } from '../lib/supabase';
+import { ClubService } from '../services/clubService';
 
 type Association = Database['public']['Tables']['associations']['Row'];
 type Club = Database['public']['Tables']['clubs']['Row'];
@@ -26,6 +27,19 @@ export default function Associations() {
     email: '',
     phone: '',
     description: '',
+  });
+
+  // États pour la suppression de club
+  const [deleteModal, setDeleteModal] = useState<{
+    show: boolean;
+    club: Club | null;
+    info: { clubName: string; memberCount: number; eventCount: number } | null;
+    loading: boolean;
+  }>({
+    show: false,
+    club: null,
+    info: null,
+    loading: false,
   });
 
   useEffect(() => {
@@ -113,6 +127,53 @@ export default function Associations() {
       navigator.clipboard.writeText(association.association_code);
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
+
+  // Ouvrir la modal de confirmation de suppression
+  const openDeleteModal = async (club: Club) => {
+    try {
+      setDeleteModal({ show: true, club, info: null, loading: true });
+      
+      // Récupérer les infos du club pour afficher dans la modal
+      const info = await ClubService.getClubDeletionInfo(club.id);
+      
+      setDeleteModal(prev => ({ ...prev, info, loading: false }));
+    } catch (error: any) {
+      console.error('Error fetching club info:', error);
+      alert('Erreur lors de la récupération des informations du club');
+      setDeleteModal({ show: false, club: null, info: null, loading: false });
+    }
+  };
+
+  // Fermer la modal
+  const closeDeleteModal = () => {
+    setDeleteModal({ show: false, club: null, info: null, loading: false });
+  };
+
+  // Supprimer le club
+  const handleDeleteClub = async () => {
+    if (!deleteModal.club) return;
+
+    try {
+      setDeleteModal(prev => ({ ...prev, loading: true }));
+
+      // Appeler le service de suppression
+      await ClubService.deleteClub(deleteModal.club.id);
+
+      // Rafraîchir les données
+      await fetchAssociationData();
+      await fetchStats();
+
+      // Fermer la modal
+      closeDeleteModal();
+
+      // Message de succès
+      alert('Club supprimé avec succès. Les membres ont été convertis en Supporters.');
+    } catch (error: any) {
+      console.error('Error deleting club:', error);
+      alert('Erreur lors de la suppression du club: ' + error.message);
+      setDeleteModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -408,46 +469,56 @@ export default function Associations() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {clubs.map((club) => (
                 <div key={club.id} className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {club.logo_url ? (
-                        <img src={club.logo_url} alt={club.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Building className="h-6 w-6 text-green-600 dark:text-green-400" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold dark-text truncate">{club.name}</h3>
-                      <div className="mt-2 space-y-1">
-                        <p className="text-xs dark-text-muted flex items-center">
-                          <Mail className="h-3 w-3 mr-1" />
-                          {club.club_email}
-                        </p>
-                        <p className="text-xs font-mono text-green-600 dark:text-green-400 flex items-center">
-                          <Building className="h-3 w-3 mr-1" />
-                          {club.club_code}
-                        </p>
-                        <p className="text-xs dark-text-muted flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {new Date(club.created_at).toLocaleDateString('fr-FR')}
-                        </p>
-                        {club.website_url && (
-                          <a 
-                            href={club.website_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center hover:underline"
-                          >
-                            <Globe className="h-3 w-3 mr-1" />
-                            Site web
-                            <ExternalLink className="h-2.5 w-2.5 ml-1" />
-                          </a>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-3 flex-1 min-w-0 mr-2">
+                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {club.logo_url ? (
+                          <img src={club.logo_url} alt={club.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Building className="h-6 w-6 text-green-600 dark:text-green-400" />
                         )}
                       </div>
-                      {club.description && (
-                        <p className="text-xs dark-text-muted mt-2 line-clamp-2">{club.description}</p>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold dark-text truncate">{club.name}</h3>
+                        
+                        <div className="mt-2 space-y-1">
+                          <p className="text-xs dark-text-muted flex items-center">
+                            <Mail className="h-3 w-3 mr-1" />
+                            {club.club_email}
+                          </p>
+                          <p className="text-xs font-mono text-green-600 dark:text-green-400 flex items-center">
+                            <Building className="h-3 w-3 mr-1" />
+                            {club.club_code}
+                          </p>
+                          <p className="text-xs dark-text-muted flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {new Date(club.created_at).toLocaleDateString('fr-FR')}
+                          </p>
+                          {club.website_url && (
+                            <a 
+                              href={club.website_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center hover:underline"
+                            >
+                              <Globe className="h-3 w-3 mr-1" />
+                              Site web
+                              <ExternalLink className="h-2.5 w-2.5 ml-1" />
+                            </a>
+                          )}
+                        </div>
+                        {club.description && (
+                          <p className="text-xs dark-text-muted mt-2 line-clamp-2">{club.description}</p>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => openDeleteModal(club)}
+                      className="p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30 rounded-lg transition-colors flex-shrink-0"
+                      title="Supprimer le club"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -455,6 +526,65 @@ export default function Associations() {
           )}
         </div>
       </div>
+
+      {/* Modal de confirmation de suppression */}
+      {deleteModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6 shadow-xl">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold dark-text">Confirmer la suppression</h3>
+            </div>
+
+            {deleteModal.loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 dark:border-red-400"></div>
+              </div>
+            ) : (
+              <>
+                <div className="mb-6 space-y-3">
+                  <p className="dark-text">
+                    Êtes-vous sûr de vouloir supprimer le club <span className="font-semibold">{deleteModal.info?.clubName}</span> ?
+                  </p>
+                  
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
+                    <p className="text-sm dark-text-muted mb-2">
+                      <strong>Cette action va :</strong>
+                    </p>
+                    <ul className="text-sm dark-text-muted space-y-1 list-disc list-inside">
+                      <li>Supprimer définitivement le club</li>
+                      <li>Supprimer tous les événements du club ({deleteModal.info?.eventCount || 0})</li>
+                      <li>Convertir {deleteModal.info?.memberCount || 0} membre(s) en <strong>Supporters</strong></li>
+                      <li>Les membres pourront toujours suivre d'autres clubs</li>
+                    </ul>
+                  </div>
+
+                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                    ⚠️ Cette action est irréversible
+                  </p>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={closeDeleteModal}
+                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 dark-text rounded-lg transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={handleDeleteClub}
+                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white rounded-lg transition-colors font-medium"
+                  >
+                    Supprimer le club
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
