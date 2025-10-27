@@ -80,6 +80,16 @@ export default function Login() {
                 </div>
               )}
 
+              {/* NOUVEAU : Lien mot de passe oublié */}
+              <div className="text-right">
+                <Link 
+                  to="/forgot-password" 
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
