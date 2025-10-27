@@ -33,6 +33,11 @@ import HelpCenter from './pages/legal/HelpCenter';
 import FAQ from './pages/legal/FAQ';
 import Documentation from './pages/legal/Documentation';
 
+// Import des pages d'invitation
+import ClubInvitations from './pages/ClubInvitations';
+import AcceptInvitation from './pages/AcceptInvitation';
+import UseInvitationLink from './pages/UseInvitationLink';
+
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
 
@@ -71,7 +76,7 @@ function App() {
           } 
         />
 
-        {/* NOUVEAU : Routes pour mot de passe oublié */}
+        {/* Routes pour mot de passe oublié */}
         <Route 
           path="/forgot-password" 
           element={
@@ -91,6 +96,20 @@ function App() {
         <Route 
           path="/club/:clubId/website" 
           element={<ClubWebsite />} 
+        />
+
+        {/* ============ INVITATIONS (Publiques, SANS Layout) ============ */}
+        
+        {/* Accepter une invitation par email */}
+        <Route 
+          path="/invitation/accept/:token" 
+          element={<AcceptInvitation />} 
+        />
+        
+        {/* Utiliser un lien d'invitation */}
+        <Route 
+          path="/invitation/link/:code" 
+          element={<UseInvitationLink />} 
         />
 
         {/* ============ PAGES LÉGALES (Publiques, SANS Layout ni Header) ============ */}
@@ -279,6 +298,20 @@ function App() {
             <Layout>
               <ProtectedRoute allowedRoles={['Super Admin', 'Club Admin', 'Sponsor']}>
                 <Mailing />
+              </ProtectedRoute>
+            </Layout>
+          }
+        />
+
+        {/* ============ INVITATIONS DE MEMBRES ============ */}
+        
+        {/* Gestion des invitations - Club Admin uniquement */}
+        <Route
+          path="/club/invitations"
+          element={
+            <Layout>
+              <ProtectedRoute requiredRole="Club Admin">
+                <ClubInvitations />
               </ProtectedRoute>
             </Layout>
           }

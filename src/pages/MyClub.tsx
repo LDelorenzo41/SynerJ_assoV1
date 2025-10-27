@@ -195,7 +195,7 @@ function MembersList({ members }: { members: ClubMember[] }) {
           </p>
           {!searchTerm && (
             <p className="text-sm dark-text-muted mt-2">
-              Partagez le code d'invitation pour inviter des membres
+              Utilisez la fonction d'invitation pour inviter des membres
             </p>
           )}
         </div>
@@ -559,7 +559,6 @@ export default function MyClub() {
                 <p className="text-sm dark-text-muted">
                   Membre de l'association : {clubData.association.name}
                 </p>
-                {/* ✅ MODIFICATION CORRIGÉE: Utilisation de getWebsiteUrl() */}
                 {clubData.website_url && (
                   <a 
                     href={getWebsiteUrl(clubData.website_url) || '#'}
@@ -840,6 +839,16 @@ export default function MyClub() {
         </div>
         <div className="p-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Nouvelle carte: Inviter des membres */}
+            <a 
+              href="/club/invitations" 
+              className="block p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border-2 border-blue-200 dark:border-blue-800"
+            >
+              <UserPlus className="h-6 w-6 text-blue-600 dark:text-blue-400 mb-2" />
+              <p className="font-medium dark-text">Inviter des Membres</p>
+              <p className="text-sm dark-text-muted">Par email ou lien</p>
+            </a>
+
             <a 
               href="/events" 
               className="block p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
@@ -860,53 +869,56 @@ export default function MyClub() {
             
             <a 
               href="/settings" 
-              className="block p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              className="block p-4 bg-gray-50 dark:bg-gray-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-colors"
             >
-              <Settings className="h-6 w-6 text-blue-600 dark:text-blue-400 mb-2" />
+              <Settings className="h-6 w-6 text-gray-600 dark:text-gray-400 mb-2" />
               <p className="font-medium dark-text">Paramètres du Compte</p>
               <p className="text-sm dark-text-muted">Configuration personnelle</p>
             </a>
             
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg space-y-2">
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg space-y-2 md:col-span-2 lg:col-span-4">
               <Mail className="h-6 w-6 text-green-600 dark:text-green-400 mb-2" />
-              <div>
-                <p className="font-medium dark-text">Contact du Club</p>
-                <p className="text-xs dark-text-muted truncate">
-                  <strong>Connexion :</strong> {clubData.club_email}
-                </p>
-                {clubData.contact_email && (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-medium dark-text mb-2">Contact du Club</p>
                   <p className="text-xs dark-text-muted truncate">
-                    <strong>Contact :</strong> {clubData.contact_email}
+                    <strong>Connexion :</strong> {clubData.club_email}
                   </p>
-                )}
-                {!clubData.contact_email && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                    Aucun email de contact défini
-                  </p>
-                )}
-                {/* ✅ MODIFICATION FINALE: Gestion correcte du texte du lien */}
-                {clubData.website_url && (
-                  <p className="text-xs dark-text-muted truncate flex items-center mt-1">
-                    <Globe className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" />
-                    <strong>Site web :</strong> 
-                    <a 
-                      href={getWebsiteUrl(clubData.website_url) || '#'}
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-green-700 dark:text-green-400 hover:underline ml-1"
-                    >
-                      {clubData.website_url.startsWith('/') 
-                        ? 'Site généré' 
-                        : clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]
-                      }
-                    </a>
-                  </p>
-                )}
-                {!clubData.website_url && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-1">
-                    Aucun site web défini
-                  </p>
-                )}
+                  {clubData.contact_email && (
+                    <p className="text-xs dark-text-muted truncate">
+                      <strong>Contact :</strong> {clubData.contact_email}
+                    </p>
+                  )}
+                  {!clubData.contact_email && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      Aucun email de contact défini
+                    </p>
+                  )}
+                </div>
+                <div>
+                  {clubData.website_url && (
+                    <p className="text-xs dark-text-muted flex items-center">
+                      <Globe className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" />
+                      <strong>Site web :</strong> 
+                      <a 
+                        href={getWebsiteUrl(clubData.website_url) || '#'}
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-green-700 dark:text-green-400 hover:underline ml-1"
+                      >
+                        {clubData.website_url.startsWith('/') 
+                          ? 'Site généré' 
+                          : clubData.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]
+                        }
+                      </a>
+                    </p>
+                  )}
+                  {!clubData.website_url && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      Aucun site web défini
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
