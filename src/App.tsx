@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
 import Associations from './pages/Associations';
@@ -67,6 +69,22 @@ function App() {
               <Login />
             </>
           } 
+        />
+
+        {/* NOUVEAU : Routes pour mot de passe oublié */}
+        <Route 
+          path="/forgot-password" 
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> :
+            <>
+              <PublicHeader />
+              <ForgotPassword />
+            </>
+          } 
+        />
+        <Route 
+          path="/reset-password" 
+          element={<ResetPassword />} 
         />
         
         {/* Site web public du club (SANS Layout ni Header) */}
