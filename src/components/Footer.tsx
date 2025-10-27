@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Heart, Mail, MapPin, Linkedin, ChevronDown } from 'lucide-react';
 
 interface FooterProps {
@@ -68,25 +69,25 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
                 {/* Menu déroulant qui apparaît vers le haut */}
                 {isLegalMenuOpen && (
                   <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-lg shadow-xl py-2 min-w-[220px] z-50 border border-gray-700">
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/help-center" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       Centre d'Aide
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    </Link>
+                    <Link to="/legal/documentation" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       Documentation
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    </Link>
+                    <Link to="/legal/faq" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       FAQ
-                    </a>
+                    </Link>
                     <hr className="border-gray-600 my-1" />
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/notices" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       Mentions Légales
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    </Link>
+                    <Link to="/legal/privacy-policy" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       Politique de Confidentialité
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    </Link>
+                    <Link to="/legal/terms" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
                       CGU
-                    </a>
+                    </Link>
                   </div>
                 )}
               </div>

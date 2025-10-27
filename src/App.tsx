@@ -14,14 +14,22 @@ import Settings from './pages/Settings';
 import Sponsors from './pages/Sponsors';
 import MonCalendrier from './pages/MonCalendrier';
 import PublicHeader from './components/PublicHeader';
-import SponsorProfile from './pages/SponsorProfile'; // ✅ NOUVEAU - Remplace SponsorEdit
+import SponsorProfile from './pages/SponsorProfile';
 import Communications from './pages/Communications';
 import Mailing from './pages/Mailing';
-import ClubWebsite from './pages/ClubWebsite'; // ✅ AJOUT - Page site web du club
+import ClubWebsite from './pages/ClubWebsite';
 
-// Import des nouveaux composants de réservation
+// Import des composants de réservation
 import EquipmentManagement from './components/equipment/EquipmentManagement';
 import ClubReservation from './components/equipment/ClubReservation';
+
+// Import des pages légales
+import LegalNotices from './pages/legal/LegalNotices';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import TermsOfService from './pages/legal/TermsOfService';
+import HelpCenter from './pages/legal/HelpCenter';
+import FAQ from './pages/legal/FAQ';
+import Documentation from './pages/legal/Documentation';
 
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
@@ -37,7 +45,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Routes publiques SANS Layout mais AVEC PublicHeader */}
+        {/* ============ ROUTES PUBLIQUES ============ */}
+        
+        {/* Page d'accueil et connexion avec PublicHeader */}
         <Route 
           path="/" 
           element={
@@ -59,20 +69,52 @@ function App() {
           } 
         />
         
-        {/* ❌ ANCIENNE ROUTE SUPPRIMÉE - Plus nécessaire avec le nouveau processus
-        <Route 
-          path="/sponsor-edit/:token" 
-          element={<SponsorEdit />} 
-        />
-        */}
-        
-        {/* ✅ ROUTE PUBLIQUE - Site web du club (SANS Layout ni Header) */}
+        {/* Site web public du club (SANS Layout ni Header) */}
         <Route 
           path="/club/:clubId/website" 
           element={<ClubWebsite />} 
         />
+
+        {/* ============ PAGES LÉGALES (Publiques, SANS Layout ni Header) ============ */}
         
-        {/* Routes protégées AVEC Layout */}
+        {/* Mentions Légales */}
+        <Route 
+          path="/legal/notices" 
+          element={<LegalNotices />} 
+        />
+        
+        {/* Politique de confidentialité */}
+        <Route 
+          path="/legal/privacy-policy" 
+          element={<PrivacyPolicy />} 
+        />
+        
+        {/* Conditions Générales d'Utilisation */}
+        <Route 
+          path="/legal/terms" 
+          element={<TermsOfService />} 
+        />
+        
+        {/* Centre d'aide */}
+        <Route 
+          path="/legal/help-center" 
+          element={<HelpCenter />} 
+        />
+        
+        {/* FAQ */}
+        <Route 
+          path="/legal/faq" 
+          element={<FAQ />} 
+        />
+        
+        {/* Documentation */}
+        <Route 
+          path="/legal/documentation" 
+          element={<Documentation />} 
+        />
+        
+        {/* ============ ROUTES PROTÉGÉES AVEC Layout ============ */}
+        
         <Route
           path="/dashboard"
           element={
@@ -83,16 +125,18 @@ function App() {
             </Layout>
           }
         />
+        
         <Route 
           path="/calendrier" 
           element={
-            <ProtectedRoute allowedRoles={['Member', 'Supporter', 'Sponsor']}> {/* ← Ajouter 'Sponsor' */}
+            <ProtectedRoute allowedRoles={['Member', 'Supporter', 'Sponsor']}>
               <Layout>
                 <MonCalendrier />
               </Layout>
             </ProtectedRoute>
           } 
         />
+        
         <Route
           path="/events"
           element={
@@ -103,6 +147,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/communications"
           element={
@@ -113,6 +158,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/associations"
           element={
@@ -123,6 +169,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/clubs"
           element={
@@ -133,6 +180,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/my-club"
           element={
@@ -143,6 +191,7 @@ function App() {
             </Layout>
           }
         />
+        
         <Route
           path="/sponsors"
           element={
@@ -154,7 +203,7 @@ function App() {
           }
         />
 
-        {/* ✅ NOUVELLE ROUTE - Profil sponsor (accessible uniquement aux Sponsors connectés) */}
+        {/* Profil sponsor (accessible uniquement aux Sponsors connectés) */}
         <Route
           path="/sponsor/profile"
           element={
@@ -177,7 +226,7 @@ function App() {
           }
         />
 
-        {/* ============ ROUTES DE RÉSERVATION ============ */}
+        {/* ============ GESTION DU MATÉRIEL ============ */}
         
         {/* Gestion du matériel - Super Admins uniquement */}
         <Route
@@ -203,6 +252,8 @@ function App() {
           }
         />
 
+        {/* ============ MAILING ============ */}
+        
         {/* Route Mailing - Super Admin, Club Admin et Sponsor */}
         <Route
           path="/mailing"
