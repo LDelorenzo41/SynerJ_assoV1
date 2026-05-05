@@ -10,14 +10,14 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
     <section className="pt-24 pb-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-encre mb-6 leading-tight">
             Connectez vos
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               {" "}associations{" "}
             </span>
             et clubs
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+          <p className="text-xl md:text-2xl text-encre-2 mb-8 leading-relaxed">
             La plateforme tout-en-un pour gérer la communucation des associations, clubs et membres. 
             Organisez des événements, connectez vos communautés et développez votre impact.
           </p>
@@ -32,7 +32,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
             </button>
             <button
               onClick={onShowDemo}
-              className="inline-flex items-center px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
+              className="inline-flex items-center px-8 py-4 border-2 border-[var(--ds-border-2)] text-encre-2 font-semibold rounded-xl hover:border-[var(--ds-border-2)] hover:bg-papier-2 transition-all duration-300"
             >
               <Play className="mr-2 h-5 w-5" />
               Voir la démo
@@ -42,8 +42,8 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
           {/* Trust Indicators */}
           <div className="flex justify-center items-center">
             <div className="flex items-center">
-              <Shield className="h-5 w-5 text-green-500 mr-2" />
-              <span className="text-gray-500">100% sécurisé</span>
+              <Shield className="h-5 w-5 text-ds-success mr-2" />
+              <span className="text-encre-3">100% sécurisé</span>
             </div>
           </div>
         </div>

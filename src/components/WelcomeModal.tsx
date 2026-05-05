@@ -20,26 +20,26 @@ export default function WelcomeModal({ userFirstName, onClose }: WelcomeModalPro
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 mb-5">
             <PartyPopper className="h-9 w-9 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-encre dark:text-white">
             Bienvenue sur SynerJ, {userFirstName || 'nouvel utilisateur'} !
           </h2>
-          <p className="mt-4 text-gray-600 dark:text-slate-300">
+          <p className="mt-4 text-encre-2 dark:text-slate-300">
             Nous sommes ravis de vous compter parmi nous. Préparez-vous à connecter, organiser et participer comme jamais auparavant.
           </p>
         </div>
 
-        <div className="mt-8 p-6 bg-gray-50 dark:bg-slate-700 rounded-lg text-center">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">
+        <div className="mt-8 p-6 bg-papier-2 dark:bg-slate-700 rounded-lg text-center">
+          <h3 className="text-lg font-semibold text-encre dark:text-slate-100">
             Faites grandir la communauté !
           </h3>
-          <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
+          <p className="mt-2 text-sm text-encre-2 dark:text-slate-300">
             Le meilleur moyen de profiter de SynerJ est avec vos amis et collègues. Invitez-les à rejoindre la plateforme.
           </p>
           <a
             href={mailtoLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+            className="mt-5 inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 bg-terracotta text-white font-semibold rounded-lg shadow-md hover:bg-terracotta-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
           >
             <Mail className="h-5 w-5 mr-3" />
             Inviter par e-mail
@@ -49,7 +49,7 @@ export default function WelcomeModal({ userFirstName, onClose }: WelcomeModalPro
         <div className="mt-8">
           <button
             onClick={onClose}
-            className="w-full py-3 px-6 bg-gray-200 dark:bg-slate-600 text-gray-800 dark:text-slate-100 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition-colors flex items-center justify-center group"
+            className="w-full py-3 px-6 bg-papier-3 dark:bg-slate-600 text-encre dark:text-slate-100 font-semibold rounded-lg hover:bg-papier-3 dark:hover:bg-slate-500 transition-colors flex items-center justify-center group"
           >
             Commencer à explorer
             <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />

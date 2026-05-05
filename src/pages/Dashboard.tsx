@@ -439,12 +439,12 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     alt, 
     size = 'w-8 h-8', 
     fallbackIcon: FallbackIcon,
-    iconColor = 'text-gray-400 dark:text-slate-500' 
+    iconColor = 'text-encre-3 dark:text-slate-500' 
   }) => {
     const [imageError, setImageError] = useState(false);
 
     return (
-      <div className={`${size} rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+      <div className={`${size} rounded-full bg-papier-2 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
         {src && !imageError ? (
           <img 
             src={src} 
@@ -465,16 +465,16 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     const groupedEvents = groupEventsByDate(upcomingEvents);
 
     return (
-      <div className="dark-card overflow-hidden shadow-sm rounded-lg h-full flex flex-col">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm overflow-hidden shadow-sm rounded-lg h-full flex flex-col">
+        <div className="px-4 sm:px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
-              <CalendarDays className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-encre flex items-center">
+              <CalendarDays className="h-5 w-5 mr-2 text-ds-info dark:text-ds-info" />
               {profile?.role === 'Club Admin' ? 'Prochains événements du club' : 'Mes prochains événements'}
             </h2>
             <Link 
               to={profile?.role === 'Club Admin' ? "/events" : "/calendrier"}
-              className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center flex-shrink-0"
+              className="text-sm text-ds-info dark:text-ds-info hover:text-ds-info dark:hover:text-ds-info flex items-center flex-shrink-0"
             >
               Voir tout
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -485,13 +485,13 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
         <div className="p-4 sm:p-6 flex-1">
           {eventsLoading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 dark:border-purple-400"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ds-info dark:border-ds-info"></div>
             </div>
           ) : upcomingEvents.length === 0 ? (
             <div className="text-center flex flex-col justify-center h-full">
-              <CalendarDays className="h-12 w-12 text-gray-300 dark:text-slate-600 mx-auto mb-3" />
-              <p className="dark-text-muted mb-2">Aucun événement à venir</p>
-              <p className="text-sm dark-text-muted">
+              <CalendarDays className="h-12 w-12 text-encre-3 dark:text-slate-600 mx-auto mb-3" />
+              <p className="text-encre-3 mb-2">Aucun événement à venir</p>
+              <p className="text-sm text-encre-3">
                 {profile?.role === 'Club Admin' 
                   ? "Créez des événements depuis la page Événements" 
                   : "Ajoutez des événements depuis la page Événements"
@@ -499,7 +499,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
               </p>
               <Link
                 to="/events"
-                className="inline-flex items-center justify-center mx-auto mt-3 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-sm"
+                className="inline-flex items-center justify-center mx-auto mt-3 px-3 py-1.5 bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info rounded-lg hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/50 transition-colors text-sm"
               >
                 <Eye className="h-4 w-4 mr-1" />
                 {profile?.role === 'Club Admin' ? 'Gérer les événements' : 'Voir les événements'}
@@ -510,37 +510,37 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
               {Object.entries(groupedEvents).map(([dateKey, events]) => (
                 <div key={dateKey}>
                   <div className="flex items-center mb-3">
-                    <div className="bg-purple-100 dark:bg-purple-900/50 rounded-full p-2 mr-3">
-                      <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                    <div className="bg-ds-info-soft dark:bg-ds-info-soft/50 rounded-full p-2 mr-3">
+                      <Calendar className="h-4 w-4 text-ds-info dark:text-ds-info" />
                     </div>
-                    <h3 className="font-semibold dark-text text-sm sm:text-base">
+                    <h3 className="font-semibold text-encre text-sm sm:text-base">
                       {formatEventDate(events[0].date)}
                     </h3>
                   </div>
                   
                   <div className="space-y-2 pl-4 sm:pl-10">
                     {events.map((event) => (
-                      <div key={event.id} className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                      <div key={event.id} className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-ds-info-soft dark:bg-ds-info-soft/20 rounded-lg hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/30 transition-colors">
                         <div className="flex items-center w-full">
                           <LogoDisplay 
                             src={event.club.logo_url} 
                             alt={`Logo ${event.club.name}`} 
                             size="w-8 h-8"
                             fallbackIcon={Building}
-                            iconColor="text-purple-600 dark:text-purple-400"
+                            iconColor="text-ds-info dark:text-ds-info"
                           />
                           
                           <div className="ml-3 flex-1 min-w-0">
-                            <p className="text-sm font-medium dark-text truncate">
+                            <p className="text-sm font-medium text-encre truncate">
                               {event.name}
                             </p>
                             <div className="flex items-center space-x-3 mt-1 flex-wrap">
-                              <div className="flex items-center text-xs dark-text-muted">
+                              <div className="flex items-center text-xs text-encre-3">
                                 <Clock className="h-3 w-3 mr-1" />
                                 {formatEventTime(event.date)}
                               </div>
                               {event.location && (
-                                <div className="flex items-center text-xs dark-text-muted">
+                                <div className="flex items-center text-xs text-encre-3">
                                   <MapPin className="h-3 w-3 mr-1" />
                                   <span className="truncate">{event.location}</span>
                                 </div>
@@ -551,19 +551,19 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                         
                         <div className="flex items-center space-x-2 self-end sm:self-center flex-shrink-0">
                           {profile?.role !== 'Club Admin' && (
-                            <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-200 dark:bg-purple-900/50 px-2 py-1 rounded font-medium truncate">
+                            <span className="text-xs text-ds-info dark:text-ds-info bg-ds-info-soft dark:bg-ds-info-soft/50 px-2 py-1 rounded font-medium truncate">
                               {event.club.name}
                             </span>
                           )}
                           {event.visibility === 'Public' ? (
                             <div className="flex items-center gap-1">
-                              <Eye className="h-4 w-4 text-green-600 dark:text-green-400"/>
-                              <span className="text-xs text-green-600 dark:text-green-400">Public</span>
+                              <Eye className="h-4 w-4 text-ds-success dark:text-ds-success"/>
+                              <span className="text-xs text-ds-success dark:text-ds-success">Public</span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1">
-                              <Users className="h-4 w-4 text-orange-600 dark:text-orange-400"/>
-                              <span className="text-xs text-orange-600 dark:text-orange-400">Membres</span>
+                              <Users className="h-4 w-4 text-ds-warning dark:text-ds-warning"/>
+                              <span className="text-xs text-ds-warning dark:text-ds-warning">Membres</span>
                             </div>
                           )}
                         </div>
@@ -574,10 +574,10 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
               ))}
               
               {upcomingEvents.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-600">
+                <div className="mt-4 pt-3 border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                   <Link
                     to={profile?.role === 'Club Admin' ? "/events" : "/calendrier"}
-                    className="w-full flex items-center justify-center px-4 py-2 text-sm text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                    className="w-full flex items-center justify-center px-4 py-2 text-sm text-ds-info dark:text-ds-info bg-ds-info-soft dark:bg-ds-info-soft/30 rounded-lg hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/50 transition-colors"
                   >
                     {profile?.role === 'Club Admin' 
                       ? 'Voir tous les événements du club' 
@@ -598,28 +598,28 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       return (
-        <div className={`dark-bg ${cardPadding} rounded-lg`}>
+        <div className={`bg-papier ${cardPadding} rounded-lg`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center min-w-0">
               <LogoDisplay 
                 src={null} 
                 alt="Aucun club" 
                 fallbackIcon={Users}
-                iconColor="text-gray-400 dark:text-slate-500"
+                iconColor="text-encre-3 dark:text-slate-500"
               />
               <div className="ml-3 min-w-0">
-                <p className="text-xs sm:text-sm dark-text-muted">Club</p>
-                <p className="text-base sm:text-lg font-semibold dark-text-muted truncate">Aucun club</p>
-                <p className="text-xs dark-text-muted hidden sm:block">Accès aux événements publics</p>
+                <p className="text-xs sm:text-sm text-encre-3">Club</p>
+                <p className="text-base sm:text-lg font-semibold text-encre-3 truncate">Aucun club</p>
+                <p className="text-xs text-encre-3 hidden sm:block">Accès aux événements publics</p>
               </div>
             </div>
             <button
               onClick={() => setShowBecomeMemberModal(true)}
-              className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all hover:scale-110 group relative flex-shrink-0"
+              className="p-2 text-ds-success dark:text-ds-success hover:bg-ds-success-soft dark:hover:bg-ds-success-soft/30 rounded-lg transition-all hover:scale-110 group relative flex-shrink-0"
               title="Devenir membre d'un club"
             >
               <UserPlus className="h-6 w-6 animate-pulse" />
-              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-encre text-white text-xs rounded py-1 px-2 whitespace-nowrap">
                 Devenir membre
               </span>
             </button>
@@ -629,23 +629,23 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     }
     if (clubInfo) {
       return (
-        <div className={`bg-green-50 dark:bg-green-900/20 ${cardPadding} rounded-lg`}>
+        <div className={`bg-ds-success-soft dark:bg-ds-success-soft/20 ${cardPadding} rounded-lg`}>
           <div className="flex items-center">
             <LogoDisplay 
               src={clubInfo.logo_url} 
               alt={`Logo ${clubInfo.name}`} 
               fallbackIcon={Building}
-              iconColor="text-green-600 dark:text-green-400"
+              iconColor="text-ds-success dark:text-ds-success"
             />
             <div className="ml-3 min-w-0 flex-1">
-              <p className="text-xs sm:text-sm dark-text-muted">Club</p>
-              <p className="text-base sm:text-lg font-semibold dark-text truncate">{clubInfo.name}</p>
+              <p className="text-xs sm:text-sm text-encre-3">Club</p>
+              <p className="text-base sm:text-lg font-semibold text-encre truncate">{clubInfo.name}</p>
               {clubInfo.website_url && (
                 <a 
                   href={getWebsiteUrl(clubInfo.website_url) || '#'}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors mt-1"
+                  className="flex items-center text-xs text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success transition-colors mt-1"
                 >
                   <ExternalLink className="h-3 w-3 mr-1" />
                   <span className="truncate">Site web</span>
@@ -663,9 +663,9 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     const cardPadding = "p-3 sm:p-4";
     if (profile?.role === 'Supporter') {
       const hasAssociation = !!associationInfo;
-      const bgColor = hasAssociation ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20';
-      const iconColor = hasAssociation ? 'text-purple-600 dark:text-purple-400' : 'text-yellow-600 dark:text-yellow-400';
-      const buttonHoverBg = hasAssociation ? 'hover:bg-purple-100 dark:hover:bg-purple-900/40' : 'hover:bg-yellow-100 dark:hover:bg-yellow-900/40';
+      const bgColor = hasAssociation ? 'bg-ds-info-soft dark:bg-ds-info-soft/20' : 'bg-ds-warning-soft dark:bg-ds-warning-soft/20';
+      const iconColor = hasAssociation ? 'text-ds-info dark:text-ds-info' : 'text-ds-warning dark:text-ds-warning';
+      const buttonHoverBg = hasAssociation ? 'hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/40' : 'hover:bg-ds-warning-soft dark:hover:bg-ds-warning-soft/40';
 
       const otherAssociations = availableAssociations.filter(assoc => assoc.id !== profile?.association_id);
       
@@ -684,8 +684,8 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                 iconColor={iconColor}
               />
               <div className="ml-3 flex-1 min-w-0">
-                <p className="text-xs sm:text-sm dark-text-muted">Structure</p>
-                <p className="text-base sm:text-lg font-semibold dark-text truncate">
+                <p className="text-xs sm:text-sm text-encre-3">Structure</p>
+                <p className="text-base sm:text-lg font-semibold text-encre truncate">
                   {hasAssociation ? associationInfo?.name : 'Non affilié'}
                 </p>
               </div>
@@ -699,7 +699,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
               title={hasAssociation ? "Changer de structure" : "Choisir une structure"}
             >
               <Search className="h-6 w-6 animate-pulse" />
-              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+              <span className="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-encre text-white text-xs rounded py-1 px-2 whitespace-nowrap">
                 {hasAssociation ? "Changer" : "Choisir"}
               </span>
             </button>
@@ -707,7 +707,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
           
           {showAssociationSearch && (
             <div className="mt-4 space-y-3">
-              <p className="text-sm dark-text-muted mb-2">
+              <p className="text-sm text-encre-3 mb-2">
                 {hasAssociation ? 'Changer pour :' : 'Structures disponibles :'}
               </p>
               
@@ -718,9 +718,9 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                     placeholder="Rechercher une structure..."
                     value={structureSearchQuery}
                     onChange={(e) => setStructureSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 pl-9 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark-input text-sm"
+                    className="w-full px-3 py-2 pl-9 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 text-sm"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-encre-3" />
                 </div>
               )}
               
@@ -730,25 +730,25 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                     <button
                       key={association.id}
                       onClick={() => handleAssociationSelection(association.id)}
-                      className="w-full text-left px-3 py-2 text-sm dark-card rounded border border-gray-200 dark:border-gray-600 dark-hover transition-colors flex items-center space-x-2"
+                      className="w-full text-left px-3 py-2 text-sm bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] hover:bg-papier-2 transition-colors flex items-center space-x-2"
                     >
                       <LogoDisplay 
                         src={association.logo_url} 
                         alt={`Logo ${association.name}`} 
                         size="w-6 h-6"
                         fallbackIcon={Building}
-                        iconColor="text-gray-400 dark:text-slate-500"
+                        iconColor="text-encre-3 dark:text-slate-500"
                       />
-                      <span className="dark-text">{association.name}</span>
+                      <span className="text-encre">{association.name}</span>
                     </button>
                   ))}
                 </div>
               ) : structureSearchQuery ? (
-                <p className="text-sm dark-text-muted italic px-3 py-2 dark-card rounded border border-gray-200 dark:border-gray-600">
+                <p className="text-sm text-encre-3 italic px-3 py-2 bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                   Aucune structure ne correspond à votre recherche "{structureSearchQuery}"
                 </p>
               ) : (
-                <p className="text-sm dark-text-muted italic px-3 py-2 dark-card rounded border border-gray-200 dark:border-gray-600">
+                <p className="text-sm text-encre-3 italic px-3 py-2 bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                   Aucune autre structure n'est disponible pour le moment.
                 </p>
               )}
@@ -760,17 +760,17 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
 
     if (associationInfo) {
       return (
-        <div className={`bg-purple-50 dark:bg-purple-900/20 ${cardPadding} rounded-lg`}>
+        <div className={`bg-ds-info-soft dark:bg-ds-info-soft/20 ${cardPadding} rounded-lg`}>
           <div className="flex items-center">
             <LogoDisplay 
               src={associationInfo.logo_url} 
               alt={`Logo ${associationInfo.name}`} 
               fallbackIcon={Building}
-              iconColor="text-purple-600 dark:text-purple-400"
+              iconColor="text-ds-info dark:text-ds-info"
             />
             <div className="ml-3 min-w-0">
-              <p className="text-xs sm:text-sm dark-text-muted">Structure</p>
-              <p className="text-base sm:text-lg font-semibold dark-text truncate">{associationInfo.name}</p>
+              <p className="text-xs sm:text-sm text-encre-3">Structure</p>
+              <p className="text-base sm:text-lg font-semibold text-encre truncate">{associationInfo.name}</p>
             </div>
           </div>
         </div>
@@ -786,9 +786,9 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     }
 
     return (
-      <div className="dark-card overflow-hidden shadow-sm rounded-lg">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm overflow-hidden shadow-sm rounded-lg">
+        <div className="px-4 sm:px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h2 className="text-lg sm:text-xl font-semibold text-encre flex items-center">
             <Eye className="h-5 w-5 mr-2" />
             Clubs que vous suivez ({followedClubs.length})
           </h2>
@@ -796,28 +796,28 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
         <div className="p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {followedClubs.map((club) => (
-              <div key={club.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div key={club.id} className="bg-terracotta-soft dark:bg-terracotta-soft border border-terracotta dark:border-terracotta rounded-lg p-4">
                 <div className="flex items-start space-x-3">
                   <LogoDisplay 
                     src={club.logo_url} 
                     alt={`Logo ${club.name}`} 
                     size="w-10 h-10"
                     fallbackIcon={Users}
-                    iconColor="text-blue-600 dark:text-blue-400"
+                    iconColor="text-terracotta dark:text-terracotta"
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold dark-text truncate">
+                    <h3 className="text-base font-semibold text-encre truncate">
                       {club.name}
                     </h3>
                     {club.description && (
-                      <p className="text-xs dark-text-muted mt-1 line-clamp-2">
+                      <p className="text-xs text-encre-3 mt-1 line-clamp-2">
                         {club.description}
                       </p>
                     )}
                     <div className="flex flex-wrap gap-2 mt-3">
                       <a
                         href={`/events?club=${club.slug}`}
-                        className="inline-flex items-center text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-900/70 transition-colors"
+                        className="inline-flex items-center text-xs px-2 py-1 bg-terracotta-soft dark:bg-terracotta-soft text-terracotta-deep dark:text-terracotta rounded hover:bg-terracotta-soft dark:hover:bg-terracotta-soft/70 transition-colors"
                         title="Voir les événements du club"
                       >
                         <Calendar className="h-3 w-3 mr-1" />
@@ -828,7 +828,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                           href={getWebsiteUrl(club.website_url) || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-colors"
+                          className="inline-flex items-center text-xs px-2 py-1 bg-ds-info-soft dark:bg-ds-info-soft/50 text-ds-info dark:text-ds-info rounded hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/70 transition-colors"
                           title="Visiter le site web"
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
@@ -837,7 +837,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                       )}
                       <a
                         href={`/clubs/${club.id}/communication`}
-                        className="inline-flex items-center text-xs px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-900/70 transition-colors"
+                        className="inline-flex items-center text-xs px-2 py-1 bg-ds-success-soft dark:bg-ds-success-soft/50 text-ds-success dark:text-ds-success rounded hover:bg-ds-success-soft dark:hover:bg-ds-success-soft/70 transition-colors"
                         title="Communication du club"
                       >
                         <MessageCircle className="h-3 w-3 mr-1" />
@@ -854,7 +854,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
             <div className="mt-6 text-center">
               <a 
                 href="/clubs" 
-                className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                className="inline-flex items-center text-sm text-terracotta dark:text-terracotta hover:text-terracotta-deep dark:hover:text-terracotta font-medium"
               >
                 Gérer vos abonnements aux clubs
                 <ArrowRight className="h-4 w-4 ml-1" />
@@ -869,7 +869,7 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-terracotta dark:border-terracotta"></div>
       </div>
     );
   }
@@ -894,13 +894,13 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     loading = false
   }) => {
     const colors: { [key: string]: { bg: string, iconBg: string, text: string } } = {
-      blue: { bg: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30', iconBg: 'bg-blue-600', text: 'text-blue-800 dark:text-blue-200' },
-      green: { bg: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30', iconBg: 'bg-green-600', text: 'text-green-800 dark:text-green-200' },
+      blue: { bg: 'bg-terracotta-soft dark:bg-terracotta-soft hover:bg-terracotta-soft dark:hover:bg-terracotta-soft/30', iconBg: 'bg-terracotta', text: 'text-terracotta-deep dark:text-terracotta' },
+      green: { bg: 'bg-ds-success-soft dark:bg-ds-success-soft/20 hover:bg-ds-success-soft dark:hover:bg-ds-success-soft/30', iconBg: 'bg-ds-success', text: 'text-ds-success dark:text-ds-success' },
       teal: { bg: 'bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30', iconBg: 'bg-teal-600', text: 'text-teal-800 dark:text-teal-200' },
-      indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30', iconBg: 'bg-indigo-600', text: 'text-indigo-800 dark:text-indigo-200' },
-      purple: { bg: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30', iconBg: 'bg-purple-600', text: 'text-purple-800 dark:text-purple-200' },
-      yellow: { bg: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30', iconBg: 'bg-yellow-600', text: 'text-yellow-800 dark:text-yellow-200' },
-      orange: { bg: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30', iconBg: 'bg-orange-600', text: 'text-orange-800 dark:text-orange-200' },
+      indigo: { bg: 'bg-ds-info-soft dark:bg-ds-info-soft/20 hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/30', iconBg: 'bg-ds-info', text: 'text-ds-info dark:text-ds-info' },
+      purple: { bg: 'bg-ds-info-soft dark:bg-ds-info-soft/20 hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/30', iconBg: 'bg-ds-info', text: 'text-ds-info dark:text-ds-info' },
+      yellow: { bg: 'bg-ds-warning-soft dark:bg-ds-warning-soft/20 hover:bg-ds-warning-soft dark:hover:bg-ds-warning-soft/30', iconBg: 'bg-ds-warning', text: 'text-ds-warning dark:text-ds-warning' },
+      orange: { bg: 'bg-ds-warning-soft dark:bg-ds-warning-soft/20 hover:bg-ds-warning-soft dark:hover:bg-ds-warning-soft/30', iconBg: 'bg-ds-warning', text: 'text-ds-warning dark:text-ds-warning' },
     };
     const c = colors[colorClass] || colors.blue;
   
@@ -914,8 +914,8 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold dark-text text-sm sm:text-base">{title}</p>
-          <p className="text-xs sm:text-sm dark-text-muted truncate">{subtitle}</p>
+          <p className="font-semibold text-encre text-sm sm:text-base">{title}</p>
+          <p className="text-xs sm:text-sm text-encre-3 truncate">{subtitle}</p>
         </div>
       </div>
     );
@@ -959,14 +959,14 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
     )}
 
     {portalError && (
-      <div className="dark-card p-4 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 rounded">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm p-4 border-l-4 border-ds-danger bg-ds-danger-soft dark:bg-ds-danger-soft rounded">
         <div className="flex items-start">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+          <AlertCircle className="h-5 w-5 text-ds-danger dark:text-ds-danger mt-0.5 mr-3 flex-shrink-0" />
           <div>
-            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+            <h3 className="text-sm font-medium text-ds-danger dark:text-ds-danger">
               Erreur d'accès au portail
             </h3>
-            <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+            <p className="text-sm text-ds-danger dark:text-ds-danger mt-1">
               {portalError}
             </p>
           </div>
@@ -974,22 +974,22 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
       </div>
     )}
 
-    <div className="dark-card overflow-hidden shadow-sm rounded-lg">
+    <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm overflow-hidden shadow-sm rounded-lg">
         {associationInfo && (
-          <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-purple-100 dark:border-purple-800">
+          <div className="px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-b border-ds-info-soft dark:border-ds-info">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <LogoDisplay 
                 src={associationInfo.logo_url} 
                 alt={`Logo ${associationInfo.name}`} 
                 size="w-10 h-10 sm:w-12 sm:h-12"
                 fallbackIcon={Building}
-                iconColor="text-purple-600 dark:text-purple-400"
+                iconColor="text-ds-info dark:text-ds-info"
               />
               <div className="min-w-0 flex-1">
-                <h3 className="text-base sm:text-lg font-semibold text-purple-900 dark:text-purple-200 truncate">
+                <h3 className="text-base sm:text-lg font-semibold text-ds-info dark:text-ds-info truncate">
                   {associationInfo.name}
                 </h3>
-                <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">
+                <p className="text-xs sm:text-sm text-ds-info dark:text-ds-info">
                   {`Tableau de bord ${getRoleDisplayName(profile?.role || '')}`}
                 </p>
               </div>
@@ -997,25 +997,25 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
           </div>
         )}
 
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h1 className="text-2xl sm:text-3xl font-bold dark-text">
+        <div className="px-4 sm:px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-encre">
             Bienvenue, {profile?.first_name}
           </h1>
-          <p className="dark-text-muted mt-1 sm:mt-2 text-sm sm:text-base">
+          <p className="text-encre-3 mt-1 sm:mt-2 text-sm sm:text-base">
             Votre espace {getRoleDisplayName(profile?.role || '')}
           </p>
         </div>
         
         <div className="p-4 sm:p-6">
           {profile?.role === 'Supporter' && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-              <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2 text-sm sm:text-base">Comment ça fonctionne ?</h3>
-              <div className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 space-y-1">
+            <div className="bg-terracotta-soft dark:bg-terracotta-soft border border-terracotta dark:border-terracotta rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <h3 className="font-medium text-terracotta-deep dark:text-terracotta mb-2 text-sm sm:text-base">Comment ça fonctionne ?</h3>
+              <div className="text-xs sm:text-sm text-terracotta-deep dark:text-terracotta space-y-1">
                 <p>• <strong>Choisissez une structure</strong> pour voir ses clubs.</p>
                 <p>• <strong>Suivez des clubs</strong> pour remplir votre agenda.</p>
                 <p>• <strong>Consultez votre calendrier</strong> pour ne rien manquer.</p>
                 {associationInfo && (
-                  <p className="mt-2 pt-2 border-t border-blue-300 dark:border-blue-600">
+                  <p className="mt-2 pt-2 border-t border-terracotta dark:border-terracotta">
                     ⚠️ <strong>Changement de structure :</strong> Vos clubs suivis seront réinitialisés.
                   </p>
                 )}
@@ -1025,14 +1025,14 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-1 space-y-4">
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+              <div className="bg-terracotta-soft dark:bg-terracotta-soft p-3 sm:p-4 rounded-lg">
                 <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg mr-3">
-                    <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="p-2 bg-terracotta-soft dark:bg-terracotta-soft rounded-lg mr-3">
+                    <Users className="h-6 w-6 text-terracotta dark:text-terracotta" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm dark-text-muted">Rôle</p>
-                    <p className="text-base sm:text-lg font-semibold dark-text truncate">
+                    <p className="text-xs sm:text-sm text-encre-3">Rôle</p>
+                    <p className="text-base sm:text-lg font-semibold text-encre truncate">
                       {getRoleDisplayName(profile?.role || '')}
                     </p>
                   </div>
@@ -1064,9 +1064,9 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
 
       {renderFollowedClubsSection()}
 
-      <div className="dark-card overflow-hidden shadow-sm rounded-lg">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-lg sm:text-xl font-semibold dark-text flex items-center">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm overflow-hidden shadow-sm rounded-lg">
+        <div className="px-4 sm:px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h2 className="text-lg sm:text-xl font-semibold text-encre flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
             Actions Rapides
           </h2>
@@ -1122,19 +1122,19 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
 
       {showChangeConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="dark-card p-4 sm:p-6 rounded-lg w-full max-w-md">
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm p-4 sm:p-6 rounded-lg w-full max-w-md">
             <div className="flex items-start mb-4">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center mr-3">
-                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 dark:text-yellow-400" />
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-ds-warning-soft dark:bg-ds-warning-soft/50 rounded-full flex items-center justify-center mr-3">
+                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-ds-warning dark:text-ds-warning" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-semibold dark-text">Changer de structure</h3>
-                <p className="text-sm dark-text-muted mt-1">Êtes-vous sûr de vouloir continuer ?</p>
+                <h3 className="text-base sm:text-lg font-semibold text-encre">Changer de structure</h3>
+                <p className="text-sm text-encre-3 mt-1">Êtes-vous sûr de vouloir continuer ?</p>
               </div>
             </div>
             
             <div className="mb-6">
-              <p className="text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded text-xs sm:text-sm">
+              <p className="text-ds-warning dark:text-ds-warning bg-ds-warning-soft dark:bg-ds-warning-soft/20 p-3 rounded text-xs sm:text-sm">
                 <strong>Attention :</strong> Cette action est irréversible. Vos clubs suivis et événements de calendrier seront réinitialisés.
               </p>
             </div>
@@ -1142,13 +1142,13 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={() => { setShowChangeConfirmation(false); setSelectedAssociationId(null); }}
-                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
+                className="w-full py-2 px-4 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg text-encre hover:bg-papier-2 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={confirmAssociationChange}
-                className="w-full py-2 px-4 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-colors"
+                className="w-full py-2 px-4 bg-ds-warning dark:bg-ds-warning text-white rounded-lg hover:bg-ds-warning dark:hover:bg-ds-warning transition-colors"
               >
                 Confirmer
               </button>
@@ -1159,28 +1159,28 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
 
       {showBecomeMemberModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="dark-card p-4 sm:p-6 rounded-lg w-full max-w-md">
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm p-4 sm:p-6 rounded-lg w-full max-w-md">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mr-3">
-                  <UserPlus className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-400" />
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-ds-success-soft dark:bg-ds-success-soft/50 rounded-full flex items-center justify-center mr-3">
+                  <UserPlus className="h-5 w-5 sm:h-6 sm:w-6 text-ds-success dark:text-ds-success" />
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold dark-text">Devenir Membre</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-encre">Devenir Membre</h3>
               </div>
               <button
                 onClick={() => { setShowBecomeMemberModal(false); setMemberClubCode(''); setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null }); }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                className="p-1 hover:bg-papier-2 dark:hover:bg-papier-3 rounded transition-colors"
               >
-                <X className="h-5 w-5 dark-text-muted" />
+                <X className="h-5 w-5 text-encre-3" />
               </button>
             </div>
             
             <div className="mb-6">
-              <p className="dark-text-muted mb-4 text-sm sm:text-base">
+              <p className="text-encre-3 mb-4 text-sm sm:text-base">
                 Entrez le code fourni par votre club pour en devenir membre.
               </p>
               
-              <label htmlFor="club-code" className="block text-xs sm:text-sm font-medium dark-text mb-2">
+              <label htmlFor="club-code" className="block text-xs sm:text-sm font-medium text-encre mb-2">
                 Code du Club
               </label>
               <input
@@ -1192,28 +1192,28 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
                   setMemberClubCode(code);
                   validateClubCode(code);
                 }}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all dark-input ${
-                  clubCodeValidation.valid === true ? 'border-green-500' :
-                  clubCodeValidation.valid === false ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 ${
+                  clubCodeValidation.valid === true ? 'border-ds-success' :
+                  clubCodeValidation.valid === false ? 'border-ds-danger' : 'border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]'
                 }`}
                 placeholder="Ex: CLUB-XYZ123"
               />
               
               <div className="h-5 mt-2 text-sm">
                 {clubCodeValidation.loading && (
-                  <p className="text-blue-600 dark:text-blue-400 flex items-center">
+                  <p className="text-terracotta dark:text-terracotta flex items-center">
                     <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></span>
                     Vérification...
                   </p>
                 )}
                 {clubCodeValidation.valid === true && (
-                  <p className="text-green-600 dark:text-green-400 flex items-center">
+                  <p className="text-ds-success dark:text-ds-success flex items-center">
                     <Check className="w-4 h-4 mr-2" />
                     Club trouvé : {clubCodeValidation.clubName}
                   </p>
                 )}
                 {clubCodeValidation.valid === false && memberClubCode.length >= 8 && (
-                  <p className="text-red-600 dark:text-red-400 flex items-center">
+                  <p className="text-ds-danger dark:text-ds-danger flex items-center">
                     <AlertCircle className="w-4 h-4 mr-2" />
                     Code de club invalide ou indisponible.
                   </p>
@@ -1224,14 +1224,14 @@ const { redirectToPortal, loading: portalLoading, error: portalError } = useCust
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={() => { setShowBecomeMemberModal(false); setMemberClubCode(''); setClubCodeValidation({ loading: false, valid: null, clubName: '', clubId: null }); }}
-                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg dark-text dark-hover transition-colors"
+                className="w-full py-2 px-4 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg text-encre hover:bg-papier-2 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleBecomeMember}
                 disabled={!clubCodeValidation.valid || loading}
-                className="w-full py-2 px-4 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-2 px-4 bg-ds-success dark:bg-ds-success-soft text-white rounded-lg hover:bg-ds-success dark:hover:bg-ds-success disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? 'Traitement...' : 'Devenir Membre'}
               </button>

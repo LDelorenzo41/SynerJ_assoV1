@@ -997,20 +997,20 @@ ${customPlanForm.name}`);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Inscription Utilisateur</h2>
-              <p className="text-gray-600">Étape 1/3 - Informations personnelles</p>
+              <h2 className="text-3xl font-bold text-encre mb-2">Inscription Utilisateur</h2>
+              <p className="text-encre-2">Étape 1/3 - Informations personnelles</p>
               <div className="flex justify-center mt-4">
                 <div className="flex space-x-2">
-                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
-                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
-                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
+                  <div className="w-8 h-2 bg-ds-info rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
                 </div>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Prénom *
                 </label>
                 <input
@@ -1018,12 +1018,12 @@ ${customPlanForm.name}`);
                   required
                   value={userForm.first_name}
                   onChange={(e) => setUserForm({ ...userForm, first_name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="Jean"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Nom *
                 </label>
                 <input
@@ -1031,15 +1031,15 @@ ${customPlanForm.name}`);
                   required
                   value={userForm.last_name}
                   onChange={(e) => setUserForm({ ...userForm, last_name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="Dupont"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Pseudo * <span className="text-xs text-gray-500">(visible publiquement)</span>
+              <label className="block text-sm font-medium text-encre-2 mb-2">
+                Pseudo * <span className="text-xs text-encre-3">(visible publiquement)</span>
               </label>
               <input
                 type="text"
@@ -1050,31 +1050,31 @@ ${customPlanForm.name}`);
                 value={userForm.pseudo}
                 onChange={(e) => handlePseudoChange(e.target.value)}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                  pseudoAvailable === true ? 'border-green-500' :
-                  pseudoAvailable === false ? 'border-red-500' : 'border-gray-300'
+                  pseudoAvailable === true ? 'border-ds-success' :
+                  pseudoAvailable === false ? 'border-ds-danger' : 'border-[var(--ds-border-2)]'
                 }`}
                 placeholder="jean_dupont"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-encre-3 mt-1">
                 3-30 caractères : lettres, chiffres, tirets (-) et underscores (_)
               </p>
               
               {checkingPseudo && (
-                <p className="mt-2 text-sm text-blue-600 flex items-center">
-                  <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
+                <p className="mt-2 text-sm text-terracotta flex items-center">
+                  <span className="animate-spin w-4 h-4 border-2 border-terracotta border-t-transparent rounded-full mr-2"></span>
                   Vérification du pseudo...
                 </p>
               )}
               
               {pseudoAvailable === true && (
-                <p className="mt-2 text-sm text-green-600 flex items-center">
+                <p className="mt-2 text-sm text-ds-success flex items-center">
                   <Check className="w-4 h-4 mr-2" />
                   Pseudo disponible
                 </p>
               )}
               
               {pseudoAvailable === false && userForm.pseudo && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p className="mt-2 text-sm text-ds-danger flex items-center">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   Pseudo déjà pris
                 </p>
@@ -1082,7 +1082,7 @@ ${customPlanForm.name}`);
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-encre-2 mb-2">
                 Courriel *
               </label>
               <input
@@ -1090,13 +1090,13 @@ ${customPlanForm.name}`);
                 required
                 value={userForm.email}
                 onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="jean.dupont@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-encre-2 mb-2">
                 Mot de passe *
               </label>
               <input
@@ -1104,7 +1104,7 @@ ${customPlanForm.name}`);
                 required
                 value={userForm.password}
                 onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 minLength={6}
                 placeholder="Minimum 6 caractères"
               />
@@ -1114,7 +1114,7 @@ ${customPlanForm.name}`);
               <button
                 type="button"
                 onClick={() => setActiveForm(null)}
-                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
               >
                 Retour
               </button>
@@ -1122,7 +1122,7 @@ ${customPlanForm.name}`);
                 type="button"
                 onClick={() => setUserStep(2)}
                 disabled={!userForm.first_name || !userForm.last_name || !userForm.pseudo || !userForm.email || !userForm.password || pseudoAvailable === false}
-                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                className="flex-1 py-3 px-6 bg-ds-info text-white rounded-lg hover:bg-ds-info disabled:opacity-50 transition-colors"
               >
                 Suivant
               </button>
@@ -1134,13 +1134,13 @@ ${customPlanForm.name}`);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Photo et Club</h2>
-              <p className="text-gray-600">Étape 2/3 - Photo de profil et club (optionnel)</p>
+              <h2 className="text-3xl font-bold text-encre mb-2">Photo et Club</h2>
+              <p className="text-encre-2">Étape 2/3 - Photo de profil et club (optionnel)</p>
               <div className="flex justify-center mt-4">
                 <div className="flex space-x-2">
-                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
-                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
-                  <div className="w-8 h-2 bg-gray-200 rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
+                  <div className="w-8 h-2 bg-ds-info rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
                 </div>
               </div>
             </div>
@@ -1151,14 +1151,14 @@ ${customPlanForm.name}`);
                 currentImage={userForm.avatar_url}
               />
               
-              <p className="text-sm text-gray-500 text-center max-w-md">
+              <p className="text-sm text-encre-3 text-center max-w-md">
                 Ajoutez une photo de profil pour personnaliser votre compte. 
                 Vous pourrez la modifier plus tard dans vos paramètres.
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-encre-2 mb-2">
                 Code de Club (Optionnel)
               </label>
               <input
@@ -1166,34 +1166,34 @@ ${customPlanForm.name}`);
                 value={userForm.club_code}
                 onChange={(e) => handleClubCodeChange(e.target.value)}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                  clubValidation.valid === true ? 'border-green-500' :
-                  clubValidation.valid === false ? 'border-red-500' : 'border-gray-300'
+                  clubValidation.valid === true ? 'border-ds-success' :
+                  clubValidation.valid === false ? 'border-ds-danger' : 'border-[var(--ds-border-2)]'
                 }`}
                 placeholder="CLUB-12345678"
               />
               
               {clubValidation.loading && (
-                <p className="mt-2 text-sm text-blue-600 flex items-center">
-                  <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
+                <p className="mt-2 text-sm text-terracotta flex items-center">
+                  <span className="animate-spin w-4 h-4 border-2 border-terracotta border-t-transparent rounded-full mr-2"></span>
                   Vérification du code...
                 </p>
               )}
               
               {clubValidation.valid === true && (
-                <p className="mt-2 text-sm text-green-600 flex items-center">
+                <p className="mt-2 text-sm text-ds-success flex items-center">
                   <Check className="w-4 w-4 mr-2" />
                   Club trouvé : {clubValidation.clubName}
                 </p>
               )}
               
               {clubValidation.valid === false && userForm.club_code && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p className="mt-2 text-sm text-ds-danger flex items-center">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   Code de club invalide
                 </p>
               )}
               
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-encre-3">
                 Laissez vide pour vous inscrire en tant que supporter avec accès aux événements publics uniquement.
               </p>
             </div>
@@ -1202,14 +1202,14 @@ ${customPlanForm.name}`);
               <button
                 type="button"
                 onClick={() => setUserStep(1)}
-                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
               >
                 Précédent
               </button>
               <button
                 type="button"
                 onClick={() => setUserStep(3)}
-                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex-1 py-3 px-6 bg-ds-info text-white rounded-lg hover:bg-ds-info transition-colors"
               >
                 Suivant
               </button>
@@ -1221,21 +1221,21 @@ ${customPlanForm.name}`);
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Préférences email</h2>
-              <p className="text-gray-600">Étape 3/3 - Choisissez vos notifications</p>
+              <h2 className="text-3xl font-bold text-encre mb-2">Préférences email</h2>
+              <p className="text-encre-2">Étape 3/3 - Choisissez vos notifications</p>
               <div className="flex justify-center mt-4">
                 <div className="flex space-x-2">
-                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
-                  <div className="w-8 h-2 bg-gray-300 rounded"></div>
-                  <div className="w-8 h-2 bg-purple-600 rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
+                  <div className="w-8 h-2 bg-papier-3 rounded"></div>
+                  <div className="w-8 h-2 bg-ds-info rounded"></div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-3">Consentements pour recevoir des emails</h3>
-                <p className="text-sm text-gray-600 mb-4">
+              <div className="bg-papier-2 p-4 rounded-lg">
+                <h3 className="font-semibold text-encre mb-3">Consentements pour recevoir des emails</h3>
+                <p className="text-sm text-encre-2 mb-4">
                   Vous pouvez modifier ces préférences à tout moment dans vos paramètres.
                 </p>
                 
@@ -1248,11 +1248,11 @@ ${customPlanForm.name}`);
                         ...userForm,
                         email_consents: { ...userForm.email_consents, clubs: e.target.checked }
                       })}
-                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-1 w-4 h-4 text-ds-info border-[var(--ds-border-2)] rounded focus:ring-purple-500"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-900">Clubs affiliés</span>
-                      <div className="text-xs text-gray-500">Événements, actualités et communications des clubs que vous suivez</div>
+                      <span className="text-sm font-medium text-encre">Clubs affiliés</span>
+                      <div className="text-xs text-encre-3">Événements, actualités et communications des clubs que vous suivez</div>
                     </div>
                   </label>
 
@@ -1264,11 +1264,11 @@ ${customPlanForm.name}`);
                         ...userForm,
                         email_consents: { ...userForm.email_consents, association: e.target.checked }
                       })}
-                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-1 w-4 h-4 text-ds-info border-[var(--ds-border-2)] rounded focus:ring-purple-500"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-900">Structure multiclub</span>
-                      <div className="text-xs text-gray-500">Actualités générales, événements inter-clubs et communications officielles</div>
+                      <span className="text-sm font-medium text-encre">Structure multiclub</span>
+                      <div className="text-xs text-encre-3">Actualités générales, événements inter-clubs et communications officielles</div>
                     </div>
                   </label>
 
@@ -1280,11 +1280,11 @@ ${customPlanForm.name}`);
                         ...userForm,
                         email_consents: { ...userForm.email_consents, municipality: e.target.checked }
                       })}
-                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-1 w-4 h-4 text-ds-info border-[var(--ds-border-2)] rounded focus:ring-purple-500"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-900">Instance communale</span>
-                      <div className="text-xs text-gray-500">Événements municipaux, subventions et informations locales</div>
+                      <span className="text-sm font-medium text-encre">Instance communale</span>
+                      <div className="text-xs text-encre-3">Événements municipaux, subventions et informations locales</div>
                     </div>
                   </label>
 
@@ -1296,11 +1296,11 @@ ${customPlanForm.name}`);
                         ...userForm,
                         email_consents: { ...userForm.email_consents, sponsors: e.target.checked }
                       })}
-                      className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-1 w-4 h-4 text-ds-info border-[var(--ds-border-2)] rounded focus:ring-purple-500"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-900">Sponsors des clubs</span>
-                      <div className="text-xs text-gray-500">Offres spéciales, promotions et communications des partenaires</div>
+                      <span className="text-sm font-medium text-encre">Sponsors des clubs</span>
+                      <div className="text-xs text-encre-3">Offres spéciales, promotions et communications des partenaires</div>
                     </div>
                   </label>
                 </div>
@@ -1311,14 +1311,14 @@ ${customPlanForm.name}`);
               <button
                 type="button"
                 onClick={() => setUserStep(2)}
-                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
               >
                 Précédent
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-3 px-6 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                className="flex-1 py-3 px-6 bg-ds-info text-white rounded-lg hover:bg-ds-info disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Inscription...' : 'Finaliser l\'inscription'}
               </button>
@@ -1335,10 +1335,10 @@ ${customPlanForm.name}`);
     <section id="registration" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-encre mb-6">
             Commencez dès aujourd'hui
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-encre-2 max-w-3xl mx-auto">
             Choisissez votre point de départ et rejoignez la communauté SynerJ
           </p>
         </div>
@@ -1347,18 +1347,18 @@ ${customPlanForm.name}`);
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div 
               onClick={() => setActiveForm('association')}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-blue-200"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-terracotta"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Building className="h-10 w-10 text-blue-600" />
+                  <Building className="h-10 w-10 text-terracotta" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer une Structure</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-2xl font-bold text-encre mb-4">Créer une Structure</h3>
+                <p className="text-encre-2 mb-6 leading-relaxed">
                   Démarrez votre organisation et gérez plusieurs clubs sous une structure commune. 
                   Parfait pour les associations ou services municipaux.
                 </p>
-                <div className="inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
+                <div className="inline-flex items-center text-terracotta font-semibold group-hover:text-terracotta-deep">
                   Commencer
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -1367,18 +1367,18 @@ ${customPlanForm.name}`);
 
             <div 
               onClick={() => setActiveForm('club')}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-green-200"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-success"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-100 to-green-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-10 w-10 text-green-600" />
+                  <Users className="h-10 w-10 text-ds-success" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Créer un Club</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-2xl font-bold text-encre mb-4">Créer un Club</h3>
+                <p className="text-encre-2 mb-6 leading-relaxed">
                   Rejoignez une structure existante et créez votre club pour organiser 
                   des événements et gérer vos membres.
                 </p>
-                <div className="inline-flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                <div className="inline-flex items-center text-ds-success font-semibold group-hover:text-ds-success">
                   Commencer
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -1390,18 +1390,18 @@ ${customPlanForm.name}`);
                 setActiveForm('user');
                 setUserStep(1);
               }}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-purple-200"
+              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-info-soft"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <UserPlus className="h-10 w-10 text-purple-600" />
+                  <UserPlus className="h-10 w-10 text-ds-info" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Rejoindre en tant qu'Utilisateur</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-2xl font-bold text-encre mb-4">Rejoindre en tant qu'Utilisateur</h3>
+                <p className="text-encre-2 mb-6 leading-relaxed">
                   Inscrivez-vous pour rejoindre des clubs, participer à des événements 
                   et rester connecté avec vos communautés.
                 </p>
-                <div className="inline-flex items-center text-purple-600 font-semibold group-hover:text-purple-700">
+                <div className="inline-flex items-center text-ds-info font-semibold group-hover:text-ds-info">
                   Commencer
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -1413,15 +1413,15 @@ ${customPlanForm.name}`);
         {/* Association Form */}
         {activeForm === 'association' && (
           <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Créer une Structure</h2>
+            <h2 className="text-3xl font-bold text-encre mb-8 text-center">Créer une Structure</h2>
             
             <form onSubmit={handleCreateAssociation} className="space-y-8">
               {/* Informations générales */}
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">Informations générales</h3>
+                <h3 className="text-xl font-semibold text-encre border-b pb-2">Informations générales</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Nom de la Structure *
                   </label>
                   <input
@@ -1429,10 +1429,10 @@ ${customPlanForm.name}`);
                     required
                     value={associationForm.name}
                     onChange={(e) => setAssociationForm({ ...associationForm, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Association Sportive de [Commune]"
                   />
-                  <div className="mt-2 text-xs text-gray-500 space-y-1">
+                  <div className="mt-2 text-xs text-encre-3 space-y-1">
                     <p className="font-medium">Exemples :</p>
                     <p>• Association Sportive de [Commune]</p>
                     <p>• Ville de [Commune] - Service des Sports</p>
@@ -1442,26 +1442,26 @@ ${customPlanForm.name}`);
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-encre-2 mb-2">
                       Ville
                     </label>
                     <input
                       type="text"
                       value={associationForm.city}
                       onChange={(e) => setAssociationForm({ ...associationForm, city: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Paris"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-encre-2 mb-2">
                       Téléphone
                     </label>
                     <input
                       type="tel"
                       value={associationForm.phone}
                       onChange={(e) => setAssociationForm({ ...associationForm, phone: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="01 23 45 67 89"
                     />
                   </div>
@@ -1469,7 +1469,7 @@ ${customPlanForm.name}`);
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-encre-2 mb-2">
                       Courriel de connexion *
                     </label>
                     <input
@@ -1477,12 +1477,12 @@ ${customPlanForm.name}`);
                       required
                       value={associationForm.email}
                       onChange={(e) => setAssociationForm({ ...associationForm, email: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="contact@structure.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-encre-2 mb-2">
                       Mot de passe *
                     </label>
                     <input
@@ -1491,39 +1491,39 @@ ${customPlanForm.name}`);
                       minLength={6}
                       value={associationForm.password}
                       onChange={(e) => setAssociationForm({ ...associationForm, password: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Minimum 6 caractères"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Description
                   </label>
                   <textarea
                     rows={4}
                     value={associationForm.description}
                     onChange={(e) => setAssociationForm({ ...associationForm, description: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Décrivez brièvement votre structure..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo de la structure</label>
+                  <label className="block text-sm font-medium text-encre-2 mb-2">Logo de la structure</label>
                   <ProfilePictureUpload
                     onImageSelect={handleAssociationLogoSelect}
                     currentImage={associationForm.logo_url}
                   />
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-encre-3 mt-2">
                     Formats acceptés : PNG, JPG, SVG. Taille max : 2MB. Dimension recommandée : 200x200px
                   </p>
                 </div>
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-900 border-b pb-2">Choisissez votre plan</h3>
+                <h3 className="text-xl font-semibold text-encre border-b pb-2">Choisissez votre plan</h3>
                 
                 <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
                   {SUBSCRIPTION_PLANS.map((plan) => {
@@ -1533,8 +1533,8 @@ ${customPlanForm.name}`);
                         key={plan.id}
                         className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-300 border-2 ${
                           associationForm.subscription_plan === plan.id
-                            ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
-                            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                            ? 'border-terracotta bg-terracotta-soft shadow-lg scale-105'
+                            : 'border-[var(--ds-border)] hover:border-[var(--ds-border-2)] hover:shadow-md'
                         }`}
                         onClick={() => handlePlanSelect(plan.id)}
                       >
@@ -1543,18 +1543,18 @@ ${customPlanForm.name}`);
                             <Icon className="h-6 w-6 text-white" />
                           </div>
                           
-                          <h4 className="text-lg font-semibold text-gray-900 mb-1">{plan.name}</h4>
-                          <p className="text-sm text-gray-500 mb-3">{plan.description}</p>
+                          <h4 className="text-lg font-semibold text-encre mb-1">{plan.name}</h4>
+                          <p className="text-sm text-encre-3 mb-3">{plan.description}</p>
                           
                           <div className="mb-4">
-                            <span className="text-2xl font-bold text-gray-900">{plan.price}</span>
-                            <span className="text-sm text-gray-500">{plan.period}</span>
+                            <span className="text-2xl font-bold text-encre">{plan.price}</span>
+                            <span className="text-sm text-encre-3">{plan.period}</span>
                           </div>
                           
-                          <ul className="space-y-2 text-sm text-gray-600 text-left">
+                          <ul className="space-y-2 text-sm text-encre-2 text-left">
                             {plan.features.map((feature, index) => (
                               <li key={index} className="flex items-start">
-                                <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                <Check className="h-4 w-4 text-ds-success mr-2 flex-shrink-0 mt-0.5" />
                                 <span>{feature}</span>
                               </li>
                             ))}
@@ -1581,7 +1581,7 @@ ${customPlanForm.name}`);
                 <button
                   type="button"
                   onClick={() => setActiveForm(null)}
-                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
                 >
                   Retour
                 </button>
@@ -1615,15 +1615,15 @@ ${customPlanForm.name}`);
           <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
             <div className="text-center mb-8">
               <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center mb-4">
-                <Sparkles className="h-8 w-8 text-pink-600" />
+                <Sparkles className="h-8 w-8 text-ds-danger" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Plan Sur Mesure</h2>
-              <p className="text-gray-600">Recevez une offre personnalisée adaptée à vos besoins</p>
+              <h2 className="text-3xl font-bold text-encre mb-2">Plan Sur Mesure</h2>
+              <p className="text-encre-2">Recevez une offre personnalisée adaptée à vos besoins</p>
             </div>
             
             <form onSubmit={handleCustomPlanRequest} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Nom de la Structure *
                 </label>
                 <input
@@ -1631,26 +1631,26 @@ ${customPlanForm.name}`);
                   required
                   value={customPlanForm.name}
                   onChange={(e) => setCustomPlanForm({ ...customPlanForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   placeholder="Nom de votre structure"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Ville
                   </label>
                   <input
                     type="text"
                     value={customPlanForm.city}
                     onChange={(e) => setCustomPlanForm({ ...customPlanForm, city: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                     placeholder="Votre ville"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Téléphone *
                   </label>
                   <input
@@ -1658,14 +1658,14 @@ ${customPlanForm.name}`);
                     required
                     value={customPlanForm.phone}
                     onChange={(e) => setCustomPlanForm({ ...customPlanForm, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                     placeholder="01 23 45 67 89"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Email de contact *
                 </label>
                 <input
@@ -1673,13 +1673,13 @@ ${customPlanForm.name}`);
                   required
                   value={customPlanForm.email}
                   onChange={(e) => setCustomPlanForm({ ...customPlanForm, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   placeholder="contact@structure.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Nombre de clubs estimé *
                 </label>
                 <input
@@ -1687,41 +1687,41 @@ ${customPlanForm.name}`);
                   required
                   value={customPlanForm.estimated_clubs}
                   onChange={(e) => setCustomPlanForm({ ...customPlanForm, estimated_clubs: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   placeholder="Ex: 30 clubs, 50+ clubs, etc."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Description de votre structure
                 </label>
                 <textarea
                   rows={3}
                   value={customPlanForm.description}
                   onChange={(e) => setCustomPlanForm({ ...customPlanForm, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   placeholder="Décrivez brièvement votre structure..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Besoins spécifiques
                 </label>
                 <textarea
                   rows={4}
                   value={customPlanForm.specific_needs}
                   onChange={(e) => setCustomPlanForm({ ...customPlanForm, specific_needs: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   placeholder="Décrivez vos besoins particuliers : intégrations spécifiques, volumes de données, fonctionnalités personnalisées, etc."
                 />
               </div>
 
-              <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+              <div className="bg-ds-danger-soft border border-ds-danger rounded-lg p-4">
                 <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 text-pink-600 mr-3 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-pink-800">
+                  <AlertCircle className="h-5 w-5 text-ds-danger mr-3 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-ds-danger">
                     <p className="font-medium mb-1">Engagement personnalisé</p>
                     <p>Notre équipe vous contactera sous 24-48h pour comprendre vos besoins et établir une offre sur mesure adaptée à votre structure.</p>
                   </div>
@@ -1732,7 +1732,7 @@ ${customPlanForm.name}`);
                 <button
                   type="button"
                   onClick={() => setActiveForm('association')}
-                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
                 >
                   Retour aux plans
                 </button>
@@ -1751,10 +1751,10 @@ ${customPlanForm.name}`);
         {/* Club Form */}
         {activeForm === 'club' && (
           <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Créer un Club</h2>
+            <h2 className="text-3xl font-bold text-encre mb-6 text-center">Créer un Club</h2>
             <form onSubmit={handleCreateClub} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Nom du Club *
                 </label>
                 <input
@@ -1762,14 +1762,14 @@ ${customPlanForm.name}`);
                   required
                   value={clubForm.name}
                   onChange={(e) => setClubForm({ ...clubForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Nom de votre club"
                 />
               </div>
               
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Courriel de connexion *
                   </label>
                   <input
@@ -1777,32 +1777,32 @@ ${customPlanForm.name}`);
                     required
                     value={clubForm.club_email}
                     onChange={(e) => setClubForm({ ...clubForm, club_email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                     placeholder="admin@club.com"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-encre-3">
                     Email pour se connecter au club
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Email de contact
                   </label>
                   <input
                     type="email"
                     value={clubForm.contact_email}
                     onChange={(e) => setClubForm({ ...clubForm, contact_email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                     placeholder="contact@club.com"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-encre-3">
                     Email affiché aux membres (optionnel)
                   </p>
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Mot de passe *
                 </label>
                 <input
@@ -1811,12 +1811,12 @@ ${customPlanForm.name}`);
                   minLength={6}
                   value={clubForm.password}
                   onChange={(e) => setClubForm({ ...clubForm, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Minimum 6 caractères"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Code de Structure *
                 </label>
                 <input
@@ -1825,95 +1825,95 @@ ${customPlanForm.name}`);
                   value={clubForm.association_code}
                   onChange={(e) => handleAssociationCodeChange(e.target.value)}
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                    associationValidation.valid === true && associationValidation.canAddClub ? 'border-green-500' :
-                    associationValidation.valid === true && !associationValidation.canAddClub ? 'border-red-500' :
-                    associationValidation.valid === false ? 'border-red-500' : 'border-gray-300'
+                    associationValidation.valid === true && associationValidation.canAddClub ? 'border-ds-success' :
+                    associationValidation.valid === true && !associationValidation.canAddClub ? 'border-ds-danger' :
+                    associationValidation.valid === false ? 'border-ds-danger' : 'border-[var(--ds-border-2)]'
                   }`}
                   placeholder="ASSOC-12345678"
                 />
                   {/* Messages de validation */}
                 {associationValidation.loading && (
-                  <p className="mt-2 text-sm text-blue-600 flex items-center">
-                    <span className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></span>
+                  <p className="mt-2 text-sm text-terracotta flex items-center">
+                    <span className="animate-spin w-4 h-4 border-2 border-terracotta border-t-transparent rounded-full mr-2"></span>
                     Vérification du code...
                   </p>
                 )}
                 
                 {associationValidation.valid === true && associationValidation.canAddClub && (
                   <div className="mt-2">
-                    <p className="text-sm text-green-600 flex items-center">
+                    <p className="text-sm text-ds-success flex items-center">
                       <Check className="w-4 h-4 mr-2" />
                       Structure trouvée : {associationValidation.associationName}
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-encre-2 mt-1">
                       📊 {associationValidation.currentClubs}/{associationValidation.maxClubs} clubs utilisés
                     </p>
                   </div>
                 )}
                 
                 {associationValidation.valid === true && !associationValidation.canAddClub && (
-                  <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-sm text-red-700 flex items-center font-semibold">
+                  <div className="mt-2 bg-ds-danger-soft border border-ds-danger rounded-lg p-3">
+                    <p className="text-sm text-ds-danger flex items-center font-semibold">
                       <AlertCircle className="w-4 h-4 mr-2" />
                       Limite atteinte !
                     </p>
-                    <p className="text-xs text-red-600 mt-1">
+                    <p className="text-xs text-ds-danger mt-1">
                       Cette structure a atteint sa limite de {associationValidation.maxClubs} clubs ({associationValidation.currentClubs}/{associationValidation.maxClubs}).
                     </p>
-                    <p className="text-xs text-red-600 mt-1">
+                    <p className="text-xs text-ds-danger mt-1">
                       Le Super Admin doit upgrader son plan pour ajouter plus de clubs.
                     </p>
                   </div>
                 )}
                 
                 {associationValidation.valid === false && clubForm.association_code && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <p className="mt-2 text-sm text-ds-danger flex items-center">
                     <AlertCircle className="w-4 h-4 mr-2" />
                     Code de structure invalide
                   </p>
                 )}
 
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-encre-3">
                   Demandez le code de structure au super admin de votre organisation
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Site web du club
                 </label>
                 <input
                   type="url"
                   value={clubForm.website_url || ''}
                   onChange={(e) => setClubForm({ ...clubForm, website_url: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="https://www.monclub.com"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-encre-3">
                   URL complète du site web (optionnel)
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-encre-2 mb-2">
                   Description
                 </label>
                 <textarea
                   rows={4}
                   value={clubForm.description}
                   onChange={(e) => setClubForm({ ...clubForm, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="Décrivez brièvement votre club..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Logo du club</label>
+                <label className="block text-sm font-medium text-encre-2 mb-2">Logo du club</label>
                 <ProfilePictureUpload
                   onImageSelect={handleClubLogoSelect}
                   currentImage={clubForm.logo_url}
                 />
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-encre-3 mt-2">
                   Formats acceptés : PNG, JPG, SVG. Taille max : 2MB. Dimension recommandée : 200x200px
                 </p>
               </div>
@@ -1922,14 +1922,14 @@ ${customPlanForm.name}`);
                 <button
                   type="button"
                   onClick={() => setActiveForm(null)}
-                  className="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 px-6 border border-[var(--ds-border-2)] rounded-lg text-encre-2 hover:bg-papier-2 transition-colors"
                 >
                   Retour
                 </button>
                 <button
                   type="submit"
                   disabled={loading || (associationValidation.valid === true && !associationValidation.canAddClub)}
-                  className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-3 px-6 bg-ds-success text-white rounded-lg hover:bg-ds-success disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? 'Création...' : 
                   associationValidation.valid && !associationValidation.canAddClub ? '🚫 Limite atteinte' : 
@@ -1953,8 +1953,8 @@ ${customPlanForm.name}`);
         {message && (
           <div className={`mt-8 max-w-2xl mx-auto p-4 rounded-lg border ${
             message.type === 'success' 
-              ? 'bg-green-50 text-green-700 border-green-200' 
-              : 'bg-red-50 text-red-700 border-red-200'
+              ? 'bg-ds-success-soft text-ds-success border-ds-success' 
+              : 'bg-ds-danger-soft text-ds-danger border-ds-danger'
           }`}>
             <div className="flex items-start">
               {message.type === 'success' ? (

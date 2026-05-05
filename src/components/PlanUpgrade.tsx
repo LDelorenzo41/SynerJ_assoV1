@@ -89,29 +89,29 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
     return (
       <div className={`mb-6 p-4 rounded-lg border-2 ${
         isAtLimit 
-          ? 'bg-red-50 border-red-500' 
-          : 'bg-yellow-50 border-yellow-500'
+          ? 'bg-ds-danger-soft border-ds-danger' 
+          : 'bg-ds-warning-soft border-ds-warning'
       }`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
             <AlertTriangle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
-              isAtLimit ? 'text-red-600' : 'text-yellow-600'
+              isAtLimit ? 'text-ds-danger' : 'text-ds-warning'
             }`} />
             <div>
               <h3 className={`font-semibold ${
-                isAtLimit ? 'text-red-900' : 'text-yellow-900'
+                isAtLimit ? 'text-ds-danger' : 'text-ds-warning'
               }`}>
                 {isAtLimit 
                   ? '🚨 Limite de clubs atteinte !' 
                   : '⚠️ Vous approchez de votre limite'}
               </h3>
               <p className={`text-sm mt-1 ${
-                isAtLimit ? 'text-red-700' : 'text-yellow-700'
+                isAtLimit ? 'text-ds-danger' : 'text-ds-warning'
               }`}>
                 Vous avez actuellement <strong>{currentClubCount} club{currentClubCount > 1 ? 's' : ''}</strong> sur {currentPlanData?.maxClubs} autorisés dans le plan <strong>{currentPlanData?.name}</strong>.
               </p>
               {isAtLimit && (
-                <p className="text-sm mt-2 text-red-800 font-medium">
+                <p className="text-sm mt-2 text-ds-danger font-medium">
                   Vous ne pouvez plus créer de nouveaux clubs. Passez à un plan supérieur pour continuer.
                 </p>
               )}
@@ -121,8 +121,8 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
             onClick={() => setShowUpgradeModal(true)}
             className={`ml-4 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
               isAtLimit
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-yellow-600 text-white hover:bg-yellow-700'
+                ? 'bg-ds-danger text-white hover:bg-ds-danger'
+                : 'bg-ds-warning text-white hover:bg-ds-warning'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -145,7 +145,7 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
                 <TrendingUp className="w-6 h-6" />
                 Upgrader votre plan
               </h2>
-              <p className="text-blue-100 mt-1">
+              <p className="text-terracotta mt-1">
                 Choisissez le plan adapté à vos {currentClubCount} clubs
               </p>
             </div>
@@ -161,10 +161,10 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
 
           <div className="p-6">
             {isAtLimit && (
-              <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-4">
+              <div className="mb-6 bg-ds-danger-soft border-2 border-ds-danger rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-red-800">
+                  <AlertTriangle className="w-5 h-5 text-ds-danger flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-ds-danger">
                     <p className="font-semibold">Action requise</p>
                     <p className="mt-1">
                       Vous avez atteint la limite de votre plan actuel. Sélectionnez un plan supérieur pour continuer à créer des clubs.
@@ -185,39 +185,39 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
                     onClick={() => setSelectedPlan(plan.id)}
                     className={`cursor-pointer rounded-xl p-6 border-2 transition-all ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        ? 'border-terracotta bg-terracotta-soft shadow-lg scale-105'
+                        : 'border-[var(--ds-border)] hover:border-[var(--ds-border-2)] hover:shadow-md'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-4">
                       <Icon className={`w-8 h-8 ${
-                        plan.id === '25+' ? 'text-pink-600' : 'text-purple-600'
+                        plan.id === '25+' ? 'text-ds-danger' : 'text-ds-info'
                       }`} />
                       {isSelected && (
-                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-terracotta rounded-full flex items-center justify-center">
                           <Check className="w-4 h-4 text-white" />
                         </div>
                       )}
                     </div>
 
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl font-bold text-encre mb-1">
                       {plan.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3">{plan.range}</p>
+                    <p className="text-sm text-encre-2 mb-3">{plan.range}</p>
 
                     <div className="mb-4">
-                      <span className="text-3xl font-bold text-gray-900">
+                      <span className="text-3xl font-bold text-encre">
                         {plan.price.split('/')[0]}
                       </span>
                       {plan.price.includes('/') && (
-                        <span className="text-gray-600">/mois</span>
+                        <span className="text-encre-2">/mois</span>
                       )}
                     </div>
 
                     <ul className="space-y-2">
                       {plan.features.slice(0, 4).map((feature, idx) => (
-                        <li key={idx} className="flex items-start text-sm text-gray-600">
-                          <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                        <li key={idx} className="flex items-start text-sm text-encre-2">
+                          <Check className="w-4 h-4 text-ds-success mr-2 flex-shrink-0 mt-0.5" />
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -231,7 +231,7 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
               {!isAtLimit && (
                 <button
                   onClick={() => setShowUpgradeModal(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 border-2 border-[var(--ds-border-2)] text-encre-2 rounded-lg hover:bg-papier-2 transition-colors font-medium"
                 >
                   Annuler
                 </button>
@@ -256,7 +256,7 @@ export default function PlanUpgrade({ currentPlan, currentClubCount, association
             </div>
 
             {selectedPlan && selectedPlan !== '25+' && (
-              <p className="mt-4 text-sm text-gray-600 text-center">
+              <p className="mt-4 text-sm text-encre-2 text-center">
                 💡 Le changement est effectif immédiatement. Votre prochaine facture sera ajustée au prorata.
               </p>
             )}
