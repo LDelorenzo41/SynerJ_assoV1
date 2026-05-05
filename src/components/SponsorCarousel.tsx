@@ -121,41 +121,41 @@ export const SponsorCarousel: React.FC = () => {
         return {
           icon: Crown,
           label: 'SPONSOR PLATINE',
-          bgColor: 'bg-purple-600 dark:bg-purple-700',
+          bgColor: 'bg-ds-info dark:bg-ds-info-soft',
           textColor: 'text-white',
-          iconColor: 'text-yellow-300'
+          iconColor: 'text-ds-warning'
         };
       case 'Or':
         return {
           icon: Award,
           label: 'SPONSOR OR',
-          bgColor: 'bg-yellow-500 dark:bg-yellow-600',
+          bgColor: 'bg-ds-warning dark:bg-ds-warning',
           textColor: 'text-white',
-          iconColor: 'text-yellow-200'
+          iconColor: 'text-ds-warning'
         };
       case 'Argent':
         return {
           icon: Medal,
           label: 'SPONSOR ARGENT',
-          bgColor: 'bg-gray-400 dark:bg-gray-500',
+          bgColor: 'bg-papier-3 dark:bg-papier-3',
           textColor: 'text-white',
-          iconColor: 'text-gray-100'
+          iconColor: 'text-papier-2'
         };
       case 'Bronze':
         return {
           icon: Medal,
           label: 'SPONSOR BRONZE',
-          bgColor: 'bg-orange-600 dark:bg-orange-700',
+          bgColor: 'bg-ds-warning dark:bg-ds-warning',
           textColor: 'text-white',
-          iconColor: 'text-orange-200'
+          iconColor: 'text-ds-warning'
         };
       default:
         return {
           icon: Star,
           label: 'PARTENAIRE',
-          bgColor: 'bg-blue-600 dark:bg-blue-700',
+          bgColor: 'bg-terracotta dark:bg-terracotta-deep',
           textColor: 'text-white',
-          iconColor: 'text-blue-200'
+          iconColor: 'text-terracotta'
         };
     }
   };
@@ -237,7 +237,7 @@ export const SponsorCarousel: React.FC = () => {
                 </div>
               ) : (
                 <div className="bg-white dark:bg-slate-100 rounded-lg p-2 shadow-md w-16 h-16 flex items-center justify-center">
-                  <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-600" />
+                  <Building2 className="h-8 w-8 text-encre-3 dark:text-encre-2" />
                 </div>
               )}
             </div>
@@ -258,7 +258,7 @@ export const SponsorCarousel: React.FC = () => {
           {/* CTA Button */}
           {currentSponsor.website && (
             <button
-              className="w-full mt-3 bg-white dark:bg-slate-100 text-gray-900 dark:text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-white/90 dark:hover:bg-slate-200 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 group"
+              className="w-full mt-3 bg-white dark:bg-slate-100 text-encre dark:text-encre px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-white/90 dark:hover:bg-slate-200 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 group"
             >
               <span>🎁 Découvrir leurs offres</span>
               <ExternalLink className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />

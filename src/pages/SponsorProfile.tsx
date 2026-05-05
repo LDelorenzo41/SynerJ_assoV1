@@ -195,24 +195,24 @@ export default function SponsorProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen dark-bg flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
+      <div className="min-h-screen bg-papier flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-terracotta dark:border-terracotta"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen dark-bg flex items-center justify-center">
-        <div className="max-w-md w-full dark-card rounded-lg shadow-md p-8">
+      <div className="min-h-screen bg-papier flex items-center justify-center">
+        <div className="max-w-md w-full bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-md p-8">
           <div className="flex items-center justify-center mb-4">
-            <AlertCircle className="h-16 w-16 text-red-500 dark:text-red-400" />
+            <AlertCircle className="h-16 w-16 text-ds-danger dark:text-ds-danger" />
           </div>
-          <h1 className="text-2xl font-bold text-center dark-text mb-4">Erreur</h1>
-          <p className="dark-text-muted text-center mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-center text-encre mb-4">Erreur</h1>
+          <p className="text-encre-3 text-center mb-6">{error}</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+            className="w-full flex items-center justify-center px-4 py-2 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour au dashboard
@@ -224,13 +224,13 @@ export default function SponsorProfile() {
 
   if (success) {
     return (
-      <div className="min-h-screen dark-bg flex items-center justify-center">
-        <div className="max-w-md w-full dark-card rounded-lg shadow-md p-8">
+      <div className="min-h-screen bg-papier flex items-center justify-center">
+        <div className="max-w-md w-full bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-md p-8">
           <div className="flex items-center justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-green-500 dark:text-green-400" />
+            <CheckCircle className="h-16 w-16 text-ds-success dark:text-ds-success" />
           </div>
-          <h1 className="text-2xl font-bold text-center dark-text mb-4">Profil mis à jour !</h1>
-          <p className="dark-text-muted text-center mb-6">
+          <h1 className="text-2xl font-bold text-center text-encre mb-4">Profil mis à jour !</h1>
+          <p className="text-encre-3 text-center mb-6">
             Vos informations ont été mises à jour avec succès. Redirection vers le dashboard...
           </p>
         </div>
@@ -239,24 +239,24 @@ export default function SponsorProfile() {
   }
 
   return (
-    <div className="min-h-screen dark-bg py-8">
+    <div className="min-h-screen bg-papier py-8">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="dark-card rounded-lg shadow-md overflow-hidden">
+        <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-md overflow-hidden">
           {/* Header */}
-          <div className="bg-blue-600 dark:bg-blue-700 px-6 py-4">
+          <div className="bg-terracotta dark:bg-terracotta-deep px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-white flex items-center">
                   <Building2 className="h-6 w-6 mr-2" />
                   Mon profil sponsor
                 </h1>
-                <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
+                <p className="text-terracotta dark:text-terracotta text-sm mt-1">
                   Gérez vos informations publiques
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="p-2 text-white hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors"
+                className="p-2 text-white hover:bg-terracotta-deep dark:hover:bg-terracotta-deep rounded-lg transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
@@ -265,19 +265,19 @@ export default function SponsorProfile() {
 
           {/* Info niveau de sponsoring */}
           {sponsor && (
-            <div className="bg-gray-50 dark:bg-slate-700 px-6 py-3 border-b border-gray-200 dark:border-gray-600">
+            <div className="bg-papier-2 dark:bg-slate-700 px-6 py-3 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
               <div className="flex items-center justify-between">
-                <span className="text-sm dark-text-muted">Niveau de sponsoring :</span>
+                <span className="text-sm text-encre-3">Niveau de sponsoring :</span>
                 <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                  sponsor.sponsor_type === 'Platine' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
-                  sponsor.sponsor_type === 'Or' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
-                  sponsor.sponsor_type === 'Argent' ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400' :
-                  'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                  sponsor.sponsor_type === 'Platine' ? 'bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info' :
+                  sponsor.sponsor_type === 'Or' ? 'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning' :
+                  sponsor.sponsor_type === 'Argent' ? 'bg-papier-2 dark:bg-papier-3 text-encre-2 dark:text-encre-3' :
+                  'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning'
                 }`}>
                   {sponsor.sponsor_type}
                 </span>
               </div>
-              <p className="text-xs dark-text-muted mt-1">
+              <p className="text-xs text-encre-3 mt-1">
                 Contactez votre association pour modifier votre niveau de sponsoring
               </p>
             </div>
@@ -286,7 +286,7 @@ export default function SponsorProfile() {
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Nom de l'entreprise *
               </label>
               <input
@@ -294,12 +294,12 @@ export default function SponsorProfile() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Email de contact *
               </label>
               <input
@@ -307,12 +307,12 @@ export default function SponsorProfile() {
                 required
                 value={formData.contact_email}
                 onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Logo de l'entreprise
               </label>
               {formData.logo_url && (
@@ -320,12 +320,12 @@ export default function SponsorProfile() {
                   <img 
                     src={formData.logo_url} 
                     alt="Logo" 
-                    className="w-32 h-32 object-contain border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600"
+                    className="w-32 h-32 object-contain border rounded-lg bg-papier-2 dark:bg-slate-700 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, logo_url: '' })}
-                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                    className="absolute -top-2 -right-2 p-1 bg-ds-danger text-white rounded-full hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -342,9 +342,9 @@ export default function SponsorProfile() {
                   className="hidden"
                   disabled={uploadingLogo}
                 />
-                <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 transition-colors">
-                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-                  <span className="text-sm dark-text-muted">
+                <div className="w-full p-4 border-2 border-dashed border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg text-center cursor-pointer hover:border-terracotta hover:bg-terracotta-soft dark:hover:border-terracotta dark:hover:bg-terracotta-soft transition-colors">
+                  <Upload className="h-6 w-6 mx-auto mb-2 text-encre-3 dark:text-encre-3" />
+                  <span className="text-sm text-encre-3">
                     {uploadingLogo ? 'Upload du logo...' : 'Télécharger un logo'}
                   </span>
                 </div>
@@ -352,7 +352,7 @@ export default function SponsorProfile() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Visuel promotionnel
               </label>
               {formData.visual_url && (
@@ -360,12 +360,12 @@ export default function SponsorProfile() {
                   <img 
                     src={formData.visual_url} 
                     alt="Visuel" 
-                    className="w-full h-32 object-cover border rounded-lg bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-gray-600"
+                    className="w-full h-32 object-cover border rounded-lg bg-papier-2 dark:bg-slate-700 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, visual_url: '' })}
-                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                    className="absolute -top-2 -right-2 p-1 bg-ds-danger text-white rounded-full hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -382,9 +382,9 @@ export default function SponsorProfile() {
                   className="hidden"
                   disabled={uploadingVisual}
                 />
-                <div className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:border-green-500 dark:hover:bg-green-900/20 transition-colors">
-                  <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-                  <span className="text-sm dark-text-muted">
+                <div className="w-full p-4 border-2 border-dashed border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg text-center cursor-pointer hover:border-ds-success hover:bg-ds-success-soft dark:hover:border-ds-success dark:hover:bg-ds-success-soft/20 transition-colors">
+                  <Upload className="h-6 w-6 mx-auto mb-2 text-encre-3 dark:text-encre-3" />
+                  <span className="text-sm text-encre-3">
                     {uploadingVisual ? 'Upload du visuel...' : 'Télécharger un visuel'}
                   </span>
                 </div>
@@ -392,62 +392,62 @@ export default function SponsorProfile() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Description de l'entreprise
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="Décrivez votre entreprise et vos services..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Site web
               </label>
               <input
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="https://www.votre-site.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Téléphone
               </label>
               <input
                 type="tel"
                 value={formData.contact_phone}
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="01 23 45 67 89"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium dark-text-muted mb-2">
+              <label className="block text-sm font-medium text-encre-3 mb-2">
                 Adresse
               </label>
               <input
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="dark-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                 placeholder="123 Rue de la Paix, 75001 Paris"
               />
             </div>
 
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+            <div className="pt-4 border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-4 py-3 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>

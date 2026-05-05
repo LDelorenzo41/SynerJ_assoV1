@@ -105,35 +105,35 @@ export const SponsorBanner: React.FC = () => {
         return {
           icon: Crown,
           borderColor: 'ring-purple-500 dark:ring-purple-400',
-          bgColor: 'bg-purple-500 dark:bg-purple-600',
-          iconColor: 'text-yellow-300'
+          bgColor: 'bg-ds-info dark:bg-ds-info',
+          iconColor: 'text-ds-warning'
         };
       case 'Or':
         return {
           icon: Award,
           borderColor: 'ring-yellow-500 dark:ring-yellow-400',
-          bgColor: 'bg-yellow-500 dark:bg-yellow-600',
+          bgColor: 'bg-ds-warning dark:bg-ds-warning',
           iconColor: 'text-white'
         };
       case 'Argent':
         return {
           icon: Medal,
           borderColor: 'ring-gray-400 dark:ring-gray-300',
-          bgColor: 'bg-gray-400 dark:bg-gray-500',
+          bgColor: 'bg-papier-3 dark:bg-papier-3',
           iconColor: 'text-white'
         };
       case 'Bronze':
         return {
           icon: Medal,
           borderColor: 'ring-orange-500 dark:ring-orange-400',
-          bgColor: 'bg-orange-500 dark:bg-orange-600',
+          bgColor: 'bg-ds-warning dark:bg-ds-warning',
           iconColor: 'text-white'
         };
       default:
         return {
           icon: Star,
           borderColor: 'ring-blue-500 dark:ring-blue-400',
-          bgColor: 'bg-blue-500 dark:bg-blue-600',
+          bgColor: 'bg-terracotta dark:bg-terracotta',
           iconColor: 'text-white'
         };
     }
@@ -142,14 +142,14 @@ export const SponsorBanner: React.FC = () => {
   if (sponsors.length === 0) return null;
 
   return (
-    <div className="relative bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border-t border-b border-purple-200 dark:border-purple-800/50 py-3 overflow-hidden">
+    <div className="relative bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border-t border-b border-ds-info-soft dark:border-ds-info/50 py-3 overflow-hidden">
       {/* Effet de brillance animé */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10 animate-shine"></div>
       
       <div className="flex animate-scroll-slow space-x-8 items-center">
         {/* Message de remerciement au début */}
         <div className="flex items-center space-x-2 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-700 rounded-full shadow-md flex-shrink-0">
-          <Sparkles className="h-4 w-4 text-yellow-300 animate-pulse" />
+          <Sparkles className="h-4 w-4 text-ds-warning animate-pulse" />
           <span className="text-sm font-semibold text-white whitespace-nowrap">
             Merci à nos {sponsors.length} sponsor{sponsors.length > 1 ? 's' : ''}
           </span>
@@ -175,7 +175,7 @@ export const SponsorBanner: React.FC = () => {
                       className="w-10 h-10 object-contain rounded-full p-1"
                     />
                   ) : (
-                    <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-600" />
+                    <Building2 className="h-6 w-6 text-encre-3 dark:text-encre-2" />
                   )}
                 </div>
                 
@@ -186,7 +186,7 @@ export const SponsorBanner: React.FC = () => {
               </div>
               
               {/* Nom du sponsor */}
-              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              <span className="text-sm font-semibold text-encre dark:text-encre whitespace-nowrap group-hover:text-ds-info dark:group-hover:text-ds-info transition-colors">
                 {sponsor.name}
               </span>
             </div>
