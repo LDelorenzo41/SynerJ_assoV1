@@ -163,14 +163,14 @@ const getNavigationItems = (): NavigationItem[] => {
   // Pour les utilisateurs non connectés ou les pages publiques
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen dark-bg">
+      <div className="min-h-screen bg-papier">
         {children}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen dark-bg flex">
+    <div className="min-h-screen bg-papier flex">
       {/* Sidebar - visible uniquement sur desktop (≥1024px) */}
       <Sidebar
         isOpen={windowWidth < 1024 ? sidebarOpen : !sidebarCollapsed}
