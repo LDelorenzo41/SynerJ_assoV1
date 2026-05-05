@@ -49,13 +49,13 @@ const ClubInvitations: React.FC = () => {
   if (!profile || profile.role !== 'Club Admin') {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md p-6">
           <div className="text-center py-8">
-            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <XCircle className="w-16 h-16 text-ds-danger mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-encre dark:text-white mb-2">
               Accès non autorisé
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-encre-2 dark:text-encre-3">
               Seuls les administrateurs de club peuvent gérer les invitations.
             </p>
           </div>
@@ -67,9 +67,9 @@ const ClubInvitations: React.FC = () => {
   if (loading && !invitations.length) {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md p-6">
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta dark:border-terracotta"></div>
           </div>
         </div>
       </div>
@@ -79,16 +79,16 @@ const ClubInvitations: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* En-tête */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md">
+        <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border)]">
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center gap-3">
-              <UserPlus className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <UserPlus className="w-8 h-8 text-terracotta dark:text-terracotta" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl font-bold text-encre dark:text-white">
                   Inviter des membres
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-encre-2 dark:text-encre-3">
                   Invitez de nouveaux membres à rejoindre votre club
                 </p>
               </div>
@@ -96,7 +96,7 @@ const ClubInvitations: React.FC = () => {
 
             <button
               onClick={refresh}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 text-encre-2 dark:text-encre-3 hover:bg-papier-2 dark:hover:bg-papier-3 rounded-lg transition-colors"
               title="Actualiser"
             >
               <RefreshCw className="w-5 h-5" />
@@ -109,8 +109,8 @@ const ClubInvitations: React.FC = () => {
               onClick={() => setActiveTab('email')}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${
                 activeTab === 'email'
-                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'border-terracotta text-terracotta dark:text-terracotta'
+                  : 'border-transparent text-encre-2 dark:text-encre-3 hover:text-encre dark:hover:text-encre-2'
               }`}
             >
               <Mail className="w-4 h-4 inline mr-2" />
@@ -120,8 +120,8 @@ const ClubInvitations: React.FC = () => {
               onClick={() => setActiveTab('link')}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${
                 activeTab === 'link'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'border-ds-info text-ds-info dark:text-ds-info'
+                  : 'border-transparent text-encre-2 dark:text-encre-3 hover:text-encre dark:hover:text-encre-2'
               }`}
             >
               <Link2 className="w-4 h-4 inline mr-2" />
@@ -131,8 +131,8 @@ const ClubInvitations: React.FC = () => {
               onClick={() => setActiveTab('history')}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${
                 activeTab === 'history'
-                  ? 'border-green-600 text-green-600 dark:text-green-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'border-ds-success text-ds-success dark:text-ds-success'
+                  : 'border-transparent text-encre-2 dark:text-encre-3 hover:text-encre dark:hover:text-encre-2'
               }`}
             >
               <Clock className="w-4 h-4 inline mr-2" />
@@ -142,8 +142,8 @@ const ClubInvitations: React.FC = () => {
               onClick={() => setActiveTab('stats')}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${
                 activeTab === 'stats'
-                  ? 'border-orange-600 text-orange-600 dark:text-orange-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'border-ds-warning text-ds-warning dark:text-ds-warning'
+                  : 'border-transparent text-encre-2 dark:text-encre-3 hover:text-encre dark:hover:text-encre-2'
               }`}
             >
               <BarChart3 className="w-4 h-4 inline mr-2" />
@@ -155,17 +155,17 @@ const ClubInvitations: React.FC = () => {
 
       {/* Message de succès global */}
       {successMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
-          <p className="text-green-800 dark:text-green-200 font-medium">{successMessage}</p>
+        <div className="bg-ds-success-soft dark:bg-ds-success-soft/20 border border-ds-success dark:border-ds-success rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-ds-success dark:text-ds-success flex-shrink-0" />
+          <p className="text-ds-success dark:text-ds-success font-medium">{successMessage}</p>
         </div>
       )}
 
       {/* Erreur globale */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center gap-3">
-          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-          <p className="text-red-800 dark:text-red-200">{error}</p>
+        <div className="bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-lg p-4 flex items-center gap-3">
+          <XCircle className="w-5 h-5 text-ds-danger dark:text-ds-danger flex-shrink-0" />
+          <p className="text-ds-danger dark:text-ds-danger">{error}</p>
         </div>
       )}
 
@@ -189,9 +189,9 @@ const ClubInvitations: React.FC = () => {
       )}
 
       {activeTab === 'history' && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md">
+          <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border)] px-6 py-4">
+            <h3 className="text-lg font-semibold text-encre dark:text-white">
               Historique des invitations par email
             </h3>
           </div>
@@ -199,11 +199,11 @@ const ClubInvitations: React.FC = () => {
           <div className="p-6">
             {invitations.length === 0 ? (
               <div className="text-center py-12">
-                <Mail className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <Mail className="w-16 h-16 text-encre-3 dark:text-encre-2 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-encre dark:text-white mb-2">
                   Aucune invitation envoyée
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-encre-2 dark:text-encre-3">
                   Les invitations que vous envoyez apparaîtront ici
                 </p>
               </div>
@@ -211,20 +211,20 @@ const ClubInvitations: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gray-50 dark:bg-gray-700">
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    <tr className="bg-papier-2 dark:bg-papier-3">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-encre-3 dark:text-encre-3 uppercase">
                         Email
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-encre-3 dark:text-encre-3 uppercase">
                         Rôle
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-encre-3 dark:text-encre-3 uppercase">
                         Statut
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-encre-3 dark:text-encre-3 uppercase">
                         Date d'envoi
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-encre-3 dark:text-encre-3 uppercase">
                         Actions
                       </th>
                     </tr>
@@ -235,24 +235,24 @@ const ClubInvitations: React.FC = () => {
                       const statusLabel = getInvitationStatusLabel(invitation.status);
 
                       return (
-                        <tr key={invitation.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                        <tr key={invitation.id} className="hover:bg-papier-2 dark:hover:bg-papier-3/50">
+                          <td className="px-4 py-3 text-sm text-encre dark:text-white">
                             {invitation.email}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          <td className="px-4 py-3 text-sm text-encre-2 dark:text-encre-3">
                             {invitation.role === 'Member' ? 'Membre' : 'Administrateur'}
                           </td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              statusColor === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                              statusColor === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                              statusColor === 'red' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                              'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                              statusColor === 'blue' ? 'bg-terracotta-soft text-terracotta-deep dark:bg-terracotta-soft dark:text-terracotta' :
+                              statusColor === 'green' ? 'bg-ds-success-soft text-ds-success dark:bg-ds-success-soft dark:text-ds-success' :
+                              statusColor === 'red' ? 'bg-ds-danger-soft text-ds-danger dark:bg-ds-danger-soft dark:text-ds-danger' :
+                              'bg-papier-2 text-encre dark:bg-papier-3 dark:text-encre-3'
                             }`}>
                               {statusLabel}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          <td className="px-4 py-3 text-sm text-encre-2 dark:text-encre-3">
                             {new Date(invitation.created_at).toLocaleDateString('fr-FR')}
                           </td>
                           <td className="px-4 py-3">
@@ -261,7 +261,7 @@ const ClubInvitations: React.FC = () => {
                                 <>
                                   <button
                                     onClick={() => resendInvitation(invitation.id)}
-                                    className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                    className="p-1 text-terracotta hover:bg-terracotta-soft dark:hover:bg-terracotta-soft rounded transition-colors"
                                     title="Renvoyer"
                                   >
                                     <Send className="w-4 h-4" />
@@ -272,7 +272,7 @@ const ClubInvitations: React.FC = () => {
                                         revokeInvitation(invitation.id);
                                       }
                                     }}
-                                    className="p-1 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded transition-colors"
+                                    className="p-1 text-ds-warning hover:bg-ds-warning-soft dark:hover:bg-ds-warning-soft/20 rounded transition-colors"
                                     title="Révoquer"
                                   >
                                     <XCircle className="w-4 h-4" />
@@ -285,7 +285,7 @@ const ClubInvitations: React.FC = () => {
                                     deleteInvitation(invitation.id);
                                   }
                                 }}
-                                className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                className="p-1 text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded transition-colors"
                                 title="Supprimer"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -306,51 +306,51 @@ const ClubInvitations: React.FC = () => {
       {activeTab === 'stats' && stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Statistiques invitations email */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Invitations email</h3>
-              <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="font-semibold text-encre dark:text-white">Invitations email</h3>
+              <Mail className="w-5 h-5 text-terracotta dark:text-terracotta" />
             </div>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">{stats.totalInvitations}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Total</span>
+                <span className="text-sm font-medium text-encre dark:text-white">{stats.totalInvitations}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">En attente</span>
-                <span className="text-sm font-medium text-blue-600">{stats.pendingInvitations}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">En attente</span>
+                <span className="text-sm font-medium text-terracotta">{stats.pendingInvitations}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Acceptées</span>
-                <span className="text-sm font-medium text-green-600">{stats.acceptedInvitations}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Acceptées</span>
+                <span className="text-sm font-medium text-ds-success">{stats.acceptedInvitations}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Expirées</span>
-                <span className="text-sm font-medium text-gray-600">{stats.expiredInvitations}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Expirées</span>
+                <span className="text-sm font-medium text-encre-2">{stats.expiredInvitations}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Révoquées</span>
-                <span className="text-sm font-medium text-red-600">{stats.revokedInvitations}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Révoquées</span>
+                <span className="text-sm font-medium text-ds-danger">{stats.revokedInvitations}</span>
               </div>
             </div>
           </div>
 
           {/* Taux d'acceptation */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Taux d'acceptation</h3>
-              <BarChart3 className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <h3 className="font-semibold text-encre dark:text-white">Taux d'acceptation</h3>
+              <BarChart3 className="w-5 h-5 text-ds-success dark:text-ds-success" />
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
+              <div className="text-4xl font-bold text-ds-success dark:text-ds-success mb-2">
                 {stats.acceptanceRate}%
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-encre-2 dark:text-encre-3">
                 {stats.acceptedInvitations} acceptées sur {stats.totalInvitations}
               </p>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-4">
+              <div className="w-full bg-papier-3 dark:bg-papier-3 rounded-full h-2 mt-4">
                 <div
-                  className="bg-green-600 h-2 rounded-full transition-all"
+                  className="bg-ds-success h-2 rounded-full transition-all"
                   style={{ width: `${stats.acceptanceRate}%` }}
                 ></div>
               </div>
@@ -358,23 +358,23 @@ const ClubInvitations: React.FC = () => {
           </div>
 
           {/* Statistiques liens */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-papier-2 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Liens d'invitation</h3>
-              <Link2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h3 className="font-semibold text-encre dark:text-white">Liens d'invitation</h3>
+              <Link2 className="w-5 h-5 text-ds-info dark:text-ds-info" />
             </div>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">{stats.totalLinks}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Total</span>
+                <span className="text-sm font-medium text-encre dark:text-white">{stats.totalLinks}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Actifs</span>
-                <span className="text-sm font-medium text-green-600">{stats.activeLinks}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Actifs</span>
+                <span className="text-sm font-medium text-ds-success">{stats.activeLinks}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Utilisations</span>
-                <span className="text-sm font-medium text-purple-600">{stats.totalLinkUses}</span>
+                <span className="text-sm text-encre-2 dark:text-encre-3">Utilisations</span>
+                <span className="text-sm font-medium text-ds-info">{stats.totalLinkUses}</span>
               </div>
             </div>
           </div>

@@ -97,16 +97,16 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
   : { valid: [] };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-papier-2 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border)]">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border)] px-6 py-4">
         <div className="flex items-center gap-3">
-          <Mail className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <Mail className="w-6 h-6 text-terracotta dark:text-terracotta" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-encre dark:text-white">
               Inviter par email
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-encre-2 dark:text-encre-3">
               Envoyez des invitations personnalisées par email
             </p>
           </div>
@@ -117,7 +117,7 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Adresses email */}
         <div>
-          <label htmlFor="emails" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="emails" className="block text-sm font-medium text-encre-2 dark:text-encre-3 mb-2">
             Adresses email *
           </label>
           <textarea
@@ -126,15 +126,15 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
             onChange={(e) => handleEmailsChange(e.target.value)}
             placeholder="exemple1@email.com&#10;exemple2@email.com&#10;exemple3@email.com&#10;&#10;Ou séparez par des virgules: email1@test.com, email2@test.com"
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white placeholder-gray-400 resize-vertical"
+            className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-terracotta dark:bg-papier-3 dark:text-white placeholder-gray-400 resize-vertical"
             disabled={loading}
           />
           <div className="flex items-center justify-between mt-2">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-encre-3 dark:text-encre-3">
               Entrez une adresse par ligne ou séparez par des virgules
             </p>
             {validEmails.length > 0 && (
-              <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+              <p className="text-xs text-ds-success dark:text-ds-success font-medium">
                 {validEmails.length} email{validEmails.length > 1 ? 's' : ''} valide{validEmails.length > 1 ? 's' : ''}
               </p>
             )}
@@ -143,20 +143,20 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
 
         {/* Rôle */}
         <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="role" className="block text-sm font-medium text-encre-2 dark:text-encre-3 mb-2">
             Rôle à attribuer *
           </label>
           <select
             id="role"
             value={role}
             onChange={(e) => setRole(e.target.value as InvitationRole)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-terracotta dark:bg-papier-3 dark:text-white"
             disabled={loading}
           >
             <option value="Member">Membre</option>
             <option value="Club Admin">Administrateur</option>
           </select>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-encre-3 dark:text-encre-3 mt-1">
             {role === 'Member' 
               ? 'Les membres peuvent voir les événements et communications du club' 
               : 'Les administrateurs peuvent gérer le club, créer des événements et inviter des membres'}
@@ -165,7 +165,7 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
 
         {/* Message personnalisé */}
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="message" className="block text-sm font-medium text-encre-2 dark:text-encre-3 mb-2">
             Message personnalisé (optionnel)
           </label>
           <textarea
@@ -175,23 +175,23 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
             placeholder="Ajoutez un message personnel pour accompagner l'invitation..."
             rows={4}
             maxLength={500}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white placeholder-gray-400 resize-vertical"
+            className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-terracotta dark:bg-papier-3 dark:text-white placeholder-gray-400 resize-vertical"
             disabled={loading}
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-encre-3 dark:text-encre-3 mt-1">
             {personalMessage.length}/500 caractères
           </p>
         </div>
 
         {/* Erreur de validation */}
         {validationError && (
-          <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-lg">
+            <AlertCircle className="w-5 h-5 text-ds-danger dark:text-ds-danger flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-800 dark:text-red-200">
+              <p className="text-sm font-medium text-ds-danger dark:text-ds-danger">
                 Erreur de validation
               </p>
-              <p className="text-sm text-red-700 dark:text-red-300">
+              <p className="text-sm text-ds-danger dark:text-ds-danger">
                 {validationError}
               </p>
             </div>
@@ -202,19 +202,19 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
         {result && (
           <div className={`flex items-start gap-3 p-4 border rounded-lg ${
             result.failed === 0
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-              : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+              ? 'bg-ds-success-soft dark:bg-ds-success-soft/20 border-ds-success dark:border-ds-success'
+              : 'bg-ds-warning-soft dark:bg-ds-warning-soft/20 border-ds-warning dark:border-ds-warning'
           }`}>
             {result.failed === 0 ? (
-              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-ds-success dark:text-ds-success flex-shrink-0 mt-0.5" />
             ) : (
-              <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-ds-warning dark:text-ds-warning flex-shrink-0 mt-0.5" />
             )}
             <div className="flex-1">
               <p className={`text-sm font-medium ${
                 result.failed === 0
-                  ? 'text-green-800 dark:text-green-200'
-                  : 'text-yellow-800 dark:text-yellow-200'
+                  ? 'text-ds-success dark:text-ds-success'
+                  : 'text-ds-warning dark:text-ds-warning'
               }`}>
                 {result.sent > 0 && `${result.sent} invitation${result.sent > 1 ? 's' : ''} envoyée${result.sent > 1 ? 's' : ''} avec succès`}
                 {result.failed > 0 && ` • ${result.failed} échec${result.failed > 1 ? 's' : ''}`}
@@ -222,12 +222,12 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
               {result.errors && result.errors.length > 0 && (
                 <ul className="mt-2 space-y-1">
                   {result.errors.slice(0, 3).map((error, index) => (
-                    <li key={index} className="text-xs text-yellow-700 dark:text-yellow-300">
+                    <li key={index} className="text-xs text-ds-warning dark:text-ds-warning">
                       • {error.email}: {error.error}
                     </li>
                   ))}
                   {result.errors.length > 3 && (
-                    <li className="text-xs text-yellow-700 dark:text-yellow-300">
+                    <li className="text-xs text-ds-warning dark:text-ds-warning">
                       • ... et {result.errors.length - 3} autre{result.errors.length - 3 > 1 ? 's' : ''} erreur{result.errors.length - 3 > 1 ? 's' : ''}
                     </li>
                   )}
@@ -237,7 +237,7 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
             <button
               type="button"
               onClick={() => setResult(null)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-encre-3 hover:text-encre-2 dark:hover:text-encre-3"
             >
               <X className="w-4 h-4" />
             </button>
@@ -245,8 +245,8 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--ds-border)] dark:border-[var(--ds-border)]">
+          <div className="text-sm text-encre-2 dark:text-encre-3">
             {validEmails.length > 0 ? (
               <span className="flex items-center gap-1">
                 <User className="w-4 h-4" />
@@ -260,7 +260,7 @@ const InviteByEmail: React.FC<InviteByEmailProps> = ({
           <button
             type="submit"
             disabled={loading || validEmails.length === 0}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            className="px-6 py-2 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
           >
             {loading ? (
               <>
