@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>SynerJ · Direction A — papier chaleureux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --papier: #fbf8f3;
+    --papier-2: #f4efe6;
+    --papier-3: #ede6d8;
+    --encre: #1f1b16;
+    --encre-2: #5a5048;
+    --encre-3: #8a7f72;
+    --terracotta: #c25a3c;
+    --terracotta-deep: #a84a2e;
+    --accent-soft: #fbe5d9;
+    --highlight: #fce896;
+    --highlight-soft: #fdf3c5;
+    --success: #5e8a5b;
+    --success-soft: #dceada;
+    --warning: #d49b3a;
+    --warning-soft: #f6e7c2;
+    --danger: #b8553f;
+    --danger-soft: #f3d6cc;
+    --info: #5a7aa3;
+    --info-soft: #d8e2ee;
+
+    --club-volley: #d97757;
+    --club-theatre: #6b5b95;
+    --club-photo: #c4a032;
+    --club-rando: #5e8a5b;
+    --club-echecs: #2d4a5a;
+
+    --club-volley-soft: #f7dccd;
+    --club-theatre-soft: #ddd5e8;
+    --club-photo-soft: #efe2b6;
+    --club-rando-soft: #d6e3d3;
+    --club-echecs-soft: #c4d0d8;
+
+    --border: rgba(31,27,22,0.08);
+    --border-2: rgba(31,27,22,0.14);
+    --shadow-sm: 0 1px 2px rgba(31,27,22,.04), 0 2px 6px rgba(31,27,22,.04);
+    --shadow-md: 0 2px 4px rgba(31,27,22,.05), 0 8px 18px rgba(31,27,22,.06);
+    --shadow-lg: 0 4px 10px rgba(31,27,22,.06), 0 16px 36px rgba(31,27,22,.10);
+
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 20px;
+
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--encre);
+    background: var(--papier);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ─── shared chrome bits ─── */
+  .serif { font-family: var(--font-display); font-weight: 400; }
+  .mono  { font-family: var(--font-mono); }
+  .hl    { background: linear-gradient(transparent 60%, var(--highlight) 60%); padding: 0 2px; }
+  .hl-soft{ background: linear-gradient(transparent 62%, var(--highlight-soft) 62%); padding: 0 2px; }
+
+  /* hatched placeholder */
+  .placeholder {
+    background:
+      repeating-linear-gradient(45deg,
+        rgba(31,27,22,.05) 0 1px,
+        transparent 1px 8px),
+      var(--papier-2);
+    border: 1px dashed rgba(31,27,22,.16);
+    border-radius: var(--r-md);
+    color: var(--encre-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px;
+  }
+
+  /* iPhone shell */
+  .phone {
+    width: 320px;
+    height: 690px;
+    background: var(--papier);
+    border-radius: 38px;
+    border: 8px solid #1a1814;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18), 0 24px 50px rgba(0,0,0,.18), inset 0 0 0 1.5px #2c2722;
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .phone-statusbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 22px 0;
+    font-size: 13px; font-weight: 600;
+    color: var(--encre);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .phone-notch {
+    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 22px; background: #1a1814; border-radius: 14px;
+    z-index: 4;
+  }
+  .phone-screen {
+    position: absolute; inset: 0;
+    padding-top: 32px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .phone-content {
+    flex: 1; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .signal-svg, .battery-svg { display: inline-block; vertical-align: middle; }
+
+  /* mobile tabbar */
+  .tabbar {
+    height: 62px;
+    border-top: 1px solid var(--border);
+    background: rgba(251,248,243,.92);
+    backdrop-filter: blur(8px);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding-bottom: 6px;
+  }
+  .tabbar > button {
+    background: none; border: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--encre-3); font-family: var(--font-sans); font-size: 11px; font-weight: 500;
+    padding: 8px 0 0;
+  }
+  .tabbar > button.active { color: var(--terracotta); }
+
+  /* generic small */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-sans); font-weight: 500; font-size: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--papier-2); color: var(--encre-2);
+    border: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  .pill.solid { background: var(--encre); color: var(--papier); border-color: var(--encre); }
+  .pill.accent { background: var(--accent-soft); color: var(--terracotta-deep); border-color: rgba(194,90,60,.15); }
+  .pill.success { background: var(--success-soft); color: #3f6b3d; border-color: rgba(94,138,91,.18); }
+  .pill.warning { background: var(--warning-soft); color: #8a6620; border-color: rgba(212,155,58,.22); }
+  .pill.danger { background: var(--danger-soft); color: #8a3a26; border-color: rgba(184,85,63,.18); }
+  .pill.info { background: var(--info-soft); color: #3d5878; border-color: rgba(90,122,163,.18); }
+  .pill.highlight { background: var(--highlight); color: #6b5816; border-color: rgba(212,155,58,.18); }
+  .pill.ghost { background: transparent; }
+
+  .btn {
+    font-family: var(--font-sans); font-weight: 600; font-size: 14px;
+    padding: 10px 16px; border-radius: 12px; cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .06s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: var(--terracotta);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 2px rgba(168,74,46,.25);
+  }
+  .btn-primary:hover { background: var(--terracotta-deep); }
+  .btn-secondary {
+    background: var(--papier);
+    color: var(--encre);
+    border-color: var(--border-2);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--encre);
+  }
+
+  /* avatar */
+  .avatar {
+    border-radius: 999px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans); font-weight: 600;
+    color: var(--encre);
+    overflow: hidden;
+    background: var(--papier-2);
+  }
+  .av-1 { background: #f7d4c4; color: #7a3a25; }
+  .av-2 { background: #ddd5e8; color: #4a3e6b; }
+  .av-3 { background: #efe2b6; color: #6b5816; }
+  .av-4 { background: #d6e3d3; color: #3f6b3d; }
+  .av-5 { background: #c4d0d8; color: #1f3340; }
+  .av-6 { background: #f4d8c8; color: #8a4a30; }
+
+  /* card */
+  .card {
+    background: var(--papier);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* desktop chrome */
+  .desk {
+    width: 1040px; height: 680px;
+    background: var(--papier);
+    border-radius: 16px;
+    border: 1px solid var(--border-2);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    font-size: 14px;
+  }
+  .desk-side {
+    width: 220px; flex-shrink: 0;
+    background: var(--papier-2);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .desk-side-dark {
+    background: #1a1814;
+    color: #d6cdbf;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .desk-main {
+    flex: 1;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 9px;
+    color: var(--encre-2); font-size: 13.5px; font-weight: 500;
+    cursor: pointer;
+  }
+  .nav-item.active {
+    background: rgba(194,90,60,.10);
+    color: var(--terracotta-deep);
+  }
+  .nav-item-dark { color: rgba(214,205,191,.7); }
+  .nav-item-dark.active {
+    background: rgba(217,119,87,.16);
+    color: #f4d8c8;
+  }
+
+  /* toolbar/header within desk */
+  .desk-header {
+    padding: 22px 32px 6px;
+  }
+
+  /* misc */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { scrollbar-width: none; }
+
+  /* phone hide scrollbar but allow */
+  .phone-scroll {
+    overflow-y: auto; overflow-x: hidden; flex: 1;
+  }
+  .phone-scroll::-webkit-scrollbar { display: none; }
+  .phone-scroll { scrollbar-width: none; }
+
+  /* design system showcase */
+  .ds-section {
+    background: var(--papier);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 18px;
+  }
+  .ds-h {
+    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--encre-3); margin-bottom: 12px;
+  }
+  .swatch {
+    height: 56px; border-radius: 10px; border: 1px solid var(--border);
+    display: flex; align-items: flex-end; padding: 6px 8px;
+    font-family: var(--font-mono); font-size: 10px;
+  }
+
+  /* like pulse */
+  @keyframes likepulse {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    60% { transform: scale(.92); }
+    100% { transform: scale(1); }
+  }
+  .like-pulse { animation: likepulse .4s ease; }
+
+  /* fade-up */
+  @keyframes fadeup {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeup .26s ease both; }
+
+  /* progress bar */
+  .progress {
+    height: 6px; border-radius: 999px;
+    background: rgba(31,27,22,0.06);
+    overflow: hidden;
+    position: relative;
+  }
+  .progress > span {
+    display: block; height: 100%;
+    background: var(--terracotta);
+    border-radius: 999px;
+  }
+
+  /* hero gradients per club */
+  .hero-volley { background: linear-gradient(135deg, #fbe5d9 0%, #f7c4ad 60%, #efb098 100%); }
+  .hero-theatre { background: linear-gradient(135deg, #ede6f5 0%, #c8bedc 100%); }
+  .hero-photo  { background: linear-gradient(135deg, #f8ecc4 0%, #e6c97d 100%); }
+  .hero-rando  { background: linear-gradient(135deg, #dcebd9 0%, #aac8a3 100%); }
+  .hero-echecs { background: linear-gradient(135deg, #cfdce4 0%, #7892a0 100%); color:#fff; }
+</style>
+</head>
+<body>
+
+<template id="__bundler_thumbnail" data-bg-color="#fbf8f3">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#fbf8f3"/>
+    <circle cx="600" cy="380" r="160" fill="#c25a3c"/>
+    <text x="600" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="180" fill="#fbf8f3">S</text>
+    <rect x="450" y="600" width="300" height="22" rx="11" fill="#fce896"/>
+    <text x="600" y="700" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#1f1b16">SynerJ</text>
+  </svg>
+</template>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="ds-screen.jsx"></script>
+<script type="text/babel" src="member-screens.jsx"></script>
+<script type="text/babel" src="secondary-screens.jsx"></script>
+<script type="text/babel" src="supporter-screens.jsx"></script>
+<script type="text/babel" src="club-admin-screens.jsx"></script>
+<script type="text/babel" src="super-admin-screens.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+
+</body>
+</html>
