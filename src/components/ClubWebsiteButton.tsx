@@ -30,9 +30,9 @@ export default function ClubWebsiteButton({
 
   // Styles en fonction de la variante
   const variantStyles = {
-    primary: 'bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600',
-    secondary: 'bg-white dark:bg-gray-800 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-gray-700',
-    ghost: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+    primary: 'bg-ds-success hover:bg-ds-success text-white dark:bg-ds-success dark:hover:bg-ds-success',
+    secondary: 'bg-white dark:bg-papier-2 border border-ds-success dark:border-ds-success text-ds-success dark:text-ds-success hover:bg-ds-success-soft dark:hover:bg-papier-3',
+    ghost: 'text-ds-success dark:text-ds-success hover:bg-ds-success-soft dark:hover:bg-ds-success-soft/20'
   };
 
   // Tailles
@@ -80,7 +80,7 @@ export function ClubWebsiteLink({
       href={window.location.origin + websiteUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:underline transition-colors ${className}`}
+      className={`inline-flex items-center text-sm text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success hover:underline transition-colors ${className}`}
       title={`Voir le site web${clubName ? ` de ${clubName}` : ''}`}
     >
       <Globe className="h-4 w-4 mr-1.5" />

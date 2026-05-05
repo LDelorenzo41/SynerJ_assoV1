@@ -60,10 +60,10 @@ export function ClubWebsite() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-papier-2">
         <div className="text-center">
-          <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Chargement du site web...</p>
+          <Loader className="w-12 h-12 animate-spin text-terracotta mx-auto mb-4" />
+          <p className="text-encre-2">Chargement du site web...</p>
         </div>
       </div>
     );
@@ -72,14 +72,14 @@ export function ClubWebsite() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-papier-2 p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Erreur</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <AlertCircle className="w-16 h-16 text-ds-danger mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-encre mb-2">Erreur</h2>
+          <p className="text-encre-2 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep transition-colors"
           >
             Réessayer
           </button>

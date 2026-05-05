@@ -223,13 +223,13 @@ export default function WebsiteGenerator({
   };
 
   return (
-    <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+    <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Globe className="h-6 w-6 text-green-600 dark:text-green-400 mr-3" />
+          <Globe className="h-6 w-6 text-ds-success dark:text-ds-success mr-3" />
           <div>
-            <h2 className="text-xl font-semibold dark-text">Générateur de Site Web</h2>
-            <p className="text-sm dark-text-muted mt-1">
+            <h2 className="text-xl font-semibold text-encre">Générateur de Site Web</h2>
+            <p className="text-sm text-encre-3 mt-1">
               Créez automatiquement un site web moderne pour votre club
             </p>
           </div>
@@ -237,18 +237,18 @@ export default function WebsiteGenerator({
       </div>
 
       {generatedUrl && (
-        <div className="mb-6 p-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+        <div className="mb-6 p-6 bg-ds-success-soft dark:bg-ds-success-soft/20 rounded-lg border border-ds-success dark:border-ds-success">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-800">
-                <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-ds-success-soft dark:bg-ds-success-soft">
+                <Check className="h-6 w-6 text-ds-success dark:text-ds-success" />
               </div>
             </div>
             <div className="ml-4 flex-1">
-              <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+              <h3 className="text-lg font-semibold text-ds-success dark:text-ds-success mb-2">
                 Site web généré avec succès ! 🎉
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-300 mb-4">
+              <p className="text-sm text-ds-success dark:text-ds-success mb-4">
                 Votre site web est maintenant accessible en ligne.
               </p>
               
@@ -257,7 +257,7 @@ export default function WebsiteGenerator({
                   href={window.location.origin + generatedUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-ds-success hover:bg-ds-success text-white font-medium rounded-lg transition-colors"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Voir le site
@@ -268,16 +268,16 @@ export default function WebsiteGenerator({
                     navigator.clipboard.writeText(window.location.origin + generatedUrl);
                     alert('URL copiée dans le presse-papier !');
                   }}
-                  className="inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-800 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 font-medium rounded-lg hover:bg-green-50 dark:hover:bg-gray-700 transition-colors"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-papier-2 border border-ds-success dark:border-ds-success text-ds-success dark:text-ds-success font-medium rounded-lg hover:bg-ds-success-soft dark:hover:bg-papier-3 transition-colors"
                 >
                   <Copy className="h-4 w-4 mr-2" />
                   Copier l'URL
                 </button>
               </div>
 
-              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-green-200 dark:border-green-700">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">URL de votre site :</p>
-                <code className="text-sm text-green-700 dark:text-green-300 break-all">
+              <div className="mt-4 p-3 bg-white dark:bg-papier-2 rounded border border-ds-success dark:border-ds-success">
+                <p className="text-xs text-encre-3 dark:text-encre-3 mb-1">URL de votre site :</p>
+                <code className="text-sm text-ds-success dark:text-ds-success break-all">
                   {window.location.origin + generatedUrl}
                 </code>
               </div>
@@ -290,8 +290,8 @@ export default function WebsiteGenerator({
         <div
           className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success'
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-200'
-              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-200'
+              ? 'bg-ds-success-soft dark:bg-ds-success-soft/20 border-ds-success dark:border-ds-success text-ds-success dark:text-ds-success'
+              : 'bg-ds-danger-soft dark:bg-ds-danger-soft border-ds-danger dark:border-ds-danger text-ds-danger dark:text-ds-danger'
           }`}
         >
           {message.text}
@@ -301,48 +301,48 @@ export default function WebsiteGenerator({
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full mb-6 flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-600"
+        className="w-full mb-6 flex items-center justify-between px-4 py-3 bg-papier-2 dark:bg-slate-800 hover:bg-papier-2 dark:hover:bg-slate-700 rounded-lg transition-colors border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
       >
-        <span className="font-medium dark-text">
+        <span className="font-medium text-encre">
           {generatedUrl ? 'Modifier / Regénérer le site' : 'Créer votre site web'}
         </span>
         {isExpanded ? (
-          <ChevronUp className="h-5 w-5 dark-text-muted" />
+          <ChevronUp className="h-5 w-5 text-encre-3" />
         ) : (
-          <ChevronDown className="h-5 w-5 dark-text-muted" />
+          <ChevronDown className="h-5 w-5 text-encre-3" />
         )}
       </button>
 
       {isExpanded && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Phrase d'accroche * <span className="text-xs text-gray-500">(Affichée dans le hero)</span>
+            <label className="block text-sm font-medium text-encre-3 mb-2">
+              Phrase d'accroche * <span className="text-xs text-encre-3">(Affichée dans le hero)</span>
             </label>
             <input
               type="text"
               required
               value={formData.tagline}
               onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
               placeholder="Ex: La passion de la marche et des rencontres"
               maxLength={100}
             />
-            <p className="text-xs dark-text-muted mt-1">
+            <p className="text-xs text-encre-3 mt-1">
               Une phrase courte et percutante (max 100 caractères)
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Image de couverture * <span className="text-xs text-gray-500">(Paysage 16:9)</span>
+            <label className="block text-sm font-medium text-encre-3 mb-2">
+              Image de couverture * <span className="text-xs text-encre-3">(Paysage 16:9)</span>
             </label>
             <div className="flex items-center space-x-4">
               <button
                 type="button"
                 onClick={() => heroInputRef.current?.click()}
                 disabled={loading}
-                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                className="flex items-center px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg hover:bg-papier-2 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 {uploadingHero ? 'Upload...' : 'Choisir une image'}
@@ -351,7 +351,7 @@ export default function WebsiteGenerator({
                 <img
                   src={heroImagePreview}
                   alt="Preview hero"
-                  className="h-16 w-28 object-cover rounded border border-gray-300 dark:border-gray-600"
+                  className="h-16 w-28 object-cover rounded border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]"
                 />
               )}
             </div>
@@ -362,21 +362,21 @@ export default function WebsiteGenerator({
               onChange={handleHeroImageChange}
               className="hidden"
             />
-            <p className="text-xs dark-text-muted mt-1">
+            <p className="text-xs text-encre-3 mt-1">
               Format recommandé : 1920x1080px. Max 5MB.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Image d'illustration <span className="text-xs text-gray-500">(Optionnel)</span>
+            <label className="block text-sm font-medium text-encre-3 mb-2">
+              Image d'illustration <span className="text-xs text-encre-3">(Optionnel)</span>
             </label>
             <div className="flex items-center space-x-4">
               <button
                 type="button"
                 onClick={() => illustrationInputRef.current?.click()}
                 disabled={loading}
-                className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                className="flex items-center px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg hover:bg-papier-2 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 {uploadingIllustration ? 'Upload...' : 'Choisir une image'}
@@ -385,7 +385,7 @@ export default function WebsiteGenerator({
                 <img
                   src={illustrationImagePreview}
                   alt="Preview illustration"
-                  className="h-16 w-16 object-cover rounded border border-gray-300 dark:border-gray-600"
+                  className="h-16 w-16 object-cover rounded border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]"
                 />
               )}
             </div>
@@ -399,41 +399,41 @@ export default function WebsiteGenerator({
           </div>
 
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Description complète du club * <span className="text-xs text-gray-500">(Affichée dans la section "À propos")</span>
+            <label className="block text-sm font-medium text-encre-3 mb-2">
+              Description complète du club * <span className="text-xs text-encre-3">(Affichée dans la section "À propos")</span>
             </label>
             <textarea
               rows={4}
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
               placeholder="Décrivez votre club, vos activités, votre philosophie en détail..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
-              Numéro de téléphone <span className="text-xs text-gray-500">(Optionnel)</span>
+            <label className="block text-sm font-medium text-encre-3 mb-2">
+              Numéro de téléphone <span className="text-xs text-encre-3">(Optionnel)</span>
             </label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+              className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
               placeholder="Ex: 06 12 34 56 78"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium dark-text-muted">
-                Horaires <span className="text-xs text-gray-500">(Optionnel)</span>
+              <label className="block text-sm font-medium text-encre-3">
+                Horaires <span className="text-xs text-encre-3">(Optionnel)</span>
               </label>
               <button
                 type="button"
                 onClick={addSchedule}
-                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+                className="flex items-center text-sm text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success transition-colors"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Ajouter un horaire
@@ -446,14 +446,14 @@ export default function WebsiteGenerator({
                     type="text"
                     value={schedule}
                     onChange={(e) => updateSchedule(index, e.target.value)}
-                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 flex-1 px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
                     placeholder={`Ex: ${index === 0 ? 'Lundi et Mercredi 18h-20h' : 'Samedi 10h-12h'}`}
                   />
                   {schedules.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeSchedule(index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-lg transition-colors"
                     >
                       <X className="h-5 w-5" />
                     </button>
@@ -465,13 +465,13 @@ export default function WebsiteGenerator({
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium dark-text-muted">
-                Lieux / Adresses <span className="text-xs text-gray-500">(Optionnel)</span>
+              <label className="block text-sm font-medium text-encre-3">
+                Lieux / Adresses <span className="text-xs text-encre-3">(Optionnel)</span>
               </label>
               <button
                 type="button"
                 onClick={addLocation}
-                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+                className="flex items-center text-sm text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success transition-colors"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Ajouter un lieu
@@ -484,14 +484,14 @@ export default function WebsiteGenerator({
                     type="text"
                     value={location}
                     onChange={(e) => updateLocation(index, e.target.value)}
-                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 flex-1 px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
                     placeholder={`Ex: ${index === 0 ? 'Gymnase municipal, 123 rue du Sport' : 'Salle annexe, 45 avenue des Loisirs'}`}
                   />
                   {locations.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeLocation(index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-lg transition-colors"
                     >
                       <X className="h-5 w-5" />
                     </button>
@@ -503,13 +503,13 @@ export default function WebsiteGenerator({
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium dark-text-muted">
-                Tarifs <span className="text-xs text-gray-500">(Optionnel)</span>
+              <label className="block text-sm font-medium text-encre-3">
+                Tarifs <span className="text-xs text-encre-3">(Optionnel)</span>
               </label>
               <button
                 type="button"
                 onClick={addPricing}
-                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+                className="flex items-center text-sm text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success transition-colors"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Ajouter un tarif
@@ -522,14 +522,14 @@ export default function WebsiteGenerator({
                     type="text"
                     value={pricing}
                     onChange={(e) => updatePricing(index, e.target.value)}
-                    className="dark-input flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 flex-1 px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all"
                     placeholder={`Ex: ${index === 0 ? 'Adultes : 150€/an' : 'Enfants (-12 ans) : 80€/an'}`}
                   />
                   {pricings.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removePricing(index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-lg transition-colors"
                     >
                       <X className="h-5 w-5" />
                     </button>
@@ -540,14 +540,14 @@ export default function WebsiteGenerator({
           </div>
 
           {/* ✅ NOUVELLE SECTION : Documents */}
-          <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
-            <div className="flex items-start gap-3 mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pt-6">
+            <div className="flex items-start gap-3 mb-4 p-4 bg-terracotta-soft dark:bg-terracotta-soft rounded-lg border border-terracotta dark:border-terracotta">
+              <FileText className="h-5 w-5 text-terracotta dark:text-terracotta mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                <h3 className="text-sm font-semibold text-terracotta-deep dark:text-terracotta mb-2">
                   📄 Comment ajouter des documents à télécharger ?
                 </h3>
-                <div className="text-xs text-blue-800 dark:text-blue-200 space-y-2">
+                <div className="text-xs text-terracotta-deep dark:text-terracotta space-y-2">
                   <p>
                     Vous pouvez proposer des documents (formulaires, fiches médicales, règlement, etc.) en téléchargement sur votre site.
                   </p>
@@ -557,7 +557,7 @@ export default function WebsiteGenerator({
                     <li>Cliquez sur "Partager" et configurez en <strong>"Tous les utilisateurs avec le lien"</strong></li>
                     <li>Copiez le lien partagé et collez-le ci-dessous</li>
                   </ol>
-                  <p className="text-blue-700 dark:text-blue-300 font-medium mt-2">
+                  <p className="text-terracotta-deep dark:text-terracotta font-medium mt-2">
                     💡 Nous n'hébergeons pas vos fichiers - ils restent sur votre espace cloud !
                   </p>
                 </div>
@@ -565,13 +565,13 @@ export default function WebsiteGenerator({
             </div>
 
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium dark-text-muted">
-                Documents à télécharger <span className="text-xs text-gray-500">(Optionnel)</span>
+              <label className="block text-sm font-medium text-encre-3">
+                Documents à télécharger <span className="text-xs text-encre-3">(Optionnel)</span>
               </label>
               <button
                 type="button"
                 onClick={addDocument}
-                className="flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+                className="flex items-center text-sm text-ds-success dark:text-ds-success hover:text-ds-success dark:hover:text-ds-success transition-colors"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Ajouter un document
@@ -580,20 +580,20 @@ export default function WebsiteGenerator({
             
             <div className="space-y-3">
               {documents.map((doc, index) => (
-                <div key={index} className="flex items-start gap-2 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div key={index} className="flex items-start gap-2 p-4 bg-papier-2 dark:bg-slate-800 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                   <div className="flex-1 space-y-3">
                     <input
                       type="text"
                       value={doc.name}
                       onChange={(e) => updateDocument(index, 'name', e.target.value)}
-                      className="dark-input w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
+                      className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
                       placeholder="Nom du document (ex: Formulaire d'inscription 2025)"
                     />
                     <input
                       type="url"
                       value={doc.url}
                       onChange={(e) => updateDocument(index, 'url', e.target.value)}
-                      className="dark-input w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
+                      className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
                       placeholder="Lien du document (ex: https://drive.google.com/file/d/.../view)"
                     />
                   </div>
@@ -601,7 +601,7 @@ export default function WebsiteGenerator({
                     <button
                       type="button"
                       onClick={() => removeDocument(index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-lg transition-colors"
                     >
                       <X className="h-5 w-5" />
                     </button>
@@ -612,7 +612,7 @@ export default function WebsiteGenerator({
           </div>
 
           <div>
-            <label className="block text-sm font-medium dark-text-muted mb-2">
+            <label className="block text-sm font-medium text-encre-3 mb-2">
               Couleur du thème
             </label>
             <div className="flex items-center space-x-4">
@@ -620,18 +620,18 @@ export default function WebsiteGenerator({
                 type="color"
                 value={formData.themeColor}
                 onChange={(e) => setFormData({ ...formData, themeColor: e.target.value })}
-                className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                className="h-10 w-20 rounded border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] cursor-pointer"
               />
-              <span className="text-sm dark-text-muted">{formData.themeColor}</span>
-              <Palette className="h-5 w-5 text-gray-400" />
+              <span className="text-sm text-encre-3">{formData.themeColor}</span>
+              <Palette className="h-5 w-5 text-encre-3" />
             </div>
           </div>
 
-          <div className="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-end space-x-4 pt-4 border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              className="flex items-center px-6 py-3 bg-ds-success text-white rounded-lg hover:bg-ds-success dark:bg-ds-success dark:hover:bg-ds-success disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {loading ? (
                 <>
