@@ -115,59 +115,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
       
       {/* Sidebar - STICKY sur desktop */}
+      {/* [DS] Look "papier chaleureux": fond papier-2, separateurs en var(--ds-border).
+          Toute la logique (sticky, transitions, overlay mobile) reste identique. */}
       <div className={`
-        fixed left-0 top-0 h-full dark-bg-secondary border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 ease-in-out
+        fixed left-0 top-0 h-full bg-papier-2 border-r border-[var(--ds-border)] z-50 transition-all duration-300 ease-in-out flex flex-col
         ${isOpen ? 'w-64' : 'w-16'}
         lg:sticky lg:top-0 lg:h-screen lg:z-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        
+
         {/* Header sidebar */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 h-16">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--ds-border)] h-16 flex-shrink-0">
           <div className={`transition-all duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'}`}>
-            <Link 
+            <Link
               to="/dashboard"
-              className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+              className="font-display text-2xl text-terracotta-deep hover:text-terracotta transition-colors"
             >
               SynerJ
             </Link>
           </div>
-          
+
           <button
             onClick={onToggle}
-            className="hidden lg:flex p-1 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+            className="hidden lg:flex p-1 rounded-md hover:bg-papier-3 transition-colors"
             aria-label={isOpen ? "Réduire la sidebar" : "Étendre la sidebar"}
           >
-            {isOpen ? <ChevronLeft className="h-5 w-5 dark-text" /> : <ChevronRight className="h-5 w-5 dark-text" />}
+            {isOpen ? <ChevronLeft className="h-5 w-5 text-encre-2" /> : <ChevronRight className="h-5 w-5 text-encre-2" />}
           </button>
         </div>
 
         {/* Dark Mode Toggle */}
-        <div className={`p-4 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${!isOpen ? 'lg:px-2' : ''}`}>
+        <div className={`p-4 border-b border-[var(--ds-border)] transition-all duration-200 flex-shrink-0 ${!isOpen ? 'lg:px-2' : ''}`}>
           <DarkModeToggle className={`${isOpen ? 'w-full' : 'lg:w-auto'}`} />
         </div>
 
         {/* Association Info */}
         {!loading && associationInfo && (
-          <div className={`p-4 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${!isOpen ? 'lg:p-2' : ''}`}>
+          <div className={`p-4 border-b border-[var(--ds-border)] transition-all duration-200 flex-shrink-0 ${!isOpen ? 'lg:p-2' : ''}`}>
             <div className={`flex items-center space-x-3 ${!isOpen ? 'lg:justify-center lg:space-x-0' : ''}`}>
               {associationInfo.logo_url ? (
                 <img
                   src={associationInfo.logo_url}
                   alt="Logo association"
-                  className="w-8 h-8 rounded-full object-cover flex-shrink-0 border-2 border-gray-200 dark:border-gray-600"
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0 border-2 border-[var(--ds-border-2)]"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
-                  <Building className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <div className="w-8 h-8 rounded-full bg-papier-3 flex items-center justify-center flex-shrink-0">
+                  <Building className="h-4 w-4 text-encre-3" />
                 </div>
               )}
-              
+
               <div className={`transition-all duration-200 ${isOpen ? 'opacity-100 flex-1' : 'opacity-0 w-0 lg:opacity-0 lg:w-0'} overflow-hidden`}>
-                <div className="text-sm font-medium dark-text truncate">
+                <div className="text-sm font-medium text-encre truncate">
                   {associationInfo.name}
                 </div>
-                <div className="text-xs dark-text-muted">Association</div>
+                <div className="font-mono text-[10px] uppercase tracking-[.08em] text-encre-3">Association</div>
               </div>
             </div>
           </div>
@@ -179,9 +181,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
-              
+
               const badgeCount = getBadgeCountForItem(item.path);
-              
+
               return (
                 <Link
                   key={item.path}
@@ -189,22 +191,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => handleNavItemClick(item.path)}
                   className={`
                     group relative flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                    ${isActive 
-                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' 
-                      : 'dark-text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    ${isActive
+                      ? 'bg-terracotta-soft text-terracotta-deep'
+                      : 'text-encre-2 hover:text-terracotta-deep hover:bg-papier-3'
                     }
                     ${!isOpen ? 'lg:justify-center lg:px-2' : ''}
                   `}
                   title={!isOpen ? item.label : undefined}
                 >
                   <Icon className="h-5 w-5 flex-shrink-0" />
-                  
+
                   <span className={`ml-3 transition-all duration-200 whitespace-nowrap ${
                     isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 lg:opacity-0 lg:-translate-x-2'
                   } overflow-hidden`}>
                     {item.label}
                   </span>
-                  
+
                   {badgeCount > 0 && (
                     <div className={`
                       flex-shrink-0 transition-all duration-200
@@ -217,12 +219,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       />
                     </div>
                   )}
-                  
+
                   {!isOpen && (
-                    <div className="hidden lg:group-hover:block absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded whitespace-nowrap z-50 pointer-events-none">
+                    <div className="hidden lg:group-hover:block absolute left-full ml-2 px-2 py-1 bg-encre text-papier text-xs rounded whitespace-nowrap z-50 pointer-events-none">
                       {item.label}
                       {badgeCount > 0 && (
-                        <span className="ml-1 text-red-400">({badgeCount})</span>
+                        <span className="ml-1 text-ds-danger">({badgeCount})</span>
                       )}
                     </div>
                   )}
@@ -236,26 +238,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(() => {
               const userRole = profile?.role;
               // Gérer les rôles avec ou sans espace
-              const canAccessMailing = 
-                userRole === 'SuperAdmin' || 
+              const canAccessMailing =
+                userRole === 'SuperAdmin' ||
                 userRole === 'Super Admin' ||
-                userRole === 'ClubAdmin' || 
+                userRole === 'ClubAdmin' ||
                 userRole === 'Club Admin' ||
                 userRole === 'Sponsor';
-              
+
               if (!canAccessMailing) return null;
-              
+
               const isActive = location.pathname === '/mailing';
-              
+
               return (
                 <Link
                   to="/mailing"
                   onClick={() => handleNavItemClick('/mailing')}
                   className={`
                     group relative flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                    ${isActive 
-                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' 
-                      : 'dark-text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    ${isActive
+                      ? 'bg-terracotta-soft text-terracotta-deep'
+                      : 'text-encre-2 hover:text-terracotta-deep hover:bg-papier-3'
                     }
                     ${!isOpen ? 'lg:justify-center lg:px-2' : ''}
                   `}
@@ -268,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     Mailing
                   </span>
                   {!isOpen && (
-                    <div className="hidden lg:group-hover:block absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs rounded whitespace-nowrap z-50 pointer-events-none">
+                    <div className="hidden lg:group-hover:block absolute left-full ml-2 px-2 py-1 bg-encre text-papier text-xs rounded whitespace-nowrap z-50 pointer-events-none">
                       Mailing
                     </div>
                   )}
@@ -279,31 +281,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Profil utilisateur et déconnexion */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+        <div className="border-t border-[var(--ds-border)] p-4 flex-shrink-0">
           <div className={`flex items-center space-x-3 mb-3 ${!isOpen ? 'lg:justify-center lg:px-0' : ''}`}>
             {profile?.avatar_url ? (
               <img
                 src={profile.avatar_url}
                 alt="Photo de profil"
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0 border-2 border-gray-200 dark:border-gray-600"
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0 border-2 border-[var(--ds-border-2)]"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
-                <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <div className="w-8 h-8 rounded-full bg-papier-3 flex items-center justify-center flex-shrink-0">
+                <User className="h-4 w-4 text-encre-3" />
               </div>
             )}
-            
+
             <div className={`transition-all duration-200 ${isOpen ? 'opacity-100 flex-1' : 'opacity-0 w-0 lg:opacity-0 lg:w-0'} overflow-hidden`}>
-              <div className="text-sm font-medium dark-text truncate">
+              <div className="text-sm font-medium text-encre truncate">
                 {profile?.first_name} {profile?.last_name}
               </div>
-              <div className="text-xs dark-text-muted">{profile?.role}</div>
+              <div className="font-mono text-[10px] uppercase tracking-[.08em] text-encre-3">{profile?.role}</div>
             </div>
           </div>
 
           <button
             onClick={onSignOut}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${
+            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-ds-danger hover:bg-ds-danger-soft transition-colors ${
               !isOpen ? 'lg:justify-center lg:space-x-0' : ''
             }`}
             title={!isOpen ? 'Déconnexion' : undefined}
