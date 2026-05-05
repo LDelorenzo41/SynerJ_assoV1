@@ -15,41 +15,42 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
   return (
     <>
       {/* Footer */}
-      <footer className="bg-gray-900 text-white">
+      {/* [DS] Footer encre quasi-noir chaud (cf. desk-side-dark du DS, #1a1814) */}
+      <footer style={{ background: '#1a1814' }} className="text-papier">
         {/* Section principale */}
         <div className="py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0">
-              
+
               {/* Section gauche - Informations entreprise */}
               <div className="flex-1">
                 <div className="flex items-center mb-4">
-                  <img 
-                    src="https://res.cloudinary.com/dhva6v5n8/image/upload/v1728059847/LOGO_T_T_zcdp8s.jpg" 
-                    alt="LD Teach & Tech" 
+                  <img
+                    src="https://res.cloudinary.com/dhva6v5n8/image/upload/v1728059847/LOGO_T_T_zcdp8s.jpg"
+                    alt="LD Teach & Tech"
                     className="h-12 w-12 rounded-lg object-cover mr-4"
                   />
                   <div>
-                    <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    <div className="font-display text-xl text-papier">
                       LD Teach & Tech
                     </div>
-                    <div className="text-sm text-gray-400">Innovation & Formation</div>
+                    <div className="font-mono text-[10px] uppercase tracking-[.08em] text-papier/60">Innovation & Formation</div>
                   </div>
                 </div>
-                
-                <p className="text-gray-400 mb-4 max-w-md">
+
+                <p className="text-papier/70 mb-4 max-w-md">
                   Nous créons votre outil numérique sur demande.
                 </p>
-                
+
                 {/* Informations de contact */}
                 <div className="space-y-2">
-                  <div className="flex items-center text-gray-400 hover:text-white transition-colors">
+                  <div className="flex items-center text-papier/70 hover:text-papier transition-colors">
                     <Mail className="h-4 w-4 mr-3" />
                     <a href="mailto:lionel.delorenzo@teachtech.fr" className="hover:underline">
                       lionel.delorenzo@teachtech.fr
                     </a>
                   </div>
-                  <div className="flex items-center text-gray-400">
+                  <div className="flex items-center text-papier/70">
                     <MapPin className="h-4 w-4 mr-3" />
                     <span>Busloup, France</span>
                   </div>
@@ -60,32 +61,32 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
               <div className="relative flex-shrink-0 mx-8">
                 <button
                   onClick={() => setIsLegalMenuOpen(!isLegalMenuOpen)}
-                  className="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors font-medium"
+                  className="flex items-center space-x-2 text-papier hover:text-terracotta transition-colors font-medium"
                 >
                   <span>Support & Légal</span>
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isLegalMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {/* Menu déroulant qui apparaît vers le haut */}
                 {isLegalMenuOpen && (
-                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-lg shadow-xl py-2 min-w-[220px] z-50 border border-gray-700">
-                    <Link to="/legal/help-center" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 rounded-lg shadow-xl py-2 min-w-[220px] z-50 border border-white/10" style={{ background: '#221f1a' }}>
+                    <Link to="/legal/help-center" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       Centre d'Aide
                     </Link>
-                    <Link to="/legal/documentation" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/documentation" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       Documentation
                     </Link>
-                    <Link to="/legal/faq" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/faq" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       FAQ
                     </Link>
-                    <hr className="border-gray-600 my-1" />
-                    <Link to="/legal/notices" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <hr className="border-white/10 my-1" />
+                    <Link to="/legal/notices" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       Mentions Légales
                     </Link>
-                    <Link to="/legal/privacy-policy" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/privacy-policy" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       Politique de Confidentialité
                     </Link>
-                    <Link to="/legal/terms" className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors text-sm">
+                    <Link to="/legal/terms" className="block px-4 py-2 text-papier/80 hover:text-papier hover:bg-white/5 transition-colors text-sm">
                       CGU
                     </Link>
                   </div>
@@ -94,16 +95,16 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
 
               {/* Section droite - Réseaux sociaux */}
               <div className="flex space-x-3 flex-shrink-0">
-                <a 
-                  href="#" 
-                  className="w-8 h-8 bg-gray-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors"
+                <a
+                  href="#"
+                  className="w-8 h-8 bg-white/5 hover:bg-terracotta rounded-lg flex items-center justify-center transition-colors"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="h-4 w-4" />
                 </a>
-                <a 
-                  href="#" 
-                  className="w-8 h-8 bg-gray-800 hover:bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center transition-colors"
+                <a
+                  href="#"
+                  className="w-8 h-8 bg-white/5 hover:bg-terracotta rounded-lg flex items-center justify-center transition-colors"
                   aria-label="Instagram"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -116,24 +117,24 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
         </div>
 
         {/* Barre de copyright */}
-        <div className="border-t border-gray-800">
+        <div className="border-t border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
               <div className="flex items-center space-x-2 text-sm">
-                <Heart className="h-4 w-4 text-red-500" />
-                <span className="text-gray-400">
+                <Heart className="h-4 w-4 text-terracotta" />
+                <span className="text-papier/60">
                   © {currentYear} LD Teach & Tech. Fait avec passion.
                 </span>
               </div>
-              
-              <div className="flex items-center space-x-4 text-sm text-gray-400">
-                <a href="#" className="hover:text-white transition-colors">
+
+              <div className="flex items-center space-x-4 text-sm text-papier/60">
+                <a href="#" className="hover:text-papier transition-colors">
                   Plan du Site
                 </a>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="#" className="hover:text-papier transition-colors">
                   Cookies
                 </a>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="#" className="hover:text-papier transition-colors">
                   Accessibilité
                 </a>
               </div>
@@ -144,48 +145,48 @@ export default function Footer({ showDemo, setShowDemo, variant = 'landing' }: F
 
       {/* Demo Modal - Uniquement pour variant landing avec showDemo */}
       {variant === 'landing' && showDemo && setShowDemo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Démo de SynerJ</h3>
-            <p className="text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-papier rounded-ds-md p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[var(--ds-border)] shadow-ds-lg">
+            <h3 className="font-display text-3xl text-encre mb-4">Démo de SynerJ</h3>
+            <p className="text-encre-2 mb-6">
               Découvrez comment SynerJ transforme la gestion de vos organisations en quelques minutes.
             </p>
-            <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center mb-6 border-2 border-dashed border-gray-300">
+            <div className="aspect-video bg-papier-2 rounded-ds-md flex items-center justify-center mb-6 border-2 border-dashed border-[var(--ds-border-2)]">
               <div className="text-center">
-                <div className="h-16 w-16 text-gray-400 mx-auto mb-4 flex items-center justify-center">
+                <div className="h-16 w-16 text-encre-3 mx-auto mb-4 flex items-center justify-center">
                   <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
-                <p className="text-gray-500">Vidéo de démonstration à venir</p>
+                <p className="text-encre-3">Vidéo de démonstration à venir</p>
               </div>
             </div>
             <div className="space-y-4 mb-6">
               <div className="flex items-start space-x-3">
-                <div className="h-5 w-5 text-green-500 mt-0.5">✓</div>
+                <div className="h-5 w-5 text-ds-success mt-0.5">✓</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Création d'organisation en 2 minutes</h4>
-                  <p className="text-gray-600 text-sm">Voyez comme il est simple de créer une association et ses clubs</p>
+                  <h4 className="font-semibold text-encre">Création d'organisation en 2 minutes</h4>
+                  <p className="text-encre-2 text-sm">Voyez comme il est simple de créer une association et ses clubs</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="h-5 w-5 text-green-500 mt-0.5">✓</div>
+                <div className="h-5 w-5 text-ds-success mt-0.5">✓</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Gestion des membres intuitive</h4>
-                  <p className="text-gray-600 text-sm">Découvrez les outils de gestion des membres et événements</p>
+                  <h4 className="font-semibold text-encre">Gestion des membres intuitive</h4>
+                  <p className="text-encre-2 text-sm">Découvrez les outils de gestion des membres et événements</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="h-5 w-5 text-green-500 mt-0.5">✓</div>
+                <div className="h-5 w-5 text-ds-success mt-0.5">✓</div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">Tableaux de bord personnalisés</h4>
-                  <p className="text-gray-600 text-sm">Explorez les interfaces selon votre rôle</p>
+                  <h4 className="font-semibold text-encre">Tableaux de bord personnalisés</h4>
+                  <p className="text-encre-2 text-sm">Explorez les interfaces selon votre rôle</p>
                 </div>
               </div>
             </div>
             <button
               onClick={() => setShowDemo(false)}
-              className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full py-3 px-6 bg-terracotta text-white font-semibold rounded-xl hover:bg-terracotta-deep transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,.22),0_1px_2px_rgba(168,74,46,.25)]"
             >
               Fermer
             </button>
