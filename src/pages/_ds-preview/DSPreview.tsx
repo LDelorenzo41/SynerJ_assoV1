@@ -1,17 +1,32 @@
 /**
  * Page d'echantillon du Design System "Direction A — papier chaleureux".
  *
- * Objectif : permettre la validation visuelle des tokens (light + dark)
- * avant de propager le DS aux composants reels (Phases 3 a 9).
+ * Phase 2b : la page consomme desormais les primitives de
+ * src/components/ui/ — c'est la double vocation de cette page :
+ *   1) valider visuellement les tokens (light + dark)
+ *   2) servir de showcase / banc d'essai pour les composants UI
+ *      avant qu'ils ne soient propages dans les vraies pages.
  *
  * Cette page est ISOLEE : elle ne consomme aucune logique metier, aucun
- * hook, aucune donnee Supabase. Elle peut etre supprimee a la fin de la
- * migration sans impact (Phase 11).
+ * hook applicatif, aucune donnee Supabase. Elle sera supprimee en
+ * Phase 11.
  *
  * Acces : /ds-preview (route publique).
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Bell, Search, Plus, Heart, Send, Filter } from 'lucide-react';
+import {
+  Button,
+  Pill,
+  Card,
+  Avatar,
+  Chip,
+  AppBar,
+  MobileSectionTitle,
+  FAB,
+  HatchPlaceholder,
+} from '../../components/ui';
 
 const SAMPLE_CLUBS = [
   { name: 'Volley', token: 'volley', icon: '🏐' },
@@ -38,22 +53,14 @@ const PALETTE_LIGHT: Array<[string, string]> = [
   ['#5a7aa3', 'info'],
 ];
 
-const PILL_VARIANTS = [
-  { label: 'default', cls: 'bg-papier-2 text-encre-2 border border-[var(--ds-border)]' },
-  { label: 'solid', cls: 'bg-encre text-papier border border-encre' },
-  { label: 'accent', cls: 'bg-terracotta-soft text-terracotta-deep border border-[rgba(194,90,60,.15)]' },
-  { label: 'success', cls: 'bg-ds-success-soft text-[#3f6b3d] border border-[rgba(94,138,91,.18)]' },
-  { label: 'warning', cls: 'bg-ds-warning-soft text-[#8a6620] border border-[rgba(212,155,58,.22)]' },
-  { label: 'danger', cls: 'bg-ds-danger-soft text-[#8a3a26] border border-[rgba(184,85,63,.18)]' },
-  { label: 'info', cls: 'bg-ds-info-soft text-[#3d5878] border border-[rgba(90,122,163,.18)]' },
-  { label: 'highlight', cls: 'bg-highlight text-[#6b5816] border border-[rgba(212,155,58,.18)]' },
-];
+const DARK_TEXT_HEXES = ['#1f1b16', '#5a5048', '#a84a2e', '#b8553f', '#5e8a5b', '#5a7aa3', '#d49b3a'];
 
 export default function DSPreview() {
   // Bascule locale du dark mode pour comparer instantanement.
   const [dark, setDark] = useState<boolean>(() =>
     typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   );
+  const [activeChip, setActiveChip] = useState<string>('all');
 
   useEffect(() => {
     const root = document.documentElement;
@@ -78,18 +85,15 @@ export default function DSPreview() {
               avant de propager le DS aux ecrans reels.
             </p>
           </div>
-          <button
-            onClick={() => setDark(d => !d)}
-            className="px-4 py-2 rounded-ds-sm bg-encre text-papier font-semibold text-sm hover:opacity-90 transition"
-          >
+          <Button variant="primary" onClick={() => setDark(d => !d)}>
             {dark ? '☀ Mode clair' : '☾ Mode sombre'}
-          </button>
+          </Button>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {/* ───── Section : Palette ───── */}
-        <section className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-6 shadow-ds-sm">
+        <Card padding="lg">
           <h2 className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 mb-4">
             Palette principale
           </h2>
@@ -98,7 +102,7 @@ export default function DSPreview() {
               <div
                 key={name}
                 className="h-16 rounded-ds-sm border border-[var(--ds-border)] flex items-end p-2 font-mono text-[10px]"
-                style={{ background: hex, color: ['#1f1b16', '#5a5048', '#a84a2e', '#b8553f', '#5e8a5b', '#5a7aa3', '#d49b3a'].includes(hex) ? '#fff' : '#1f1b16' }}
+                style={{ background: hex, color: DARK_TEXT_HEXES.includes(hex) ? '#fff' : '#1f1b16' }}
               >
                 <div>
                   <div className="opacity-90">{name}</div>
@@ -118,10 +122,10 @@ export default function DSPreview() {
               </div>
             ))}
           </div>
-        </section>
+        </Card>
 
         {/* ───── Section : Typographie ───── */}
-        <section className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-6 shadow-ds-sm">
+        <Card padding="lg">
           <h2 className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 mb-4">
             Typographie
           </h2>
@@ -133,51 +137,72 @@ export default function DSPreview() {
             <div className="font-sans text-sm text-encre-2">DM Sans body · 14px — texte courant, lisible et discret.</div>
             <div className="font-mono text-xs text-encre-3 uppercase tracking-[.08em]">JetBrains Mono · labels techniques</div>
           </div>
-        </section>
+        </Card>
 
-        {/* ───── Section : Boutons ───── */}
-        <section className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-6 shadow-ds-sm">
+        {/* ───── Section : Boutons (primitives) ───── */}
+        <Card padding="lg">
           <h2 className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 mb-4">
-            Boutons
+            Boutons (primitive Button)
           </h2>
-          <div className="flex flex-wrap gap-3 items-center">
-            <button className="px-4 py-2.5 rounded-xl bg-terracotta text-white font-semibold hover:bg-terracotta-deep transition shadow-[inset_0_1px_0_rgba(255,255,255,.22),0_1px_2px_rgba(168,74,46,.25)]">
-              Action principale
-            </button>
-            <button className="px-4 py-2.5 rounded-xl bg-papier text-encre font-semibold border border-[var(--ds-border-2)] hover:bg-papier-2 transition">
-              Action secondaire
-            </button>
-            <button className="px-4 py-2.5 rounded-xl bg-transparent text-encre font-semibold hover:bg-papier-2 transition">
-              Ghost
-            </button>
-            <button className="px-4 py-2.5 rounded-xl bg-encre text-papier font-semibold hover:opacity-90 transition">
-              Inverse
-            </button>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-3 items-center">
+              <Button variant="primary">Action principale</Button>
+              <Button variant="secondary">Action secondaire</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="primary" leftIcon={<Plus size={16} />}>Avec icone</Button>
+              <Button variant="primary" rightIcon={<Send size={16} />}>Envoyer</Button>
+              <Button variant="primary" disabled>Disabled</Button>
+            </div>
+            <div className="flex flex-wrap gap-3 items-center">
+              <Button variant="primary" size="sm">Small</Button>
+              <Button variant="primary" size="md">Medium</Button>
+              <Button variant="primary" size="lg">Large</Button>
+              <Button variant="secondary" size="sm" fullWidth className="max-w-xs">FullWidth (capped)</Button>
+            </div>
           </div>
-        </section>
+        </Card>
 
         {/* ───── Section : Pills ───── */}
-        <section className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-6 shadow-ds-sm">
+        <Card padding="lg">
           <h2 className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 mb-4">
-            Pills (badges sémantiques)
+            Pills (primitive Pill, 9 variantes)
           </h2>
           <div className="flex flex-wrap gap-2">
-            {PILL_VARIANTS.map(p => (
-              <span
-                key={p.label}
-                className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${p.cls}`}
-              >
-                {p.label}
-              </span>
+            <Pill>default</Pill>
+            <Pill variant="solid">solid</Pill>
+            <Pill variant="accent">accent</Pill>
+            <Pill variant="success">success</Pill>
+            <Pill variant="warning">warning</Pill>
+            <Pill variant="danger">danger</Pill>
+            <Pill variant="info">info</Pill>
+            <Pill variant="highlight">highlight</Pill>
+            <Pill variant="ghost">ghost</Pill>
+            <Pill variant="accent" icon={<Bell size={12} />}>avec icone</Pill>
+          </div>
+        </Card>
+
+        {/* ───── Section : Chips (filtres) ───── */}
+        <Card padding="lg">
+          <h2 className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 mb-4">
+            Chips (filtre actif/inactif — clic pour basculer)
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            <Chip leftIcon={<Filter size={14} />} active={activeChip === 'all'} onClick={() => setActiveChip('all')}>
+              Tous les clubs
+            </Chip>
+            {SAMPLE_CLUBS.map(c => (
+              <Chip key={c.token} active={activeChip === c.token} onClick={() => setActiveChip(c.token)}>
+                <span>{c.icon}</span> {c.name}
+              </Chip>
             ))}
           </div>
-        </section>
+        </Card>
 
-        {/* ───── Section : Cards + avatar + progress ───── */}
+        {/* ───── Section : Cards + avatar + progress + placeholder ───── */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-5 shadow-ds-sm">
+          <Card>
             <div className="flex items-center gap-3 mb-3">
-              <div className="ds-av-1 w-10 h-10 rounded-full inline-flex items-center justify-center font-semibold text-sm">MD</div>
+              <Avatar name="Marie Dupont" size={40} n={1} />
               <div>
                 <div className="font-display text-lg leading-tight">Marie Dupont</div>
                 <div className="font-mono text-[10px] uppercase tracking-[.08em] text-encre-3">Capitaine · Volley</div>
@@ -186,32 +211,84 @@ export default function DSPreview() {
             <p className="text-sm text-encre-2">Match contre les Aigles samedi à 14h. <span className="ds-hl">Présence obligatoire</span>.</p>
             <div className="ds-progress mt-4"><span style={{ width: '72%' }} /></div>
             <div className="font-mono text-[10px] text-encre-3 mt-1">Inscriptions · 18/25</div>
-          </div>
+          </Card>
 
-          <div className="bg-papier border border-[var(--ds-border)] rounded-ds-md p-5 shadow-ds-sm">
+          <Card>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-terracotta-soft text-terracotta-deep border border-[rgba(194,90,60,.15)]">Théâtre</span>
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-highlight text-[#6b5816]">À ne pas rater</span>
+              <Pill variant="accent">Théâtre</Pill>
+              <Pill variant="highlight">À ne pas rater</Pill>
             </div>
             <h3 className="font-display text-xl leading-tight mb-2">Première de la saison</h3>
             <p className="text-sm text-encre-2">La troupe joue son nouveau spectacle vendredi. Trois représentations.</p>
             <div className="mt-4 flex -space-x-2">
-              <div className="ds-av-2 w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-semibold border-2 border-papier">AB</div>
-              <div className="ds-av-3 w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-semibold border-2 border-papier">CD</div>
-              <div className="ds-av-4 w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-semibold border-2 border-papier">EF</div>
-              <div className="ds-av-5 w-8 h-8 rounded-full inline-flex items-center justify-center text-xs font-semibold border-2 border-papier">+12</div>
+              <Avatar name="Alice B" size={32} n={2} className="border-2 border-papier" />
+              <Avatar name="Carl D" size={32} n={3} className="border-2 border-papier" />
+              <Avatar name="Eve F" size={32} n={4} className="border-2 border-papier" />
+              <Avatar name="+12" size={32} n={5} className="border-2 border-papier" />
             </div>
-          </div>
+          </Card>
 
-          <div className="ds-placeholder min-h-[180px]">
-            Zone à imager · placeholder hachuré
-          </div>
+          <HatchPlaceholder height={180} caption="Zone à imager · placeholder hachuré" badge="PLACEHOLDER" />
         </section>
 
-        {/* ───── Section : Sidebar mock (desktop) ───── */}
-        <section className="bg-papier border border-[var(--ds-border)] rounded-ds-md overflow-hidden shadow-ds-sm">
+        {/* ───── Section : AppBar + MobileSectionTitle + FAB (mobile shell) ───── */}
+        <Card padding="none" className="overflow-hidden">
           <div className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 px-6 pt-6 mb-3">
-            Chrome desktop (apercu)
+            Mobile · AppBar + MobileSectionTitle + FAB
+          </div>
+          <div className="px-6 pb-6 flex justify-center">
+            {/* Mock d'un ecran de telephone simplifie */}
+            <div className="relative w-[320px] h-[520px] rounded-[28px] border-[6px] border-[#1a1814] overflow-hidden bg-papier shadow-ds-md">
+              <AppBar
+                title="Fil"
+                subtitle="3 nouvelles publications"
+                left={<Avatar name="Yo Lo" size={32} n={1} />}
+                right={<button className="p-1.5 rounded-lg hover:bg-papier-2"><Bell size={18} /></button>}
+              />
+              <MobileSectionTitle action={<button className="text-[11px] text-terracotta-deep">Tout voir</button>}>
+                Aujourd'hui
+              </MobileSectionTitle>
+              <div className="px-4 space-y-2">
+                <Card padding="sm">
+                  <div className="flex items-start gap-2">
+                    <Avatar name="Volley Club" size={28} n={1} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold leading-tight">Volley Club</div>
+                      <div className="text-xs text-encre-2 mt-0.5">Match samedi 14h · présence requise</div>
+                    </div>
+                    <Heart size={16} className="text-encre-3 mt-0.5" />
+                  </div>
+                </Card>
+                <Card padding="sm">
+                  <div className="flex items-start gap-2">
+                    <Avatar name="Theatre" size={28} n={2} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold leading-tight">Troupe Théâtre</div>
+                      <div className="text-xs text-encre-2 mt-0.5">Répétition générale ce soir 20h</div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              <MobileSectionTitle>Hier</MobileSectionTitle>
+              <div className="px-4">
+                <HatchPlaceholder height={70} caption="Placeholder photo de la rando" />
+              </div>
+              <FAB icon={<Plus size={22} strokeWidth={2} />} />
+              {/* Faux tabbar */}
+              <div className="absolute bottom-0 left-0 right-0 h-14 border-t border-[var(--ds-border)] bg-papier flex items-center justify-around text-[11px] text-encre-3">
+                <span className="text-terracotta">Fil</span>
+                <span>Agenda</span>
+                <span>Mon club</span>
+                <span>Plus</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* ───── Section : Sidebar mock (desktop) ───── */}
+        <Card padding="none" className="overflow-hidden">
+          <div className="font-mono text-[11px] uppercase tracking-[.08em] text-encre-3 px-6 pt-6 mb-3">
+            Desktop · chrome (apercu)
           </div>
           <div className="flex h-72">
             <aside className="w-56 bg-papier-2 border-r border-[var(--ds-border)] p-4 space-y-1">
@@ -225,19 +302,25 @@ export default function DSPreview() {
               ))}
             </aside>
             <div className="flex-1 p-6">
-              <h3 className="font-display text-2xl mb-2">Communications</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-display text-2xl">Communications</h3>
+                <div className="flex items-center gap-2">
+                  <Button variant="secondary" size="sm" leftIcon={<Search size={14} />}>Rechercher</Button>
+                  <Button variant="primary" size="sm" leftIcon={<Plus size={14} />}>Nouvelle</Button>
+                </div>
+              </div>
               <p className="text-sm text-encre-2 mb-4">Aperçu de la zone de contenu principale dans une vue admin desktop.</p>
               <div className="grid grid-cols-3 gap-3">
                 {[1, 2, 3].map(n => (
-                  <div key={n} className="bg-papier border border-[var(--ds-border)] rounded-ds-sm p-3 text-xs text-encre-2">
+                  <Card key={n} padding="sm">
                     <div className="font-mono text-[10px] uppercase text-encre-3 mb-1">Carte {n}</div>
-                    Contenu d'exemple sur fond papier.
-                  </div>
+                    <div className="text-xs text-encre-2">Contenu d'exemple sur fond papier.</div>
+                  </Card>
                 ))}
               </div>
             </div>
           </div>
-        </section>
+        </Card>
 
         <footer className="text-center font-mono text-[10px] uppercase tracking-[.12em] text-encre-3 py-6">
           Page d'echantillon · sera supprimee en Phase 11
