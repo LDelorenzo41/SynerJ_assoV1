@@ -19,18 +19,22 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   associationInfo,
   loading = false
 }) => (
-  <div className="lg:hidden fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-30">
+  // [DS] TopBar mobile look "papier chaleureux"
+  <div
+    className="lg:hidden fixed top-0 w-full backdrop-blur-sm border-b border-[var(--ds-border)] z-30"
+    style={{ background: 'rgba(251,248,243,0.95)' }}
+  >
     <div className="flex items-center justify-between px-4 h-16">
       <div className="flex items-center space-x-3">
         <button
           onClick={onMenuToggle}
-          className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-md text-encre-3 hover:text-encre hover:bg-papier-2 transition-colors"
           aria-label="Ouvrir le menu"
         >
           <Menu className="h-6 w-6" />
         </button>
-        
-        <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+
+        <div className="font-display text-2xl text-terracotta-deep">
           SynerJ
         </div>
       </div>
@@ -38,10 +42,10 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
       {/* Association info - masquée pendant le loading */}
       {!loading && associationInfo && (
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+          <div className="w-6 h-6 rounded-full bg-papier-2 flex items-center justify-center overflow-hidden">
             {associationInfo.logo_url ? (
-              <img 
-                src={associationInfo.logo_url} 
+              <img
+                src={associationInfo.logo_url}
                 alt={`Logo ${associationInfo.name}`}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -56,20 +60,20 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
                 }}
               />
             ) : (
-              <Building className="w-4 h-4 text-gray-400" />
+              <Building className="w-4 h-4 text-encre-3" />
             )}
           </div>
-          <span className="text-sm text-gray-600 font-medium max-w-32 truncate">
+          <span className="text-sm text-encre-2 font-medium max-w-32 truncate">
             {associationInfo.name}
           </span>
         </div>
       )}
-      
+
       {/* Skeleton pendant le loading */}
       {loading && (
         <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse"></div>
-          <div className="w-24 h-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="w-6 h-6 rounded-full bg-papier-2 animate-pulse"></div>
+          <div className="w-24 h-4 bg-papier-2 rounded animate-pulse"></div>
         </div>
       )}
     </div>
