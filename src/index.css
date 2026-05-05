@@ -326,3 +326,99 @@
 .ds-av-4 { background: #d6e3d3; color: #3f6b3d; }
 .ds-av-5 { background: #c4d0d8; color: #1f3340; }
 .ds-av-6 { background: #f4d8c8; color: #8a4a30; }
+
+/* ============================================================
+   PHASE 1b — Variante DARK "encre chaleureuse"
+   ------------------------------------------------------------
+   Le DS livre n'a pas de variante dark : on la concoit ici en
+   inversant la metaphore "papier/encre" (fonds sombres tiedes,
+   textes en papier creme) tout en preservant l'identite chaude.
+   La bascule se fait via la classe .dark deja branchee sur <html>
+   par le DarkModeToggle existant. Aucun composant n'a besoin
+   d'etre modifie : les tokens (bg-papier, text-encre, ...)
+   bougent automatiquement.
+   ============================================================ */
+
+.dark {
+  /* Papier devient "encre" (fonds noirs chauds, pas du gris froid) */
+  --papier: #1a1814;
+  --papier-2: #221f1a;
+  --papier-3: #2c2722;
+
+  /* Encre devient "papier" (textes creme) */
+  --encre: #f4efe6;
+  --encre-2: #c8bfb0;
+  --encre-3: #8a7f72;
+
+  /* Terracotta legerement remonte pour rester visible sur fond sombre */
+  --terracotta: #d97757;
+  --terracotta-deep: #c25a3c;
+  --accent-soft: #3a2620;
+
+  /* Highlight desature pour ne pas bruler */
+  --highlight: #b8983d;
+  --highlight-soft: #4a3d1c;
+
+  /* Semantiques : on garde la teinte, on desature les "soft" */
+  --ds-success: #7aa377;
+  --ds-success-soft: #2a3a28;
+  --ds-warning: #d4a85a;
+  --ds-warning-soft: #3d3220;
+  --ds-danger: #d06a52;
+  --ds-danger-soft: #3d2620;
+  --ds-info: #7a99c0;
+  --ds-info-soft: #1f2a3a;
+
+  /* Couleurs club (teintes inchangees, "soft" assombries) */
+  --club-volley-soft: #3d2620;
+  --club-theatre-soft: #2a253a;
+  --club-photo-soft: #3a3220;
+  --club-rando-soft: #243025;
+  --club-echecs-soft: #1f2a30;
+
+  /* Bordures plus claires sur fond sombre */
+  --ds-border: rgba(244, 239, 230, 0.10);
+  --ds-border-2: rgba(244, 239, 230, 0.18);
+
+  /* Ombres plus profondes (le fond sombre absorbe les ombres legeres) */
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, .25), 0 2px 6px rgba(0, 0, 0, .25);
+  --ds-shadow-md: 0 2px 4px rgba(0, 0, 0, .30), 0 8px 18px rgba(0, 0, 0, .35);
+  --ds-shadow-lg: 0 4px 10px rgba(0, 0, 0, .35), 0 16px 36px rgba(0, 0, 0, .50);
+}
+
+/* Surligneur en dark : on desature le fond pour rester lisible */
+.dark .ds-hl {
+  background: linear-gradient(transparent 60%, rgba(184, 152, 61, 0.35) 60%);
+  color: #fce896;
+}
+.dark .ds-hl-soft {
+  background: linear-gradient(transparent 62%, rgba(184, 152, 61, 0.20) 62%);
+}
+
+/* Placeholder hachure en dark */
+.dark .ds-placeholder {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(244, 239, 230, .05) 0 1px,
+      transparent 1px 8px),
+    var(--papier-2);
+  border-color: rgba(244, 239, 230, .14);
+}
+
+/* Hero gradients adaptes au dark (assombris, garder l'identite club) */
+.dark .ds-hero-volley  { background: linear-gradient(135deg, #3a2620 0%, #5a3424 60%, #6b3e2a 100%); color: #fce896; }
+.dark .ds-hero-theatre { background: linear-gradient(135deg, #2a253a 0%, #3d3454 100%); color: #f4efe6; }
+.dark .ds-hero-photo   { background: linear-gradient(135deg, #3a3220 0%, #5a4a26 100%); color: #fce896; }
+.dark .ds-hero-rando   { background: linear-gradient(135deg, #243025 0%, #3a4d3a 100%); color: #f4efe6; }
+.dark .ds-hero-echecs  { background: linear-gradient(135deg, #1f2a30 0%, #2d4a5a 100%); color: #f4efe6; }
+
+/* Pastels avatar : on assombrit le fond mais on garde le glyphe lisible */
+.dark .ds-av-1 { background: #4a2e22; color: #f4d8c8; }
+.dark .ds-av-2 { background: #2f2a45; color: #c8bedc; }
+.dark .ds-av-3 { background: #3d3320; color: #efe2b6; }
+.dark .ds-av-4 { background: #25352a; color: #d6e3d3; }
+.dark .ds-av-5 { background: #1f2a32; color: #c4d0d8; }
+.dark .ds-av-6 { background: #3d2820; color: #f4d8c8; }
+
+/* La transition globale "* { transition }" deja definie plus haut
+   couvre la bascule light/dark sur tous les tokens.            */
