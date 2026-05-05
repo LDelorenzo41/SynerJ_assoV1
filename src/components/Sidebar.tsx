@@ -116,9 +116,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       
       {/* Sidebar - STICKY sur desktop */}
       {/* [DS] Look "papier chaleureux": fond papier-2, separateurs en var(--ds-border).
-          Toute la logique (sticky, transitions, overlay mobile) reste identique. */}
+          Toute la logique (sticky, transitions, overlay mobile) reste identique.
+          [Fix] pb-32 lg:pb-20 reserve la zone des barres flottantes (banner
+          sponsor + tabbar mobile) pour que le bouton "Deconnexion" reste
+          accessible en bas de la sidebar. */}
       <div className={`
-        fixed left-0 top-0 h-full bg-papier-2 border-r border-[var(--ds-border)] z-50 transition-all duration-300 ease-in-out flex flex-col
+        fixed left-0 top-0 h-full bg-papier-2 border-r border-[var(--ds-border)] z-[60] transition-all duration-300 ease-in-out flex flex-col
+        pb-32 lg:pb-20
         ${isOpen ? 'w-64' : 'w-16'}
         lg:sticky lg:top-0 lg:h-screen lg:z-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
