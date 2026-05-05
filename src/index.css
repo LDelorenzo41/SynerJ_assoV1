@@ -196,3 +196,133 @@
 .dark .dark-bg-secondary {
   background-color: #1e293b;
 }
+
+/* ============================================================
+   DESIGN SYSTEM "Direction A — papier chaleureux"
+   ------------------------------------------------------------
+   Phase 1 : tokens light + utilitaires partages.
+   Phase 1b ajoutera l'override .dark { } juste en dessous.
+   Tous les tokens sont expose's en CSS variables pour que
+   Tailwind (via tailwind.config.js) et le code legacy puissent
+   les consommer indifferemment.
+   ============================================================ */
+
+:root {
+  /* Papier (fonds) */
+  --papier: #fbf8f3;
+  --papier-2: #f4efe6;
+  --papier-3: #ede6d8;
+
+  /* Encre (textes) */
+  --encre: #1f1b16;
+  --encre-2: #5a5048;
+  --encre-3: #8a7f72;
+
+  /* Accent terracotta */
+  --terracotta: #c25a3c;
+  --terracotta-deep: #a84a2e;
+  --accent-soft: #fbe5d9;
+
+  /* Highlight surligneur */
+  --highlight: #fce896;
+  --highlight-soft: #fdf3c5;
+
+  /* Semantiques (prefixees ds- pour ne pas collisionner avec d'eventuelles
+     classes Tailwind "success" / "warning" / etc.) */
+  --ds-success: #5e8a5b;
+  --ds-success-soft: #dceada;
+  --ds-warning: #d49b3a;
+  --ds-warning-soft: #f6e7c2;
+  --ds-danger: #b8553f;
+  --ds-danger-soft: #f3d6cc;
+  --ds-info: #5a7aa3;
+  --ds-info-soft: #d8e2ee;
+
+  /* Couleurs par club */
+  --club-volley: #d97757;
+  --club-theatre: #6b5b95;
+  --club-photo: #c4a032;
+  --club-rando: #5e8a5b;
+  --club-echecs: #2d4a5a;
+  --club-volley-soft: #f7dccd;
+  --club-theatre-soft: #ddd5e8;
+  --club-photo-soft: #efe2b6;
+  --club-rando-soft: #d6e3d3;
+  --club-echecs-soft: #c4d0d8;
+
+  /* Bordures et ombres */
+  --ds-border: rgba(31, 27, 22, 0.08);
+  --ds-border-2: rgba(31, 27, 22, 0.14);
+  --ds-shadow-sm: 0 1px 2px rgba(31, 27, 22, .04), 0 2px 6px rgba(31, 27, 22, .04);
+  --ds-shadow-md: 0 2px 4px rgba(31, 27, 22, .05), 0 8px 18px rgba(31, 27, 22, .06);
+  --ds-shadow-lg: 0 4px 10px rgba(31, 27, 22, .06), 0 16px 36px rgba(31, 27, 22, .10);
+
+  /* Familles de polices (miroir du tailwind.config) */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ----- Utilitaires partages issus du DS ----- */
+
+.ds-serif { font-family: var(--font-display); font-weight: 400; }
+.ds-mono  { font-family: var(--font-mono); }
+
+/* Surligneur "stabilo" */
+.ds-hl {
+  background: linear-gradient(transparent 60%, var(--highlight) 60%);
+  padding: 0 2px;
+}
+.ds-hl-soft {
+  background: linear-gradient(transparent 62%, var(--highlight-soft) 62%);
+  padding: 0 2px;
+}
+
+/* Placeholder hachure (mockups, zones a imager plus tard) */
+.ds-placeholder {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(31, 27, 22, .05) 0 1px,
+      transparent 1px 8px),
+    var(--papier-2);
+  border: 1px dashed rgba(31, 27, 22, .16);
+  border-radius: 14px;
+  color: var(--encre-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+}
+
+/* Progress bar fine */
+.ds-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(31, 27, 22, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+.ds-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--terracotta);
+  border-radius: 999px;
+}
+
+/* Hero gradients par club */
+.ds-hero-volley  { background: linear-gradient(135deg, #fbe5d9 0%, #f7c4ad 60%, #efb098 100%); }
+.ds-hero-theatre { background: linear-gradient(135deg, #ede6f5 0%, #c8bedc 100%); }
+.ds-hero-photo   { background: linear-gradient(135deg, #f8ecc4 0%, #e6c97d 100%); }
+.ds-hero-rando   { background: linear-gradient(135deg, #dcebd9 0%, #aac8a3 100%); }
+.ds-hero-echecs  { background: linear-gradient(135deg, #cfdce4 0%, #7892a0 100%); color: #fff; }
+
+/* Pastels avatar (av-1..6) */
+.ds-av-1 { background: #f7d4c4; color: #7a3a25; }
+.ds-av-2 { background: #ddd5e8; color: #4a3e6b; }
+.ds-av-3 { background: #efe2b6; color: #6b5816; }
+.ds-av-4 { background: #d6e3d3; color: #3f6b3d; }
+.ds-av-5 { background: #c4d0d8; color: #1f3340; }
+.ds-av-6 { background: #f4d8c8; color: #8a4a30; }
