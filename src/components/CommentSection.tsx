@@ -186,8 +186,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
   if (loading) {
     return (
-      <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
+      <div className="mt-4 p-3 bg-white dark:bg-papier-2 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+        <div className="flex items-center gap-2 text-encre-2 dark:text-encre-3 text-sm">
           <MessageCircle className="w-4 h-4 animate-pulse" />
           <span>Chargement...</span>
         </div>
@@ -196,19 +196,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   }
 
   return (
-    <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+    <div className="mt-4 p-4 bg-white dark:bg-papier-2 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
       {/* En-tête compact */}
       <div className="flex items-center gap-2 mb-3">
-        <MessageCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+        <MessageCircle className="w-4 h-4 text-ds-info dark:text-ds-info" />
+        <h3 className="text-sm font-semibold text-encre dark:text-white">
           Commentaires {comments.length > 0 && `(${comments.length})`}
         </h3>
       </div>
 
       {/* Message d'erreur */}
       {error && (
-        <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-          <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <div className="mb-3 p-2 bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-md">
+          <p className="text-xs text-ds-danger dark:text-ds-danger">{error}</p>
         </div>
       )}
 
@@ -216,28 +216,28 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       {comments.length > 0 && (
         <div className="space-y-3 mb-4">
           {comments.map(comment => (
-            <div key={comment.id} className="pb-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <div key={comment.id} className="pb-3 border-b border-[var(--ds-border)] dark:border-[var(--ds-border)] last:border-0">
               {editingCommentId === comment.id ? (
                 /* Mode édition */
                 <div className="space-y-2">
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-                      isOverLimit() ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                    className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent resize-none bg-white dark:bg-papier-3 text-encre dark:text-white ${
+                      isOverLimit() ? 'border-ds-danger dark:border-ds-danger' : 'border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]'
                     }`}
                     rows={2}
                     disabled={submitting}
                   />
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs ${isOverLimit() ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <span className={`text-xs ${isOverLimit() ? 'text-ds-danger dark:text-ds-danger' : 'text-encre-3 dark:text-encre-3'}`}>
                       {getCharacterCount()} / {COMMENT_VALIDATION.MAX_LENGTH}
                     </span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveEdit(comment.id)}
                         disabled={submitting || isOverLimit()}
-                        className="flex items-center gap-1 px-2 py-1 bg-indigo-600 dark:bg-indigo-700 text-white rounded hover:bg-indigo-700 dark:hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                        className="flex items-center gap-1 px-2 py-1 bg-ds-info dark:bg-ds-info-soft text-white rounded hover:bg-ds-info dark:hover:bg-ds-info disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                       >
                         <Check className="w-3 h-3" />
                         <span>Enregistrer</span>
@@ -245,7 +245,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       <button
                         onClick={handleCancelEdit}
                         disabled={submitting}
-                        className="flex items-center gap-1 px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 text-xs"
+                        className="flex items-center gap-1 px-2 py-1 bg-papier-3 dark:bg-papier-3 text-encre-2 dark:text-encre-3 rounded hover:bg-papier-3 dark:hover:bg-papier-3 disabled:opacity-50 text-xs"
                       >
                         <X className="w-3 h-3" />
                         <span>Annuler</span>
@@ -266,8 +266,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                           className="w-6 h-6 rounded-full object-cover flex-shrink-0"
                         />
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center flex-shrink-0">
-                          <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-xs">
+                        <div className="w-6 h-6 rounded-full bg-ds-info-soft dark:bg-ds-info-soft flex items-center justify-center flex-shrink-0">
+                          <span className="text-ds-info dark:text-ds-info font-semibold text-xs">
                             {getUserDisplayName(comment).charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -276,10 +276,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       {/* Nom et date */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium text-gray-900 dark:text-white text-sm">
+                          <span className="font-medium text-encre dark:text-white text-sm">
                             {getUserDisplayName(comment)}
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-encre-3 dark:text-encre-3">
                             {formatDate(comment.created_at)}
                             {comment.updated_at && ' • Modifié'}
                           </span>
@@ -293,7 +293,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         {comment.user_id === user.id && (
                           <button
                             onClick={() => handleEditComment(comment)}
-                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                            className="p-1 text-encre-3 dark:text-encre-3 hover:text-ds-info dark:hover:text-ds-info transition-colors"
                             title="Modifier"
                           >
                             <Edit2 className="w-3 h-3" />
@@ -302,7 +302,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         {canDeleteComment(comment) && (
                           <button
                             onClick={() => handleDeleteComment(comment.id)}
-                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            className="p-1 text-encre-3 dark:text-encre-3 hover:text-ds-danger dark:hover:text-ds-danger transition-colors"
                             title="Supprimer"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -313,7 +313,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                   </div>
 
                   {/* Contenu du commentaire */}
-                  <p className="text-gray-700 dark:text-gray-300 text-sm ml-8 whitespace-pre-wrap">
+                  <p className="text-encre-2 dark:text-encre-3 text-sm ml-8 whitespace-pre-wrap">
                     {comment.content}
                   </p>
                 </div>
@@ -330,20 +330,20 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Ajouter un commentaire..."
-            className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
-              isOverLimit() ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+            className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent resize-none bg-white dark:bg-papier-3 text-encre dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+              isOverLimit() ? 'border-ds-danger dark:border-ds-danger' : 'border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]'
             }`}
             rows={2}
             disabled={submitting}
           />
           <div className="flex items-center justify-between">
-            <span className={`text-xs ${isOverLimit() ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
+            <span className={`text-xs ${isOverLimit() ? 'text-ds-danger dark:text-ds-danger' : 'text-encre-3 dark:text-encre-3'}`}>
               {getCharacterCount()} / {COMMENT_VALIDATION.MAX_LENGTH}
             </span>
             <button
               type="submit"
               disabled={submitting || newComment.trim().length === 0 || isOverLimit()}
-              className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 dark:bg-indigo-700 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+              className="flex items-center gap-1 px-3 py-1.5 bg-ds-info dark:bg-ds-info-soft text-white rounded-md hover:bg-ds-info dark:hover:bg-ds-info disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
             >
               <Send className="w-3 h-3" />
               <span>{submitting ? 'Envoi...' : 'Commenter'}</span>
@@ -351,8 +351,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           </div>
         </form>
       ) : (
-        <div className="text-center py-2 bg-gray-50 dark:bg-gray-700/50 rounded-md">
-          <p className="text-gray-600 dark:text-gray-400 text-xs">
+        <div className="text-center py-2 bg-papier-2 dark:bg-papier-3/50 rounded-md">
+          <p className="text-encre-2 dark:text-encre-3 text-xs">
             Connectez-vous pour commenter
           </p>
         </div>

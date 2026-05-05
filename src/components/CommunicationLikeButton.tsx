@@ -36,8 +36,8 @@ export const CommunicationLikeButton: React.FC<CommunicationLikeButtonProps> = (
         ${isCompact ? 'px-2 py-1 text-sm' : 'px-3 py-2'}
         rounded-lg
         ${stats.isLikedByUser 
-          ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20' 
-          : 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+          ? 'text-ds-danger dark:text-ds-danger bg-ds-danger-soft dark:bg-ds-danger-soft' 
+          : 'text-encre-2 dark:text-encre-3 bg-papier-2 dark:bg-papier-2 hover:bg-papier-3 dark:hover:bg-papier-3'
         }
         ${toggling ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}
         ${className}

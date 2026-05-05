@@ -91,12 +91,12 @@ const LogoDisplay: React.FC<LogoDisplayProps> = ({
   alt,
   size = 'w-8 h-8',
   fallbackIcon: FallbackIcon,
-  iconColor = 'text-gray-400 dark:text-slate-500'
+  iconColor = 'text-encre-3 dark:text-slate-500'
 }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className={`${size} rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+    <div className={`${size} rounded-full bg-papier-2 dark:bg-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0`}>
       {src && !imageError ? (
         <img
           src={src}
@@ -115,15 +115,15 @@ const PriorityBadge: React.FC<{ priority: 'Low' | 'Normal' | 'High' | 'Urgent' }
   const getPriorityStyles = () => {
     switch (priority) {
       case 'Urgent':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700';
+        return 'bg-ds-danger-soft dark:bg-ds-danger-soft/30 text-ds-danger dark:text-ds-danger border-ds-danger dark:border-ds-danger';
       case 'High':
-        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-700';
+        return 'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning border-ds-warning dark:border-ds-warning';
       case 'Normal':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700';
+        return 'bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta border-terracotta dark:border-terracotta';
       case 'Low':
-        return 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
+        return 'bg-papier-2 dark:bg-papier/30 text-encre dark:text-encre-3 border-[var(--ds-border)] dark:border-[var(--ds-border)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
+        return 'bg-papier-2 dark:bg-papier/30 text-encre dark:text-encre-3 border-[var(--ds-border)] dark:border-[var(--ds-border)]';
     }
   };
 
@@ -771,20 +771,20 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold dark-text">Communications</h1>
+          <h1 className="text-3xl font-bold text-encre">Communications</h1>
         </div>
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
+        <div className="bg-ds-warning-soft dark:bg-ds-warning-soft/20 border border-ds-warning dark:border-ds-warning rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
+            <AlertCircle className="h-6 w-6 text-ds-warning dark:text-ds-warning mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Association requise</h2>
-              <p className="text-yellow-800 dark:text-yellow-300 mb-4">
+              <h2 className="text-lg font-semibold text-ds-warning dark:text-ds-warning mb-2">Association requise</h2>
+              <p className="text-ds-warning dark:text-ds-warning mb-4">
                 Pour voir les communications, vous devez d'abord rejoindre une association.
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
               <Link
                 to="/dashboard"
-                className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
+                className="bg-terracotta text-white hover:bg-terracotta-deep inline-flex items-center px-4 py-2 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Aller au tableau de bord
@@ -808,9 +808,9 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
       <button
         onClick={onClick}
         className="inline-flex items-center gap-2 px-3 py-2 rounded-lg
-        text-gray-600 dark:text-gray-400 
-        bg-gray-100 dark:bg-gray-800 
-        hover:bg-gray-200 dark:hover:bg-gray-700
+        text-encre-2 dark:text-encre-3 
+        bg-papier-2 dark:bg-papier-2 
+        hover:bg-papier-3 dark:hover:bg-papier-3
         transition-all"
       >
         <MessageCircle className="w-5 h-5" />
@@ -824,7 +824,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-terracotta dark:border-terracotta"></div>
       </div>
     );
   }
@@ -833,12 +833,12 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold dark-text">{getPageTitle()}</h1>
+          <h1 className="text-3xl font-bold text-encre">{getPageTitle()}</h1>
           {clubId && clubInfo && (
             <div className="mt-2 flex items-center space-x-2">
               <Link
                 to="/communications"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                className="text-sm text-terracotta dark:text-terracotta hover:text-terracotta-deep dark:hover:text-terracotta"
               >
                 ← Retour à toutes les communications
               </Link>
@@ -861,7 +861,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                 is_pinned: false,
               });
             }}
-            className="dark-btn-primary px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
+            className="bg-terracotta text-white hover:bg-terracotta-deep px-3 sm:px-4 lg:px-4 py-2 rounded-lg transition-colors flex items-center justify-center sm:justify-start space-x-0 sm:space-x-2"
             title="Nouvelle Communication"
           >
             <Plus className="h-4 w-4 flex-shrink-0" />
@@ -871,16 +871,16 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
         )}
       </div>
 
-      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 p-4 rounded-lg">
+      <div className="bg-ds-info-soft dark:bg-ds-info-soft/20 border border-ds-info-soft dark:border-ds-info p-4 rounded-lg">
         <div className="flex items-start">
           <div className="flex-shrink-0">
-            <MessageSquare className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <MessageSquare className="h-5 w-5 text-ds-info dark:text-ds-info" />
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-purple-800 dark:text-purple-200">
+            <h3 className="text-sm font-medium text-ds-info dark:text-ds-info">
               {getPageDescription()}
             </h3>
-            <div className="mt-1 text-sm text-purple-700 dark:text-purple-300">
+            <div className="mt-1 text-sm text-ds-info dark:text-ds-info">
               {getPageSubDescription()}
             </div>
           </div>
@@ -889,24 +889,24 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="dark-card p-6 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm p-6 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold dark-text">
+              <h2 className="text-xl font-bold text-encre">
                 {editingCommunication ? 'Modifier la Communication' : 'Nouvelle Communication'}
               </h2>
               <button
                 onClick={() => setShowForm(false)}
                 disabled={submittingCommunication}
-                className="p-2 dark-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-papier-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <X className="h-5 w-5 dark-text" />
+                <X className="h-5 w-5 text-encre" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium dark-text mb-2">
+                  <label className="block text-sm font-medium text-encre mb-2">
                     Titre de la Communication *
                   </label>
                   <input
@@ -914,20 +914,20 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                     required
                     value={communicationForm.title}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3"
                     placeholder="Ex: Nouveau règlement concernant les terrains"
                     disabled={submittingCommunication}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium dark-text mb-2">
+                  <label className="block text-sm font-medium text-encre mb-2">
                     Priorité *
                   </label>
                   <select
                     value={communicationForm.priority}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, priority: e.target.value as 'Low' | 'Normal' | 'High' | 'Urgent' })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3"
                     disabled={submittingCommunication}
                   >
                     <option value="Low">Faible</option>
@@ -940,13 +940,13 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium dark-text mb-2">
+                  <label className="block text-sm font-medium text-encre mb-2">
                     Visibilité *
                   </label>
                   <select
                     value={communicationForm.visibility}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, visibility: e.target.value as 'Public' | 'Private' })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3"
                     disabled={submittingCommunication}
                   >
                     <option value="Public">Publique</option>
@@ -955,17 +955,17 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium dark-text mb-2">
+                  <label className="block text-sm font-medium text-encre mb-2">
                     Date d'expiration
                   </label>
                   <input
                     type="datetime-local"
                     value={communicationForm.expires_at}
                     onChange={(e) => setCommunicationForm({ ...communicationForm, expires_at: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3"
                     disabled={submittingCommunication}
                   />
-                  <p className="text-xs dark-text-muted mt-1">
+                  <p className="text-xs text-encre-3 mt-1">
                     Laissez vide pour une communication permanente
                   </p>
                 </div>
@@ -973,10 +973,10 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
               {isSuperAdmin && communicationForm.visibility === 'Private' && (
                 <div>
-                  <label className="block text-sm font-medium dark-text mb-2">
+                  <label className="block text-sm font-medium text-encre mb-2">
                     Clubs ciblés
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg p-3">
                     {availableClubs.map((club) => (
                       <label key={club.id} className="flex items-center space-x-2">
                         <input
@@ -998,11 +998,11 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                           className="rounded"
                           disabled={submittingCommunication}
                         />
-                        <span className="text-sm dark-text">{club.name}</span>
+                        <span className="text-sm text-encre">{club.name}</span>
                       </label>
                     ))}
                   </div>
-                  <p className="text-xs dark-text-muted mt-1">
+                  <p className="text-xs text-encre-3 mt-1">
                     Sélectionnez les clubs qui recevront cette communication privée
                   </p>
                 </div>
@@ -1017,14 +1017,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                   className="rounded"
                   disabled={submittingCommunication}
                 />
-                <label htmlFor="is_pinned" className="text-sm dark-text flex items-center space-x-1">
+                <label htmlFor="is_pinned" className="text-sm text-encre flex items-center space-x-1">
                   <Pin className="h-4 w-4" />
                   <span>Épingler cette communication</span>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium dark-text mb-2">
+                <label className="block text-sm font-medium text-encre mb-2">
                   Image de la Communication
                 </label>
 
@@ -1033,12 +1033,12 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                     <img
                       src={communicationForm.image_url}
                       alt="Aperçu"
-                      className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                      className="w-full h-48 object-cover rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                     />
                     <button
                       type="button"
                       onClick={() => setCommunicationForm({ ...communicationForm, image_url: '' })}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      className="absolute top-2 right-2 p-1 bg-ds-danger text-white rounded-full hover:bg-ds-danger"
                       disabled={submittingCommunication}
                     >
                       <X className="h-4 w-4" />
@@ -1058,9 +1058,9 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                       className="hidden"
                       disabled={uploadingImage || submittingCommunication}
                     />
-                    <div className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
-                      <Upload className="h-5 w-5 mx-auto mb-1 text-gray-400 dark:text-slate-500" />
-                      <span className="text-sm dark-text-muted">
+                    <div className="w-full p-3 border-2 border-dashed border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg text-center cursor-pointer hover:border-ds-info dark:hover:border-ds-info hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/20 transition-colors">
+                      <Upload className="h-5 w-5 mx-auto mb-1 text-encre-3 dark:text-slate-500" />
+                      <span className="text-sm text-encre-3">
                         {uploadingImage ? 'Upload...' : 'Télécharger'}
                       </span>
                     </div>
@@ -1070,14 +1070,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                     type="button"
                     onClick={handleGenerateImage}
                     disabled={generatingImage || !communicationForm.title || submittingCommunication}
-                    className="flex-1 p-3 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-lg text-center hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 p-3 border-2 border-dashed border-ds-info dark:border-ds-info rounded-lg text-center hover:border-ds-info dark:hover:border-ds-info hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {generatingImage ? (
-                      <RefreshCw className="h-5 w-5 mx-auto mb-1 text-purple-500 dark:text-purple-400 animate-spin" />
+                      <RefreshCw className="h-5 w-5 mx-auto mb-1 text-ds-info dark:text-ds-info animate-spin" />
                     ) : (
-                      <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500 dark:text-purple-400" />
+                      <Sparkles className="h-5 w-5 mx-auto mb-1 text-ds-info dark:text-ds-info" />
                     )}
-                    <span className="text-sm text-purple-600 dark:text-purple-400">
+                    <span className="text-sm text-ds-info dark:text-ds-info">
                       {generatingImage ? 'Génération...' : 'Générer IA'}
                     </span>
                   </button>
@@ -1086,14 +1086,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium dark-text">
+                  <label className="block text-sm font-medium text-encre">
                     Contenu de la Communication *
                   </label>
                   <button
                     type="button"
                     onClick={handleRewriteContent}
                     disabled={rewritingContent || !communicationForm.title || !communicationForm.content || submittingCommunication}
-                    className="flex items-center space-x-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center space-x-1 px-3 py-1 bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info rounded-lg hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/50 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Utiliser l'IA pour améliorer le contenu"
                   >
                     {rewritingContent ? (
@@ -1111,33 +1111,33 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                 </div>
 
                 {showAiSuggestion && aiSuggestion && (
-                  <div className="mb-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
+                  <div className="mb-3 p-3 bg-ds-info-soft dark:bg-ds-info-soft/20 border border-ds-info-soft dark:border-ds-info rounded-lg">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center">
-                        <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 mr-2" />
-                        <span className="text-sm font-medium text-purple-900 dark:text-purple-200">
+                        <Sparkles className="h-4 w-4 text-ds-info dark:text-ds-info mr-2" />
+                        <span className="text-sm font-medium text-ds-info dark:text-ds-info">
                           Suggestion de l'IA
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={rejectAiSuggestion}
-                        className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400"
+                        className="text-encre-3 dark:text-slate-500 hover:text-encre-2 dark:hover:text-slate-400"
                         disabled={submittingCommunication}
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
 
-                    <div className="dark-card p-2 rounded border border-purple-100 dark:border-purple-600 mb-3">
-                      <p className="text-sm dark-text whitespace-pre-wrap">{aiSuggestion}</p>
+                    <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm p-2 rounded border border-ds-info-soft dark:border-ds-info mb-3">
+                      <p className="text-sm text-encre whitespace-pre-wrap">{aiSuggestion}</p>
                     </div>
 
                     <div className="flex space-x-2">
                       <button
                         type="button"
                         onClick={acceptAiSuggestion}
-                        className="flex-1 px-3 py-1 bg-purple-600 dark:bg-purple-700 text-white text-sm rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
+                        className="flex-1 px-3 py-1 bg-ds-info dark:bg-ds-info-soft text-white text-sm rounded hover:bg-ds-info dark:hover:bg-ds-info transition-colors"
                         disabled={submittingCommunication}
                       >
                         Utiliser ce contenu
@@ -1147,7 +1147,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                         onClick={() => {
                           acceptAiSuggestion();
                         }}
-                        className="flex-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                        className="flex-1 px-3 py-1 bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info text-sm rounded hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/50 transition-colors"
                         disabled={submittingCommunication}
                       >
                         Utiliser et modifier
@@ -1161,7 +1161,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                   required
                   value={communicationForm.content}
                   onChange={(e) => setCommunicationForm({ ...communicationForm, content: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent dark-input"
+                  className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3"
                   placeholder="Rédigez le contenu de votre communication..."
                   disabled={submittingCommunication}
                 />
@@ -1172,14 +1172,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                   type="button"
                   onClick={() => setShowForm(false)}
                   disabled={submittingCommunication}
-                  className="dark-btn-secondary flex-1 py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-papier-2 text-encre border border-[var(--ds-border-2)] hover:bg-papier-3 flex-1 py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={uploadingImage || generatingImage || submittingCommunication}
-                  className="flex-1 py-3 px-4 dark-btn-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  className="flex-1 py-3 px-4 bg-terracotta text-white hover:bg-terracotta-deep rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   {submittingCommunication ? (
                     <>
@@ -1196,9 +1196,9 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
         </div>
       )}
 
-      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-lg font-semibold dark-text flex items-center">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h2 className="text-lg font-semibold text-encre flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
             Communications ({communications.length})
           </h2>
@@ -1211,33 +1211,33 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
               : 'Auteur inconnu';
 
             return (
-              <div key={communication.id} className="px-6 py-6 dark-hover">
-                <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-gray-100 dark:border-gray-600">
+              <div key={communication.id} className="px-6 py-6 hover:bg-papier-2">
+                <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                   <LogoDisplay
                     src={communication.club_id ? communication.clubs?.logo_url : communication.associations?.logo_url}
                     alt={`Logo ${communication.club_id ? communication.clubs?.name : communication.associations?.name}`}
                     size="w-10 h-10"
                     fallbackIcon={communication.club_id ? Building : Globe}
-                    iconColor="text-purple-600 dark:text-purple-400"
+                    iconColor="text-ds-info dark:text-ds-info"
                   />
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <h4 className="text-sm font-medium dark-text">
+                      <h4 className="text-sm font-medium text-encre">
                         {communication.club_id ? communication.clubs?.name : communication.associations?.name}
                       </h4>
                       {communication.is_pinned && (
-                        <Pin className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        <Pin className="h-4 w-4 text-ds-info dark:text-ds-info" />
                       )}
                     </div>
                     <div className="flex items-center space-x-2 mt-1">
                       {communication.visibility === 'Public' ? (
-                        <Eye className="h-3 w-3 text-green-600 dark:text-green-400" />
+                        <Eye className="h-3 w-3 text-ds-success dark:text-ds-success" />
                       ) : (
-                        <Lock className="h-3 w-3 text-orange-600 dark:text-orange-400" />
+                        <Lock className="h-3 w-3 text-ds-warning dark:text-ds-warning" />
                       )}
                       <span className={`px-2 py-0.5 text-xs rounded-full ${communication.visibility === 'Public'
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                        : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                        ? 'bg-ds-success-soft dark:bg-ds-success-soft/30 text-ds-success dark:text-ds-success'
+                        : 'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning'
                         }`}>
                         {communication.visibility === 'Public' ? 'Publique' : 'Privée'}
                       </span>
@@ -1245,7 +1245,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs dark-text-muted">
+                    <div className="text-xs text-encre-3">
                       {new Date(communication.created_at).toLocaleDateString('fr-FR', {
                         year: 'numeric',
                         month: 'short',
@@ -1254,7 +1254,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                         minute: '2-digit',
                       })}
                     </div>
-                    <div className="text-xs dark-text-muted mt-1">
+                    <div className="text-xs text-encre-3 mt-1">
                       Par {authorName}
                     </div>
                   </div>
@@ -1266,7 +1266,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                       <img
                         src={communication.image_url}
                         alt={communication.title}
-                        className="w-full h-48 lg:h-32 object-contain bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
+                        className="w-full h-48 lg:h-32 object-contain bg-papier-2 dark:bg-slate-800 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setSelectedImage(communication.image_url)}
                       />
                     </div>
@@ -1275,10 +1275,10 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-bold dark-text mb-3 flex items-center space-x-2">
+                        <h3 className="text-xl font-bold text-encre mb-3 flex items-center space-x-2">
                           <span>{communication.title}</span>
                           {communication.expires_at && (
-                            <span className="flex items-center text-xs text-orange-600 dark:text-orange-400">
+                            <span className="flex items-center text-xs text-ds-warning dark:text-ds-warning">
                               <Clock className="h-3 w-3 mr-1" />
                               Expire le {new Date(communication.expires_at).toLocaleDateString('fr-FR')}
                             </span>
@@ -1286,13 +1286,13 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                         </h3>
 
                         <div className="mb-4">
-                          <p className={`dark-text ${!isExpanded ? 'line-clamp-3' : ''}`}>
+                          <p className={`text-encre ${!isExpanded ? 'line-clamp-3' : ''}`}>
                             {communication.content}
                           </p>
                           {communication.content.length > 200 && (
                             <button
                               onClick={() => toggleCommunicationExpansion(communication.id)}
-                              className="mt-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center"
+                              className="mt-2 text-sm text-ds-info dark:text-ds-info hover:text-ds-info dark:hover:text-ds-info flex items-center"
                             >
                               {isExpanded ? (
                                 <>
@@ -1311,13 +1311,13 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
                         {communication.visibility === 'Private' && communication.target_clubs_data && communication.target_clubs_data.length > 0 && (
                           <div className="mb-4">
-                            <div className="flex items-center text-sm dark-text-muted mb-2">
+                            <div className="flex items-center text-sm text-encre-3 mb-2">
                               <Target className="h-4 w-4 mr-1" />
                               Clubs ciblés :
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {communication.target_clubs_data.map((club) => (
-                                <span key={club.id} className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                                <span key={club.id} className="px-2 py-1 bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info text-xs rounded-full">
                                   {club.name}
                                 </span>
                               ))}
@@ -1328,7 +1328,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                         <div className="space-y-4 mt-4">
 
                           {/* Barre d'actions : Likes et Commentaires */}
-                          <div className="flex items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-3 pt-3 border-t border-[var(--ds-border)] dark:border-[var(--ds-border)]">
                             {/* Bouton de like */}
                             <CommunicationLikeButton
                               communicationId={communication.id}
@@ -1350,7 +1350,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => togglePin(communication.id, communication.is_pinned)}
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${communication.is_pinned ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-900/50'}`}
+                                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${communication.is_pinned ? 'bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info hover:bg-ds-info-soft dark:hover:bg-ds-info-soft/50' : 'bg-papier-2 dark:bg-papier/30 text-encre-2 dark:text-encre-3 hover:bg-papier-3 dark:hover:bg-papier-3/50'}`}
                               >
                                 {communication.is_pinned ? (
                                   <>
@@ -1366,14 +1366,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
                               </button>
                               <button
                                 onClick={() => handleEdit(communication)}
-                                className="flex items-center space-x-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 text-sm transition-colors"
+                                className="flex items-center space-x-1 px-3 py-1 bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta rounded-lg hover:bg-terracotta-soft dark:hover:bg-terracotta-soft/50 text-sm transition-colors"
                               >
                                 <Edit className="h-4 w-4" />
                                 <span>Modifier</span>
                               </button>
                               <button
                                 onClick={() => handleDelete(communication.id)}
-                                className="flex items-center space-x-1 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 text-sm transition-colors"
+                                className="flex items-center space-x-1 px-3 py-1 bg-ds-danger-soft dark:bg-ds-danger-soft/30 text-ds-danger dark:text-ds-danger rounded-lg hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft/50 text-sm transition-colors"
                               >
                                 <Trash2 className="h-4 w-4" />
                                 <span>Supprimer</span>
@@ -1383,7 +1383,7 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
 
                           {/* Section des commentaires (affichée conditionnellement) */}
                           {showCommentsFor === communication.id && (
-                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="pt-4 border-t border-[var(--ds-border)] dark:border-[var(--ds-border)]">
                               <CommunicationCommentSection
                                 communicationId={communication.id}
                                 isCommunicationOwner={canManageCommunication(communication)}
@@ -1400,14 +1400,14 @@ if (sponsors) recipientIds.push(...sponsors.map(s => s.user_id!));
           })}
           {communications.length === 0 && (
             <div className="px-6 py-12 text-center">
-              <MessageSquare className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 mb-4" />
-              <p className="dark-text-muted">
+              <MessageSquare className="mx-auto h-12 w-12 text-encre-3 dark:text-slate-500 mb-4" />
+              <p className="text-encre-3">
                 {clubId && clubInfo ?
                   `Aucune communication pour ${clubInfo.name}` :
                   'Aucune communication disponible'
                 }
               </p>
-              <p className="text-sm dark-text-muted mt-2">
+              <p className="text-sm text-encre-3 mt-2">
                 {clubId && clubInfo ? (
                   `Ce club n'a publié aucune communication.`
                 ) : (

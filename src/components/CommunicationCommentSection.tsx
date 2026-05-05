@@ -139,7 +139,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-encre-3 dark:text-encre-3">
           <MessageCircle className="w-5 h-5" />
           <span className="text-sm">Chargement des commentaires...</span>
         </div>
@@ -150,7 +150,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
   return (
     <div className="space-y-4">
       {/* En-tête avec statistiques */}
-      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+      <div className="flex items-center gap-2 text-encre-2 dark:text-encre-3">
         <MessageCircle className="w-5 h-5" />
         <span className="font-medium">
           {stats.totalComments} {stats.totalComments > 1 ? 'commentaires' : 'commentaire'}
@@ -159,7 +159,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
 
       {/* Message d'erreur */}
       {error && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm">
+        <div className="p-3 bg-ds-danger-soft dark:bg-ds-danger-soft text-ds-danger dark:text-ds-danger rounded-lg text-sm">
           {error}
         </div>
       )}
@@ -172,8 +172,8 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Ajouter un commentaire..."
-              className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+              className="w-full px-4 py-3 pr-12 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg 
+                       bg-white dark:bg-papier-2 text-encre dark:text-encre
                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
                        resize-none transition-all"
               rows={3}
@@ -184,8 +184,8 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
               type="submit"
               disabled={submitting || newComment.trim().length === 0}
               className="absolute bottom-3 right-3 p-2 rounded-lg
-                       bg-blue-600 text-white
-                       hover:bg-blue-700 active:scale-95
+                       bg-terracotta text-white
+                       hover:bg-terracotta-deep active:scale-95
                        disabled:opacity-50 disabled:cursor-not-allowed
                        transition-all"
               title="Envoyer le commentaire"
@@ -193,7 +193,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
               <Send className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex justify-between items-center text-xs text-encre-3 dark:text-encre-3">
             <span>
               {newComment.length}/{COMMUNICATION_COMMENT_VALIDATION.MAX_LENGTH} caractères
             </span>
@@ -204,7 +204,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
       {/* Liste des commentaires */}
       <div className="space-y-3">
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-encre-3 dark:text-encre-3">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Aucun commentaire pour le moment</p>
             {user && <p className="text-xs mt-1">Soyez le premier à commenter !</p>}
@@ -213,7 +213,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-2"
+              className="p-4 bg-papier-2 dark:bg-papier-2/50 rounded-lg space-y-2"
             >
               {/* En-tête du commentaire */}
               <div className="flex items-start justify-between gap-2">
@@ -225,15 +225,15 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                       className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-terracotta flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
                       {getDisplayName(comment).charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                    <p className="font-medium text-encre dark:text-encre truncate">
                       {getDisplayName(comment)}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-encre-3 dark:text-encre-3">
                       {formatDate(comment.created_at)}
                       {comment.updated_at && ' (modifié)'}
                     </p>
@@ -246,7 +246,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                     {canEditComment(comment) && editingCommentId !== comment.id && (
                       <button
                         onClick={() => handleEditComment(comment)}
-                        className="p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="p-1.5 text-encre-2 dark:text-encre-3 hover:bg-papier-3 dark:hover:bg-papier-3 rounded transition-colors"
                         title="Modifier"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -255,7 +255,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                     {canDeleteComment(comment) && editingCommentId !== comment.id && (
                       <button
                         onClick={() => handleDeleteComment(comment.id)}
-                        className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        className="p-1.5 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded transition-colors"
                         title="Supprimer"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -271,8 +271,8 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg 
+                             bg-white dark:bg-papier-2 text-encre dark:text-encre
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent
                              resize-none"
                     rows={3}
@@ -283,7 +283,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                     <button
                       onClick={() => handleSaveEdit(comment.id)}
                       disabled={submitting || editContent.trim().length === 0}
-                      className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                      className="px-3 py-1.5 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep 
                                disabled:opacity-50 disabled:cursor-not-allowed
                                flex items-center gap-1 text-sm transition-colors"
                     >
@@ -293,8 +293,8 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                     <button
                       onClick={handleCancelEdit}
                       disabled={submitting}
-                      className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
-                               rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600
+                      className="px-3 py-1.5 bg-papier-3 dark:bg-papier-3 text-encre-2 dark:text-encre-3 
+                               rounded-lg hover:bg-papier-3 dark:hover:bg-papier-3
                                flex items-center gap-1 text-sm transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -303,7 +303,7 @@ export const CommunicationCommentSection: React.FC<CommunicationCommentSectionPr
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+                <p className="text-encre-2 dark:text-encre-3 whitespace-pre-wrap break-words">
                   {comment.content}
                 </p>
               )}

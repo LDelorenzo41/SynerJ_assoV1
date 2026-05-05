@@ -29,7 +29,7 @@ export const CommentBadge: React.FC<CommentBadgeProps> = ({
     inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm
     transition-all duration-200
     ${onClick ? 'cursor-pointer hover:bg-opacity-80' : ''}
-    ${count > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}
+    ${count > 0 ? 'bg-ds-info-soft text-ds-info' : 'bg-papier-2 text-encre-2'}
   `;
 
   return (
@@ -71,7 +71,7 @@ export const CommentBadgeCompact: React.FC<CommentBadgeProps> = ({
       onClick={onClick}
       disabled={!onClick}
       className={`
-        inline-flex items-center gap-1 text-gray-600 hover:text-indigo-600
+        inline-flex items-center gap-1 text-encre-2 hover:text-ds-info
         transition-colors disabled:cursor-default
         ${className}
       `}

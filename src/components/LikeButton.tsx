@@ -37,8 +37,8 @@ export default function LikeButton({ eventId, userId, size = 'md', showCount = t
       disabled={!userId || toggling}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-200 ${
         isLikedByUser
-          ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'
-          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+          ? 'bg-ds-danger-soft dark:bg-ds-danger-soft text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft/30'
+          : 'bg-papier-2 dark:bg-papier-3 text-encre-2 dark:text-encre-3 hover:bg-papier-3 dark:hover:bg-papier-3'
       } ${!userId ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${
         toggling ? 'opacity-70' : ''
       }`}
