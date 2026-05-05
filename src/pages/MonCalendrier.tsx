@@ -80,7 +80,7 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
         marker.bindPopup(`
           <div class="p-2">
             <h3 class="font-bold text-sm mb-1">${eventName}</h3>
-            <p class="text-xs text-gray-600">${display_name}</p>
+            <p class="text-xs text-encre-2">${display_name}</p>
           </div>
         `).openPopup();
 
@@ -116,26 +116,26 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-white dark:bg-papier-2 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Map className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Map className="h-5 w-5 text-terracotta dark:text-terracotta" />
             <h2 className="text-lg font-semibold dark:text-white">Localisation de l'événement</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-papier-2 dark:hover:bg-papier-3 rounded-lg transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <X className="h-5 w-5 text-encre-3 dark:text-encre-3" />
           </button>
         </div>
 
         <div className="p-6">
           <div className="mb-4">
             <h3 className="font-bold text-lg dark:text-white mb-1">{eventName}</h3>
-            <div className="flex items-center text-gray-600 dark:text-gray-300">
+            <div className="flex items-center text-encre-2 dark:text-encre-3">
               <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="text-sm">{location}</span>
             </div>
@@ -144,25 +144,25 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
           <div className="relative">
             <div 
               ref={mapRef} 
-              className="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"
+              className="w-full h-96 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
               style={{ minHeight: '384px' }}
             />
             
             {loading && (
-              <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg">
+              <div className="absolute inset-0 bg-white dark:bg-papier-2 bg-opacity-75 flex items-center justify-center rounded-lg">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Chargement de la carte...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta dark:border-terracotta mx-auto mb-2"></div>
+                  <p className="text-sm text-encre-2 dark:text-encre-3">Chargement de la carte...</p>
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-90 flex items-center justify-center rounded-lg">
+              <div className="absolute inset-0 bg-white dark:bg-papier-2 bg-opacity-90 flex items-center justify-center rounded-lg">
                 <div className="text-center p-6">
-                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                  <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <AlertCircle className="h-8 w-8 text-ds-danger mx-auto mb-2" />
+                  <p className="text-sm text-ds-danger dark:text-ds-danger mb-2">{error}</p>
+                  <p className="text-xs text-encre-3 dark:text-encre-3">
                     Vérifiez que l'adresse est correcte et réessayez
                   </p>
                 </div>
@@ -170,7 +170,7 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, location, eventNam
             )}
           </div>
 
-          <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+          <div className="mt-4 text-xs text-encre-3 dark:text-encre-3 text-center">
             Carte fournie par OpenStreetMap • Géolocalisation par Nominatim
           </div>
         </div>
@@ -261,26 +261,26 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-papier-2 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Share2 className="h-5 w-5 text-terracotta dark:text-terracotta" />
             <h2 className="text-lg font-semibold dark:text-white">Partager l'événement</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-papier-2 dark:hover:bg-papier-3 rounded-lg transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <X className="h-5 w-5 text-encre-3 dark:text-encre-3" />
           </button>
         </div>
 
         <div className="p-6">
-          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div className="mb-6 p-4 bg-papier-2 dark:bg-papier-3 rounded-lg">
             <h3 className="font-semibold dark:text-white mb-2">{event.name}</h3>
-            <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <div className="text-sm text-encre-2 dark:text-encre-3 space-y-1">
               <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-2" />
                 {new Date(event.date).toLocaleDateString('fr-FR', {
@@ -310,7 +310,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                 type="text"
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-papier-3 dark:text-white"
                 placeholder="Ex: Marie, Paul, Dr. Dubois..."
               />
             </div>
@@ -328,7 +328,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     onChange={() => setFormality('tu')}
                     className="mr-2"
                   />
-                  <span className="text-sm dark:text-gray-300">Tutoiement (tu)</span>
+                  <span className="text-sm dark:text-encre-3">Tutoiement (tu)</span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -338,7 +338,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     onChange={() => setFormality('vous')}
                     className="mr-2"
                   />
-                  <span className="text-sm dark:text-gray-300">Vouvoiement (vous)</span>
+                  <span className="text-sm dark:text-encre-3">Vouvoiement (vous)</span>
                 </label>
               </div>
             </div>
@@ -351,7 +351,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-papier-3 dark:text-white"
                 placeholder="Ajouter un message personnel..."
               />
             </div>
@@ -370,7 +370,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                       }
                       setEditMode(!editMode);
                     }}
-                    className="text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                    className="text-xs px-3 py-1 bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta rounded hover:bg-terracotta-soft dark:hover:bg-terracotta-soft transition-colors"
                   >
                     {editMode ? 'Aperçu' : 'Modifier'}
                   </button>
@@ -381,11 +381,11 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     value={editableMessage}
                     onChange={(e) => setEditableMessage(e.target.value)}
                     rows={12}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono text-sm"
+                    className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-papier-3 dark:text-white font-mono text-sm"
                   />
                 ) : (
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-sm max-h-64 overflow-y-auto">
-                    <pre className="whitespace-pre-wrap text-gray-700 dark:text-gray-300 font-sans">
+                  <div className="p-3 bg-terracotta-soft dark:bg-terracotta-soft border border-blue-200 dark:border-blue-700 rounded-lg text-sm max-h-64 overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-encre-2 dark:text-encre-3 font-sans">
                       {editableMessage || generateEmailContent()}
                     </pre>
                   </div>
@@ -397,14 +397,14 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
           <div className="flex space-x-3 pt-6">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] text-encre-2 dark:text-encre-3 rounded-lg hover:bg-papier-2 dark:hover:bg-papier-3 transition-colors"
             >
               Annuler
             </button>
             <button
               onClick={handleShare}
               disabled={!recipientName.trim()}
-              className="flex-1 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 px-4 py-2 bg-terracotta dark:bg-terracotta-deep text-white rounded-lg hover:bg-terracotta-deep dark:hover:bg-terracotta-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               <Send className="h-4 w-4 mr-2" />
               Partager
@@ -466,7 +466,7 @@ export default function MonCalendrier() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-terracotta dark:border-terracotta"></div>
       </div>
     );
   }
@@ -475,11 +475,11 @@ export default function MonCalendrier() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold dark-text flex items-center">
-            <Calendar className="h-8 w-8 mr-3 text-blue-600 dark:text-blue-400" />
+          <h1 className="text-3xl font-bold text-encre flex items-center">
+            <Calendar className="h-8 w-8 mr-3 text-terracotta dark:text-terracotta" />
             Mon Calendrier
           </h1>
-          <p className="dark-text-muted mt-2">
+          <p className="text-encre-3 mt-2">
             {calendarEventsCount} événement{calendarEventsCount !== 1 ? 's' : ''} dans votre calendrier personnel
           </p>
         </div>
@@ -487,7 +487,7 @@ export default function MonCalendrier() {
         <div className="flex space-x-3">
           <button
             onClick={fetchUserCalendarEvents}
-            className="dark-btn-secondary flex items-center px-4 py-2 rounded-lg transition-colors"
+            className="bg-papier-2 text-encre border border-[var(--ds-border-2)] hover:bg-papier-3 flex items-center px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Actualiser
@@ -496,7 +496,7 @@ export default function MonCalendrier() {
           {calendarEventsCount > 0 && (
             <button
               onClick={exportCalendarToICS}
-              className="flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+              className="flex items-center px-4 py-2 bg-ds-success dark:bg-green-700 text-white rounded-lg hover:bg-ds-success dark:hover:bg-ds-success transition-colors"
             >
               <Download className="h-4 w-4 mr-2" />
               Exporter (.ics)
@@ -506,33 +506,33 @@ export default function MonCalendrier() {
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4">
+        <div className="bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-red-700 rounded-lg p-4">
           <div className="flex items-center">
-            <div className="text-red-600 dark:text-red-400 mr-2">⚠️</div>
-            <div className="text-red-800 dark:text-red-200">{error}</div>
+            <div className="text-ds-danger dark:text-ds-danger mr-2">⚠️</div>
+            <div className="text-ds-danger dark:text-red-200">{error}</div>
           </div>
         </div>
       )}
 
       {calendarEventsCount === 0 ? (
-        <div className="dark-bg rounded-lg p-8 text-center">
-          <Calendar className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium dark-text mb-2">Aucun événement dans votre calendrier</h3>
-          <p className="dark-text-muted mb-4">
+        <div className="bg-papier rounded-lg p-8 text-center">
+          <Calendar className="h-16 w-16 text-encre-3 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-encre mb-2">Aucun événement dans votre calendrier</h3>
+          <p className="text-encre-3 mb-4">
             Commencez par ajouter des événements depuis la page Événements
           </p>
           <a
             href="/events"
-            className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
+            className="bg-terracotta text-white hover:bg-terracotta-deep inline-flex items-center px-4 py-2 rounded-lg transition-colors"
           >
             <Calendar className="h-4 w-4 mr-2" />
             Voir les événements
           </a>
         </div>
       ) : (
-        <div className="dark-card shadow-sm rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-            <h2 className="text-lg font-semibold dark-text">
+        <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+            <h2 className="text-lg font-semibold text-encre">
               Vos événements ({calendarEventsCount})
             </h2>
           </div>
@@ -541,7 +541,7 @@ export default function MonCalendrier() {
             {calendarEvents.map((event) => (
               <div 
                 key={event.id} 
-                className={`px-6 py-6 dark-hover ${
+                className={`px-6 py-6 hover:bg-papier-2 ${
                   isEventPast(event.date) ? 'opacity-60' : ''
                 }`}
               >
@@ -552,7 +552,7 @@ export default function MonCalendrier() {
                       <img 
                         src={event.image_url} 
                         alt={event.name}
-                        className="w-full h-48 lg:h-40 object-contain bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
+                        className="w-full h-48 lg:h-40 object-contain bg-papier-2 dark:bg-slate-800 rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setSelectedImage(event.image_url)}
                       />
                     </div>
@@ -562,19 +562,19 @@ export default function MonCalendrier() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold dark-text">
+                          <h3 className="text-lg font-semibold text-encre">
                             {event.name}
                           </h3>
                           
                           <div className="flex items-center space-x-2">
                             {event.visibility === 'Public' ? (
-                              <Eye className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              <Eye className="h-4 w-4 text-ds-success dark:text-ds-success" />
                             ) : (
-                              <EyeOff className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                              <EyeOff className="h-4 w-4 text-ds-warning dark:text-orange-400" />
                             )}
                             
                             {isEventPast(event.date) && (
-                              <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 rounded-full">
+                              <span className="px-2 py-1 text-xs bg-papier-2 dark:bg-slate-700 text-encre-2 dark:text-slate-300 rounded-full">
                                 Passé
                               </span>
                             )}
@@ -582,17 +582,17 @@ export default function MonCalendrier() {
                         </div>
 
                         <div className="space-y-2">
-                          <div className="flex items-center dark-text-muted">
+                          <div className="flex items-center text-encre-3">
                             <Clock className="h-4 w-4 mr-2" />
                             <span className="capitalize">{formatEventDate(event.date)}</span>
                           </div>
 
                           {event.location && (
-                            <div className="flex items-center dark-text-muted">
+                            <div className="flex items-center text-encre-3">
                               <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                               <span className="flex-1">{event.location}</span>
                               <button 
-                                className="ml-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
+                                className="ml-2 text-xs text-terracotta dark:text-terracotta hover:text-terracotta-deep dark:hover:text-terracotta underline"
                                 onClick={() => openMapModal(event.name, event.location!)}
                               >
                                 Voir sur la carte
@@ -601,20 +601,20 @@ export default function MonCalendrier() {
                           )}
 
                           {event.club && (
-                            <div className="flex items-center dark-text-muted">
-                              <span className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
+                            <div className="flex items-center text-encre-3">
+                              <span className="text-sm bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta px-2 py-1 rounded">
                                 {event.club.name}
                               </span>
                             </div>
                           )}
 
                           {event.description && (
-                            <p className="dark-text text-sm mt-2">
+                            <p className="text-encre text-sm mt-2">
                               {event.description}
                             </p>
                           )}
 
-                          <p className="text-xs dark-text-muted">
+                          <p className="text-xs text-encre-3">
                             Ajouté le {format(new Date(event.added_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
                           </p>
                         </div>
@@ -630,7 +630,7 @@ export default function MonCalendrier() {
   
   <button
     onClick={() => openShareModal(event)}
-    className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+    className="p-2 text-terracotta dark:text-terracotta hover:bg-terracotta-soft dark:hover:bg-terracotta-soft rounded-lg transition-colors"
     title="Partager cet événement"
   >
     <Share2 className="h-4 w-4" />
@@ -638,7 +638,7 @@ export default function MonCalendrier() {
   
   <button
     onClick={() => removeEventFromCalendar(event.id)}
-    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+    className="p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-lg transition-colors"
     title="Retirer de mon calendrier"
   >
     <Trash2 className="h-4 w-4" />
