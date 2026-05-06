@@ -74,17 +74,17 @@ const Documentation: React.FC = () => {
             
             <h4 class="text-lg font-semibold text-slate-900 mt-6 mb-3">🎯 Objectifs principaux</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-blue-900 mb-1">Simplicité</p>
-                <p class="text-blue-800 text-sm">Interface intuitive et facile à prendre en main</p>
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">Simplicité</p>
+                <p class="text-terracotta-deep text-sm">Interface intuitive et facile à prendre en main</p>
               </div>
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-green-900 mb-1">Centralisation</p>
-                <p class="text-green-800 text-sm">Toutes vos données au même endroit</p>
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-success mb-1">Centralisation</p>
+                <p class="text-ds-success text-sm">Toutes vos données au même endroit</p>
               </div>
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <p class="font-semibold text-indigo-900 mb-1">Collaboration</p>
-                <p class="text-indigo-800 text-sm">Faciliter le travail d'équipe</p>
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-info mb-1">Collaboration</p>
+                <p class="text-ds-info text-sm">Faciliter le travail d'équipe</p>
               </div>
               <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
                 <p class="font-semibold text-amber-900 mb-1">Automatisation</p>
@@ -102,7 +102,7 @@ const Documentation: React.FC = () => {
             <div class="space-y-6">
               <div>
                 <h4 class="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Code class="w-5 h-5 text-indigo-600" />
+                  <Code class="w-5 h-5 text-ds-info" />
                   Frontend
                 </h4>
                 <div class="bg-slate-50 rounded-lg p-4 space-y-2">
@@ -143,7 +143,7 @@ const Documentation: React.FC = () => {
 
               <div>
                 <h4 class="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Database class="w-5 h-5 text-indigo-600" />
+                  <Database class="w-5 h-5 text-ds-info" />
                   Backend & Base de données
                 </h4>
                 <div class="bg-slate-50 rounded-lg p-4 space-y-2">
@@ -172,7 +172,7 @@ const Documentation: React.FC = () => {
 
               <div>
                 <h4 class="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <CreditCard class="w-5 h-5 text-indigo-600" />
+                  <CreditCard class="w-5 h-5 text-ds-info" />
                   Paiements & Facturation
                 </h4>
                 <div class="bg-slate-50 rounded-lg p-4 space-y-2">
@@ -193,7 +193,7 @@ const Documentation: React.FC = () => {
 
               <div>
                 <h4 class="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                  <Globe class="w-5 h-5 text-indigo-600" />
+                  <Globe class="w-5 h-5 text-ds-info" />
                   Hébergement & Infrastructure
                 </h4>
                 <div class="bg-slate-50 rounded-lg p-4 space-y-2">
@@ -277,21 +277,21 @@ SynerJ/
 
             <h4 class="text-lg font-semibold text-slate-900 mb-3">🏗️ Principes architecturaux</h4>
             <div class="space-y-3">
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-blue-900 mb-1">Séparation des responsabilités</p>
-                <p class="text-blue-800 text-sm">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">Séparation des responsabilités</p>
+                <p class="text-terracotta-deep text-sm">
                   Les pages gèrent l'affichage, les hooks gèrent l'état, les services gèrent la logique métier
                 </p>
               </div>
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-green-900 mb-1">Composants réutilisables</p>
-                <p class="text-green-800 text-sm">
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-success mb-1">Composants réutilisables</p>
+                <p class="text-ds-success text-sm">
                   Code DRY (Don't Repeat Yourself) avec des composants modulaires
                 </p>
               </div>
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <p class="font-semibold text-indigo-900 mb-1">TypeScript strict</p>
-                <p class="text-indigo-800 text-sm">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-info mb-1">TypeScript strict</p>
+                <p class="text-ds-info text-sm">
                   Typage fort pour éviter les bugs et améliorer la maintenabilité
                 </p>
               </div>
@@ -337,15 +337,15 @@ SynerJ/
             <h4 class="text-lg font-semibold text-slate-900 mb-3">🔐 Méthodes d'authentification disponibles</h4>
             <div class="space-y-2">
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Email + Mot de passe (méthode principale)</span>
               </div>
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Magic Link (lien de connexion par email)</span>
               </div>
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Authentification à deux facteurs (2FA) - optionnel</span>
               </div>
             </div>
@@ -376,14 +376,14 @@ SynerJ/
             </p>
 
             <div class="space-y-4">
-              <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-red-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-danger-soft border-l-4 border-ds-danger p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-danger mb-2 flex items-center gap-2">
                   <Shield class="w-5 h-5" />
                   Super Admin
                 </h4>
-                <p class="text-red-800 text-sm mb-2">Accès et contrôle complets sur toute la plateforme</p>
-                <p class="text-red-900 font-medium text-sm mb-1">Permissions :</p>
-                <ul class="list-disc list-inside text-red-800 text-sm ml-4 space-y-1">
+                <p class="text-ds-danger text-sm mb-2">Accès et contrôle complets sur toute la plateforme</p>
+                <p class="text-ds-danger font-medium text-sm mb-1">Permissions :</p>
+                <ul class="list-disc list-inside text-ds-danger text-sm ml-4 space-y-1">
                   <li>Gestion de toutes les associations et clubs</li>
                   <li>Gestion de tous les utilisateurs</li>
                   <li>Gestion du matériel (ajout, modification, suppression)</li>
@@ -393,14 +393,14 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-info mb-2 flex items-center gap-2">
                   <Users class="w-5 h-5" />
                   Administrateur de Club
                 </h4>
-                <p class="text-indigo-800 text-sm mb-2">Gestion complète de son club</p>
-                <p class="text-indigo-900 font-medium text-sm mb-1">Permissions :</p>
-                <ul class="list-disc list-inside text-indigo-800 text-sm ml-4 space-y-1">
+                <p class="text-ds-info text-sm mb-2">Gestion complète de son club</p>
+                <p class="text-ds-info font-medium text-sm mb-1">Permissions :</p>
+                <ul class="list-disc list-inside text-ds-info text-sm ml-4 space-y-1">
                   <li>Gestion des membres de son club</li>
                   <li>Création et gestion d'événements</li>
                   <li>Publication de communications</li>
@@ -412,14 +412,14 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-green-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-success mb-2 flex items-center gap-2">
                   <CheckCircle class="w-5 h-5" />
                   Membre
                 </h4>
-                <p class="text-green-800 text-sm mb-2">Utilisateur standard avec accès aux fonctionnalités de base</p>
-                <p class="text-green-900 font-medium text-sm mb-1">Permissions :</p>
-                <ul class="list-disc list-inside text-green-800 text-sm ml-4 space-y-1">
+                <p class="text-ds-success text-sm mb-2">Utilisateur standard avec accès aux fonctionnalités de base</p>
+                <p class="text-ds-success font-medium text-sm mb-1">Permissions :</p>
+                <ul class="list-disc list-inside text-ds-success text-sm ml-4 space-y-1">
                   <li>Consultation des événements</li>
                   <li>Inscription aux événements</li>
                   <li>Consultation du calendrier</li>
@@ -429,14 +429,14 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep mb-2 flex items-center gap-2">
                   <Info class="w-5 h-5" />
                   Supporter
                 </h4>
-                <p class="text-blue-800 text-sm mb-2">Suiveur du club sans participation active</p>
-                <p class="text-blue-900 font-medium text-sm mb-1">Permissions :</p>
-                <ul class="list-disc list-inside text-blue-800 text-sm ml-4 space-y-1">
+                <p class="text-terracotta-deep text-sm mb-2">Suiveur du club sans participation active</p>
+                <p class="text-terracotta-deep font-medium text-sm mb-1">Permissions :</p>
+                <ul class="list-disc list-inside text-terracotta-deep text-sm ml-4 space-y-1">
                   <li>Consultation des événements publics</li>
                   <li>Réception des communications</li>
                   <li>Consultation du site web public du club</li>
@@ -476,12 +476,12 @@ SynerJ/
             <h3 class="text-xl font-semibold text-slate-900 mb-4">Protection et sécurisation des données</h3>
             
             <div class="space-y-4">
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-green-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-success mb-2 flex items-center gap-2">
                   <Shield class="w-5 h-5" />
                   Chiffrement des données
                 </h4>
-                <ul class="list-disc list-inside text-green-800 text-sm ml-4 space-y-1">
+                <ul class="list-disc list-inside text-ds-success text-sm ml-4 space-y-1">
                   <li><strong>En transit :</strong> TLS 1.3 / SSL pour toutes les communications (HTTPS)</li>
                   <li><strong>Au repos :</strong> AES-256 pour le stockage des données sur Supabase</li>
                   <li><strong>Mots de passe :</strong> Hachage bcrypt avec salt unique par utilisateur</li>
@@ -489,15 +489,15 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep mb-2 flex items-center gap-2">
                   <Database class="w-5 h-5" />
                   Row Level Security (RLS)
                 </h4>
-                <p class="text-blue-800 text-sm mb-2">
+                <p class="text-terracotta-deep text-sm mb-2">
                   Chaque table PostgreSQL est protégée par des politiques RLS qui garantissent que :
                 </p>
-                <ul class="list-disc list-inside text-blue-800 text-sm ml-4 space-y-1">
+                <ul class="list-disc list-inside text-terracotta-deep text-sm ml-4 space-y-1">
                   <li>Un utilisateur ne peut accéder qu'à ses propres données</li>
                   <li>Un membre ne voit que les données de son club</li>
                   <li>Un admin de club ne peut gérer que son club</li>
@@ -505,12 +505,12 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-info mb-2 flex items-center gap-2">
                   <CheckCircle class="w-5 h-5" />
                   Conformité RGPD
                 </h4>
-                <ul class="list-disc list-inside text-indigo-800 text-sm ml-4 space-y-1">
+                <ul class="list-disc list-inside text-ds-info text-sm ml-4 space-y-1">
                   <li>Consentement explicite lors de l'inscription</li>
                   <li>Droit d'accès, de rectification, d'effacement</li>
                   <li>Portabilité des données (export CSV/JSON)</li>
@@ -533,12 +533,12 @@ SynerJ/
                 </ul>
               </div>
 
-              <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-red-900 mb-2 flex items-center gap-2">
+              <div class="bg-ds-danger-soft border-l-4 border-ds-danger p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-danger mb-2 flex items-center gap-2">
                   <Shield class="w-5 h-5" />
                   Protection contre les attaques
                 </h4>
-                <ul class="list-disc list-inside text-red-800 text-sm ml-4 space-y-1">
+                <ul class="list-disc list-inside text-ds-danger text-sm ml-4 space-y-1">
                   <li><strong>SQL Injection :</strong> Requêtes paramétrées via Supabase client</li>
                   <li><strong>XSS :</strong> Sanitisation des inputs utilisateur</li>
                   <li><strong>CSRF :</strong> Tokens CSRF sur les actions sensibles</li>
@@ -570,29 +570,29 @@ SynerJ/
 
             <h4 class="text-lg font-semibold text-slate-900 mb-3">🎯 Fonctionnalités clés</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">✅ Création d'événements</p>
-                <p class="text-blue-800 text-sm">Formulaire complet avec tous les détails nécessaires</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">✅ Création d'événements</p>
+                <p class="text-terracotta-deep text-sm">Formulaire complet avec tous les détails nécessaires</p>
               </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">📅 Vue calendrier</p>
-                <p class="text-blue-800 text-sm">Visualisation mensuelle, hebdomadaire, quotidienne</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">📅 Vue calendrier</p>
+                <p class="text-terracotta-deep text-sm">Visualisation mensuelle, hebdomadaire, quotidienne</p>
               </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">👥 Gestion des participants</p>
-                <p class="text-blue-800 text-sm">Inscriptions, confirmations, liste d'attente</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">👥 Gestion des participants</p>
+                <p class="text-terracotta-deep text-sm">Inscriptions, confirmations, liste d'attente</p>
               </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">🔔 Notifications automatiques</p>
-                <p class="text-blue-800 text-sm">Rappels avant événement, modifications, annulations</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">🔔 Notifications automatiques</p>
+                <p class="text-terracotta-deep text-sm">Rappels avant événement, modifications, annulations</p>
               </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">💬 Commentaires et likes</p>
-                <p class="text-blue-800 text-sm">Interaction sociale autour des événements</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">💬 Commentaires et likes</p>
+                <p class="text-terracotta-deep text-sm">Interaction sociale autour des événements</p>
               </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-semibold text-blue-900 mb-1">📊 Statistiques</p>
-                <p class="text-blue-800 text-sm">Taux de participation, événements populaires</p>
+              <div class="bg-terracotta-soft p-4 rounded-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">📊 Statistiques</p>
+                <p class="text-terracotta-deep text-sm">Taux de participation, événements populaires</p>
               </div>
             </div>
 
@@ -617,9 +617,9 @@ SynerJ/
               </pre>
             </div>
 
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-              <p class="text-green-900 font-semibold mb-2">💡 Bonnes pratiques</p>
-              <ul class="list-disc list-inside text-green-800 text-sm ml-4 space-y-1">
+            <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-4">
+              <p class="text-ds-success font-semibold mb-2">💡 Bonnes pratiques</p>
+              <ul class="list-disc list-inside text-ds-success text-sm ml-4 space-y-1">
                 <li>Créez vos événements au moins 1 semaine à l'avance</li>
                 <li>Ajoutez une image attractive pour plus d'engagement</li>
                 <li>Activez les rappels automatiques 24h avant l'événement</li>
@@ -759,31 +759,31 @@ SynerJ/
             </div>
 
             <h4 class="text-lg font-semibold text-slate-900 mb-3">🔄 Workflow de réservation</h4>
-            <div class="bg-blue-50 rounded-lg p-6">
+            <div class="bg-terracotta-soft rounded-lg p-6">
               <div class="space-y-3">
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">1</div>
-                  <p class="text-blue-900 text-sm"><strong>Admin Club</strong> sélectionne le matériel et les dates</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">1</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Admin Club</strong> sélectionne le matériel et les dates</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">2</div>
-                  <p class="text-blue-900 text-sm"><strong>Demande créée</strong> avec statut "En attente"</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">2</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Demande créée</strong> avec statut "En attente"</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">3</div>
-                  <p class="text-blue-900 text-sm"><strong>Super Admin</strong> reçoit une notification</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">3</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Super Admin</strong> reçoit une notification</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">4</div>
-                  <p class="text-blue-900 text-sm"><strong>Validation ou refus</strong> de la demande</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">4</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Validation ou refus</strong> de la demande</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">5</div>
-                  <p class="text-blue-900 text-sm"><strong>Notification</strong> envoyée au demandeur</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">5</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Notification</strong> envoyée au demandeur</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <div class="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">6</div>
-                  <p class="text-blue-900 text-sm"><strong>Matériel bloqué</strong> pour les dates réservées</p>
+                  <div class="bg-terracotta text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">6</div>
+                  <p class="text-terracotta-deep text-sm"><strong>Matériel bloqué</strong> pour les dates réservées</p>
                 </div>
               </div>
             </div>
@@ -814,26 +814,26 @@ SynerJ/
             <h4 class="text-lg font-semibold text-slate-900 mb-3">🎯 Emplacements d'affichage</h4>
             <div class="space-y-2 mb-6">
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Bannière sur le tableau de bord</span>
               </div>
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Carrousel dans les pages d'événements</span>
               </div>
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Page sponsors dédiée sur le site web public</span>
               </div>
               <div class="flex items-center gap-2 text-slate-700">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+                <CheckCircle class="w-5 h-5 text-ds-success" />
                 <span>Footer des emails (plans Premium)</span>
               </div>
             </div>
 
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-              <p class="text-green-900 font-semibold mb-2">💡 Maximiser la visibilité</p>
-              <ul class="list-disc list-inside text-green-800 text-sm ml-4 space-y-1">
+            <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+              <p class="text-ds-success font-semibold mb-2">💡 Maximiser la visibilité</p>
+              <ul class="list-disc list-inside text-ds-success text-sm ml-4 space-y-1">
                 <li>Ajoutez des logos haute résolution (PNG transparent recommandé)</li>
                 <li>Rédigez des descriptions attractives avec mots-clés</li>
                 <li>Liez les sponsors à des événements spécifiques</li>
@@ -865,102 +865,102 @@ SynerJ/
                 <p class="text-slate-600 mb-4">Idéal pour débuter et tester la plateforme</p>
                 <ul class="space-y-2 text-slate-700 text-sm">
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-success flex-shrink-0 mt-0.5" />
                     <span>Jusqu'à <strong>50 membres</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-success flex-shrink-0 mt-0.5" />
                     <span><strong>10 événements/mois</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-success flex-shrink-0 mt-0.5" />
                     <span><strong>500 Mo</strong> de stockage</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-success flex-shrink-0 mt-0.5" />
                     <span>Fonctionnalités de base</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-success flex-shrink-0 mt-0.5" />
                     <span>Support par email</span>
                   </li>
                 </ul>
               </div>
 
-              <div class="bg-blue-50 border-2 border-blue-500 rounded-xl p-6">
+              <div class="bg-terracotta-soft border-2 border-terracotta rounded-xl p-6">
                 <div class="flex items-center justify-between mb-4">
-                  <h4 class="text-xl font-bold text-blue-900">Plan Essentiel</h4>
-                  <span class="text-3xl font-bold text-blue-900">Sur devis</span>
+                  <h4 class="text-xl font-bold text-terracotta-deep">Plan Essentiel</h4>
+                  <span class="text-3xl font-bold text-terracotta-deep">Sur devis</span>
                 </div>
-                <p class="text-blue-700 mb-4">Pour les associations en croissance</p>
-                <ul class="space-y-2 text-blue-800 text-sm">
+                <p class="text-terracotta-deep mb-4">Pour les associations en croissance</p>
+                <ul class="space-y-2 text-terracotta-deep text-sm">
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span>Jusqu'à <strong>200 membres</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span><strong>Événements illimités</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span><strong>5 Go</strong> de stockage</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span>Gestion des sponsors</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span>Mailing avancé</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" />
                     <span>Support prioritaire</span>
                   </li>
                 </ul>
               </div>
 
-              <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-600 rounded-xl p-6 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-indigo-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg">
+              <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-ds-info rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-ds-info text-white px-4 py-1 text-xs font-bold rounded-bl-lg">
                   POPULAIRE
                 </div>
                 <div class="flex items-center justify-between mb-4">
-                  <h4 class="text-xl font-bold text-indigo-900">Plan Premium</h4>
-                  <span class="text-3xl font-bold text-indigo-900">Sur devis</span>
+                  <h4 class="text-xl font-bold text-ds-info">Plan Premium</h4>
+                  <span class="text-3xl font-bold text-ds-info">Sur devis</span>
                 </div>
-                <p class="text-indigo-700 mb-4">Pour les grandes structures et fédérations</p>
-                <ul class="space-y-2 text-indigo-800 text-sm">
+                <p class="text-ds-info mb-4">Pour les grandes structures et fédérations</p>
+                <ul class="space-y-2 text-ds-info text-sm">
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span><strong>Membres illimités</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span><strong>Événements illimités</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span><strong>Stockage illimité</strong></span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span>Site web personnalisé pour le club</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span>Gestion multi-clubs</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span>API et intégrations</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span>Support 24/7</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <CheckCircle class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle class="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                     <span>Gestionnaire de compte dédié</span>
                   </li>
                 </ul>
@@ -981,23 +981,23 @@ SynerJ/
 
             <h4 class="text-lg font-semibold text-slate-900 mb-3">💳 Fonctionnalités Stripe</h4>
             <div class="space-y-3 mb-6">
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-green-900 mb-1">Stripe Checkout</p>
-                <p class="text-green-800 text-sm">
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-success mb-1">Stripe Checkout</p>
+                <p class="text-ds-success text-sm">
                   Pages de paiement hébergées et sécurisées par Stripe. Vous êtes redirigé vers un 
                   environnement Stripe pour effectuer le paiement, puis redirigé vers SynerJ.
                 </p>
               </div>
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <p class="font-semibold text-blue-900 mb-1">Customer Portal</p>
-                <p class="text-blue-800 text-sm">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <p class="font-semibold text-terracotta-deep mb-1">Customer Portal</p>
+                <p class="text-terracotta-deep text-sm">
                   Portail client sécurisé pour gérer vos moyens de paiement, consulter vos factures, 
                   et modifier votre abonnement.
                 </p>
               </div>
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <p class="font-semibold text-indigo-900 mb-1">Abonnements récurrents</p>
-                <p class="text-indigo-800 text-sm">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <p class="font-semibold text-ds-info mb-1">Abonnements récurrents</p>
+                <p class="text-ds-info text-sm">
                   Gestion automatique des renouvellements mensuels ou annuels. Vous recevez une 
                   facture par email à chaque paiement.
                 </p>
@@ -1054,12 +1054,12 @@ SynerJ/
           content: `
             <h3 class="text-xl font-semibold text-slate-900 mb-4">API REST SynerJ</h3>
             
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
-              <p class="text-blue-900 font-semibold mb-2 flex items-center gap-2">
+            <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg mb-6">
+              <p class="text-terracotta-deep font-semibold mb-2 flex items-center gap-2">
                 <Info class="w-5 h-5" />
                 Disponibilité
               </p>
-              <p class="text-blue-800 text-sm">
+              <p class="text-terracotta-deep text-sm">
                 L'API REST de SynerJ est disponible uniquement pour les clients <strong>Plan Premium</strong>. 
                 Contactez-nous pour obtenir vos clés API.
               </p>
@@ -1072,23 +1072,23 @@ SynerJ/
               <p class="font-semibold text-slate-900 mb-3">Endpoints disponibles :</p>
               <div class="space-y-2 text-sm font-mono">
                 <div class="flex items-center gap-2">
-                  <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">GET</span>
+                  <span class="bg-ds-success text-white px-2 py-1 rounded text-xs">GET</span>
                   <span class="text-slate-700">/clubs</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">GET</span>
+                  <span class="bg-ds-success text-white px-2 py-1 rounded text-xs">GET</span>
                   <span class="text-slate-700">/clubs/:id</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">GET</span>
+                  <span class="bg-ds-success text-white px-2 py-1 rounded text-xs">GET</span>
                   <span class="text-slate-700">/events</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs">POST</span>
+                  <span class="bg-terracotta text-white px-2 py-1 rounded text-xs">POST</span>
                   <span class="text-slate-700">/events</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">GET</span>
+                  <span class="bg-ds-success text-white px-2 py-1 rounded text-xs">GET</span>
                   <span class="text-slate-700">/members</span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -1128,10 +1128,10 @@ Content-Type: application/json</code></pre>
             <h3 class="text-xl font-semibold text-slate-900 mb-4">Solutions aux problèmes fréquents</h3>
             
             <div class="space-y-4">
-              <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-red-900 mb-2">❌ Je ne peux pas me connecter</h4>
-                <p class="text-red-800 text-sm mb-2"><strong>Solutions :</strong></p>
-                <ul class="list-disc list-inside text-red-800 text-sm ml-4 space-y-1">
+              <div class="bg-ds-danger-soft border-l-4 border-ds-danger p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-danger mb-2">❌ Je ne peux pas me connecter</h4>
+                <p class="text-ds-danger text-sm mb-2"><strong>Solutions :</strong></p>
+                <ul class="list-disc list-inside text-ds-danger text-sm ml-4 space-y-1">
                   <li>Vérifiez que votre email et mot de passe sont corrects</li>
                   <li>Vérifiez que vous avez validé votre email (cliquez sur le lien reçu)</li>
                   <li>Utilisez "Mot de passe oublié" pour réinitialiser</li>
@@ -1152,10 +1152,10 @@ Content-Type: application/json</code></pre>
                 </ul>
               </div>
 
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 mb-2">📧 Je ne reçois pas les emails</h4>
-                <p class="text-blue-800 text-sm mb-2"><strong>Solutions :</strong></p>
-                <ul class="list-disc list-inside text-blue-800 text-sm ml-4 space-y-1">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep mb-2">📧 Je ne reçois pas les emails</h4>
+                <p class="text-terracotta-deep text-sm mb-2"><strong>Solutions :</strong></p>
+                <ul class="list-disc list-inside text-terracotta-deep text-sm ml-4 space-y-1">
                   <li>Vérifiez votre dossier spam/courrier indésirable</li>
                   <li>Ajoutez noreply@synerj.app à vos contacts</li>
                   <li>Vérifiez que votre adresse email est correcte dans vos paramètres</li>
@@ -1163,10 +1163,10 @@ Content-Type: application/json</code></pre>
                 </ul>
               </div>
 
-              <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-green-900 mb-2">💳 Mon paiement a échoué</h4>
-                <p class="text-green-800 text-sm mb-2"><strong>Solutions :</strong></p>
-                <ul class="list-disc list-inside text-green-800 text-sm ml-4 space-y-1">
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-success mb-2">💳 Mon paiement a échoué</h4>
+                <p class="text-ds-success text-sm mb-2"><strong>Solutions :</strong></p>
+                <ul class="list-disc list-inside text-ds-success text-sm ml-4 space-y-1">
                   <li>Vérifiez que votre carte n'est pas expirée</li>
                   <li>Vérifiez le solde de votre compte</li>
                   <li>Assurez-vous que la 3D Secure est activée</li>
@@ -1176,10 +1176,10 @@ Content-Type: application/json</code></pre>
                 </ul>
               </div>
 
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-indigo-900 mb-2">📱 L'application est lente sur mobile</h4>
-                <p class="text-indigo-800 text-sm mb-2"><strong>Solutions :</strong></p>
-                <ul class="list-disc list-inside text-indigo-800 text-sm ml-4 space-y-1">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-info mb-2">📱 L'application est lente sur mobile</h4>
+                <p class="text-ds-info text-sm mb-2"><strong>Solutions :</strong></p>
+                <ul class="list-disc list-inside text-ds-info text-sm ml-4 space-y-1">
                   <li>Fermez les autres onglets du navigateur</li>
                   <li>Fermez les applications en arrière-plan</li>
                   <li>Vérifiez votre connexion 4G/5G ou WiFi</li>
@@ -1191,7 +1191,7 @@ Content-Type: application/json</code></pre>
 
             <div class="bg-slate-100 rounded-lg p-6 mt-6">
               <p class="text-slate-900 font-semibold mb-3 flex items-center gap-2">
-                <Mail class="w-5 h-5 text-indigo-600" />
+                <Mail class="w-5 h-5 text-ds-info" />
                 Toujours un problème ?
               </p>
               <p class="text-slate-700 text-sm mb-3">
@@ -1199,7 +1199,7 @@ Content-Type: application/json</code></pre>
               </p>
               <a 
                 href="mailto:contact-synerj@teachtech.fr"
-                class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                class="inline-flex items-center gap-2 bg-ds-info text-white px-6 py-3 rounded-lg hover:bg-ds-info transition-colors text-sm font-medium"
               >
                 <Mail class="w-4 h-4" />
                 contact-synerj@teachtech.fr
@@ -1237,13 +1237,13 @@ Content-Type: application/json</code></pre>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link 
             to="/" 
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
+            className="inline-flex items-center text-ds-info hover:text-ds-info transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-indigo-600" />
+            <BookOpen className="w-8 h-8 text-ds-info" />
             Documentation technique
           </h1>
           <p className="text-slate-600 mt-2">
@@ -1274,8 +1274,8 @@ Content-Type: application/json</code></pre>
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <HelpCircle className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <HelpCircle className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Centre d'aide
               </h3>
             </div>
@@ -1289,8 +1289,8 @@ Content-Type: application/json</code></pre>
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <MessageSquare className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <MessageSquare className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 FAQ
               </h3>
             </div>
@@ -1304,8 +1304,8 @@ Content-Type: application/json</code></pre>
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <Mail className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <Mail className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Support technique
               </h3>
             </div>
@@ -1389,15 +1389,15 @@ Content-Type: application/json</code></pre>
 
         {/* Footer links */}
         <div className="mt-12 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/legal/notices" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/notices" className="text-ds-info hover:text-ds-info underline">
             Mentions Légales
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
             Politique de confidentialité
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/terms" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/terms" className="text-ds-info hover:text-ds-info underline">
             CGU
           </Link>
         </div>

@@ -288,13 +288,13 @@ const FAQ: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link 
             to="/" 
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
+            className="inline-flex items-center text-ds-info hover:text-ds-info transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <MessageSquare className="w-8 h-8 text-indigo-600" />
+            <MessageSquare className="w-8 h-8 text-ds-info" />
             Questions fréquentes (FAQ)
           </h1>
           <p className="text-slate-600 mt-2">
@@ -325,8 +325,8 @@ const FAQ: React.FC = () => {
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <HelpCircle className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <HelpCircle className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Centre d'aide
               </h3>
             </div>
@@ -340,8 +340,8 @@ const FAQ: React.FC = () => {
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <BookOpen className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <BookOpen className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Documentation
               </h3>
             </div>
@@ -361,7 +361,7 @@ const FAQ: React.FC = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-ds-info text-white'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -383,7 +383,7 @@ const FAQ: React.FC = () => {
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
               >
                 <div className="flex items-start gap-3 flex-1">
-                  <HelpCircle className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <HelpCircle className="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                   <h3 className="font-semibold text-slate-900">
                     {item.question}
                   </h3>
@@ -416,7 +416,7 @@ const FAQ: React.FC = () => {
             </h3>
             <p className="text-slate-600 mb-6">
               Essayez avec d'autres mots-clés ou consultez notre{' '}
-              <Link to="/legal/help-center" className="text-indigo-600 hover:text-indigo-800 underline">
+              <Link to="/legal/help-center" className="text-ds-info hover:text-ds-info underline">
                 Centre d'aide
               </Link>
             </p>
@@ -425,7 +425,7 @@ const FAQ: React.FC = () => {
                 setSearchQuery('');
                 setSelectedCategory('all');
               }}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              className="bg-ds-info text-white px-6 py-2 rounded-lg hover:bg-ds-info transition-colors"
             >
               Réinitialiser les filtres
             </button>
@@ -439,14 +439,14 @@ const FAQ: React.FC = () => {
               <h2 className="text-2xl font-bold mb-2">
                 Vous ne trouvez pas votre réponse ?
               </h2>
-              <p className="text-indigo-100">
+              <p className="text-ds-info">
                 Notre équipe de support est là pour vous aider. Contactez-nous par e-mail 
                 et nous vous répondrons rapidement.
               </p>
             </div>
             <a
               href="mailto:contact-synerj@teachtech.fr"
-              className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors flex items-center gap-2 flex-shrink-0"
+              className="bg-white text-ds-info px-8 py-3 rounded-lg font-semibold hover:bg-ds-info-soft transition-colors flex items-center gap-2 flex-shrink-0"
             >
               <Mail className="w-5 h-5" />
               Contacter le support
@@ -464,15 +464,15 @@ const FAQ: React.FC = () => {
 
         {/* Liens footer */}
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/legal/notices" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/notices" className="text-ds-info hover:text-ds-info underline">
             Mentions Légales
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
             Politique de confidentialité
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/terms" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/terms" className="text-ds-info hover:text-ds-info underline">
             CGU
           </Link>
         </div>

@@ -10,13 +10,13 @@ const LegalNotices: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link 
             to="/" 
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
+            className="inline-flex items-center text-ds-info hover:text-ds-info transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <Shield className="w-8 h-8 text-indigo-600" />
+            <Shield className="w-8 h-8 text-ds-info" />
             Mentions Légales
           </h1>
           <p className="text-slate-600 mt-2">Informations légales relatives à SynerJ</p>
@@ -30,7 +30,7 @@ const LegalNotices: React.FC = () => {
           {/* Éditeur du site */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-indigo-600" />
+              <Building2 className="w-6 h-6 text-ds-info" />
               Éditeur du site
             </h2>
             <div className="bg-slate-50 rounded-lg p-6 space-y-3">
@@ -50,7 +50,7 @@ const LegalNotices: React.FC = () => {
                 <strong className="text-slate-900">Numéro TVA intracommunautaire :</strong> Non applicable
               </p>
               <p className="text-slate-700 flex items-start gap-2">
-                <MapPin className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                <MapPin className="w-5 h-5 text-ds-info flex-shrink-0 mt-0.5" />
                 <span>
                   <strong className="text-slate-900">Siège social :</strong><br />
                   8 sentier du coteau<br />
@@ -64,7 +64,7 @@ const LegalNotices: React.FC = () => {
           {/* Directeur de la publication */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <FileText className="w-6 h-6 text-indigo-600" />
+              <FileText className="w-6 h-6 text-ds-info" />
               Directeur de la publication
             </h2>
             <div className="bg-slate-50 rounded-lg p-6">
@@ -80,19 +80,19 @@ const LegalNotices: React.FC = () => {
           {/* Contact */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Mail className="w-6 h-6 text-indigo-600" />
+              <Mail className="w-6 h-6 text-ds-info" />
               Contact
             </h2>
             <div className="bg-slate-50 rounded-lg p-6 space-y-3">
               <p className="text-slate-700 flex items-center gap-2">
-                <Mail className="w-5 h-5 text-indigo-600" />
+                <Mail className="w-5 h-5 text-ds-info" />
                 <strong className="text-slate-900">Email :</strong> 
-                <a href="mailto:contact-synerj@teachtech.fr" className="text-indigo-600 hover:text-indigo-800 underline">
+                <a href="mailto:contact-synerj@teachtech.fr" className="text-ds-info hover:text-ds-info underline">
                   contact-synerj@teachtech.fr
                 </a>
               </p>
               <p className="text-slate-700 flex items-center gap-2">
-                <Phone className="w-5 h-5 text-indigo-600" />
+                <Phone className="w-5 h-5 text-ds-info" />
                 <strong className="text-slate-900">Téléphone :</strong> Contact par mail
               </p>
             </div>
@@ -152,13 +152,13 @@ const LegalNotices: React.FC = () => {
               </p>
               <p className="text-slate-700 mt-3">
                 Pour exercer ces droits, veuillez nous contacter à l'adresse : 
-                <a href="mailto:contact-synerj@teachtech.fr" className="text-indigo-600 hover:text-indigo-800 underline ml-1">
+                <a href="mailto:contact-synerj@teachtech.fr" className="text-ds-info hover:text-ds-info underline ml-1">
                   contact-synerj@teachtech.fr
                 </a>
               </p>
               <p className="text-slate-700 mt-3">
                 Pour plus d'informations sur la gestion de vos données personnelles, consultez notre{' '}
-                <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+                <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
                   Politique de confidentialité
                 </Link>.
               </p>

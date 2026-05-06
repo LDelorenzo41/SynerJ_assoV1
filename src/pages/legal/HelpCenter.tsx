@@ -71,8 +71,8 @@ const HelpCenter: React.FC = () => {
               <li>Vérifiez votre e-mail et cliquez sur le lien de confirmation</li>
               <li>Connectez-vous avec vos identifiants</li>
             </ol>
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-              <p class="text-blue-800 text-sm"><strong>Conseil :</strong> Utilisez un mot de passe unique et activez l'authentification à deux facteurs (2FA) pour plus de sécurité.</p>
+            <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg mt-4">
+              <p class="text-terracotta-deep text-sm"><strong>Conseil :</strong> Utilisez un mot de passe unique et activez l'authentification à deux facteurs (2FA) pour plus de sécurité.</p>
             </div>
           `
         },
@@ -93,10 +93,10 @@ const HelpCenter: React.FC = () => {
                   <li>Fonctionnalités de base</li>
                 </ul>
               </div>
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 mb-2">⭐ Plan Essentiel</h4>
-                <p class="text-blue-800 text-sm mb-2"><strong>Idéal pour :</strong> Associations en croissance (50-200 membres)</p>
-                <ul class="list-disc list-inside text-blue-800 text-sm ml-4 space-y-1">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep mb-2">⭐ Plan Essentiel</h4>
+                <p class="text-terracotta-deep text-sm mb-2"><strong>Idéal pour :</strong> Associations en croissance (50-200 membres)</p>
+                <ul class="list-disc list-inside text-terracotta-deep text-sm ml-4 space-y-1">
                   <li>Jusqu'à 200 membres</li>
                   <li>Événements illimités</li>
                   <li>5 Go de stockage</li>
@@ -105,10 +105,10 @@ const HelpCenter: React.FC = () => {
                   <li>Support prioritaire</li>
                 </ul>
               </div>
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-indigo-900 mb-2">💎 Plan Premium</h4>
-                <p class="text-indigo-800 text-sm mb-2"><strong>Idéal pour :</strong> Grandes associations et fédérations</p>
-                <ul class="list-disc list-inside text-indigo-800 text-sm ml-4 space-y-1">
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-4 rounded-r-lg">
+                <h4 class="font-semibold text-ds-info mb-2">💎 Plan Premium</h4>
+                <p class="text-ds-info text-sm mb-2"><strong>Idéal pour :</strong> Grandes associations et fédérations</p>
+                <ul class="list-disc list-inside text-ds-info text-sm ml-4 space-y-1">
                   <li>Membres illimités</li>
                   <li>Événements illimités</li>
                   <li>Stockage illimité</li>
@@ -130,35 +130,35 @@ const HelpCenter: React.FC = () => {
             <p>Une fois votre compte créé, voici les étapes recommandées :</p>
             <div class="space-y-3 mt-4">
               <div class="flex items-start gap-3">
-                <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                <div class="bg-ds-info-soft text-ds-info rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">1</div>
                 <div>
                   <h4 class="font-semibold text-slate-900">Complétez votre profil</h4>
                   <p class="text-slate-700 text-sm">Ajoutez une photo, vos coordonnées et vos préférences</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                <div class="bg-ds-info-soft text-ds-info rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">2</div>
                 <div>
                   <h4 class="font-semibold text-slate-900">Créez ou rejoignez un club</h4>
                   <p class="text-slate-700 text-sm">En tant qu'admin, créez votre club. En tant que membre, demandez à rejoindre un club existant</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                <div class="bg-ds-info-soft text-ds-info rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">3</div>
                 <div>
                   <h4 class="font-semibold text-slate-900">Invitez vos membres</h4>
                   <p class="text-slate-700 text-sm">Utilisez la fonction d'invitation pour ajouter vos membres</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">4</div>
+                <div class="bg-ds-info-soft text-ds-info rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">4</div>
                 <div>
                   <h4 class="font-semibold text-slate-900">Créez votre premier événement</h4>
                   <p class="text-slate-700 text-sm">Testez la plateforme en créant un événement de test</p>
                 </div>
               </div>
               <div class="flex items-start gap-3">
-                <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">5</div>
+                <div class="bg-ds-info-soft text-ds-info rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">5</div>
                 <div>
                   <h4 class="font-semibold text-slate-900">Explorez les fonctionnalités</h4>
                   <p class="text-slate-700 text-sm">Découvrez le calendrier, les communications, le mailing, etc.</p>
@@ -199,8 +199,8 @@ const HelpCenter: React.FC = () => {
               <li>Ajoutez une image ou bannière (optionnel)</li>
               <li>Cliquez sur "Créer" ou "Publier"</li>
             </ol>
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-              <p class="text-green-800 text-sm"><strong>Astuce :</strong> Les membres recevront une notification automatique pour les nouveaux événements !</p>
+            <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-4">
+              <p class="text-ds-success text-sm"><strong>Astuce :</strong> Les membres recevront une notification automatique pour les nouveaux événements !</p>
             </div>
           `
         },
@@ -245,10 +245,10 @@ const HelpCenter: React.FC = () => {
                 <h4 class="font-semibold text-slate-900 mb-2">📅 Accéder à votre calendrier</h4>
                 <p class="text-slate-700 text-sm">Cliquez sur "Mon Calendrier" dans le menu principal pour voir tous vos événements en vue calendrier.</p>
               </div>
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 mb-2">🔗 Export iCal (Google Calendar, Outlook, Apple Calendar)</h4>
-                <p class="text-blue-800 text-sm mb-2">Pour synchroniser avec votre calendrier externe :</p>
-                <ol class="list-decimal list-inside text-blue-800 text-sm ml-4 space-y-1">
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep mb-2">🔗 Export iCal (Google Calendar, Outlook, Apple Calendar)</h4>
+                <p class="text-terracotta-deep text-sm mb-2">Pour synchroniser avec votre calendrier externe :</p>
+                <ol class="list-decimal list-inside text-terracotta-deep text-sm ml-4 space-y-1">
                   <li>Accédez à vos Paramètres > Calendrier</li>
                   <li>Copiez le lien de synchronisation iCal</li>
                   <li>Ajoutez-le comme "Calendrier Internet" dans votre application calendrier</li>
@@ -301,21 +301,21 @@ const HelpCenter: React.FC = () => {
           content: `
             <p>SynerJ propose plusieurs rôles avec des permissions différentes :</p>
             <div class="space-y-3 mt-4">
-              <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg">
-                <h4 class="font-semibold text-red-900 text-sm mb-1">🔴 Super Admin</h4>
-                <p class="text-red-800 text-xs">Accès complet : gestion de toutes les associations, clubs, paramètres système</p>
+              <div class="bg-ds-danger-soft border-l-4 border-ds-danger p-3 rounded-r-lg">
+                <h4 class="font-semibold text-ds-danger text-sm mb-1">🔴 Super Admin</h4>
+                <p class="text-ds-danger text-xs">Accès complet : gestion de toutes les associations, clubs, paramètres système</p>
               </div>
-              <div class="bg-indigo-50 border-l-4 border-indigo-600 p-3 rounded-r-lg">
-                <h4 class="font-semibold text-indigo-900 text-sm mb-1">🔵 Administrateur de Club</h4>
-                <p class="text-indigo-800 text-xs">Gestion complète de son club : membres, événements, communications, finances</p>
+              <div class="bg-ds-info-soft border-l-4 border-ds-info p-3 rounded-r-lg">
+                <h4 class="font-semibold text-ds-info text-sm mb-1">🔵 Administrateur de Club</h4>
+                <p class="text-ds-info text-xs">Gestion complète de son club : membres, événements, communications, finances</p>
               </div>
-              <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg">
-                <h4 class="font-semibold text-green-900 text-sm mb-1">🟢 Membre</h4>
-                <p class="text-green-800 text-xs">Participation aux événements, consultation du calendrier, profil personnel</p>
+              <div class="bg-ds-success-soft border-l-4 border-ds-success p-3 rounded-r-lg">
+                <h4 class="font-semibold text-ds-success text-sm mb-1">🟢 Membre</h4>
+                <p class="text-ds-success text-xs">Participation aux événements, consultation du calendrier, profil personnel</p>
               </div>
-              <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
-                <h4 class="font-semibold text-blue-900 text-sm mb-1">🔵 Supporter</h4>
-                <p class="text-blue-800 text-xs">Suivi du club, réception des communications (sans participation active)</p>
+              <div class="bg-terracotta-soft border-l-4 border-terracotta p-3 rounded-r-lg">
+                <h4 class="font-semibold text-terracotta-deep text-sm mb-1">🔵 Supporter</h4>
+                <p class="text-terracotta-deep text-xs">Suivi du club, réception des communications (sans participation active)</p>
               </div>
               <div class="bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-lg">
                 <h4 class="font-semibold text-amber-900 text-sm mb-1">🟡 Sponsor</h4>
@@ -362,8 +362,8 @@ const HelpCenter: React.FC = () => {
               <li>Activez les notifications si vous voulez alerter les membres</li>
               <li>Publiez ou programmez pour plus tard</li>
             </ol>
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-              <p class="text-blue-800 text-sm"><strong>Astuce :</strong> Les membres peuvent liker et commenter vos publications pour créer de l'engagement !</p>
+            <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg mt-4">
+              <p class="text-terracotta-deep text-sm"><strong>Astuce :</strong> Les membres peuvent liker et commenter vos publications pour créer de l'engagement !</p>
             </div>
           `
         },
@@ -431,8 +431,8 @@ const HelpCenter: React.FC = () => {
               <li>Activez la visibilité publique si vous voulez afficher le sponsor sur votre site web</li>
               <li>Enregistrez</li>
             </ol>
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-              <p class="text-green-800 text-sm"><strong>Avantage :</strong> Les sponsors apparaissent automatiquement dans un carrousel sur votre tableau de bord et site web public !</p>
+            <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-4">
+              <p class="text-ds-success text-sm"><strong>Avantage :</strong> Les sponsors apparaissent automatiquement dans un carrousel sur votre tableau de bord et site web public !</p>
             </div>
           `
         },
@@ -510,8 +510,8 @@ const HelpCenter: React.FC = () => {
               <li>Ajoutez une note explicative (raison de la demande)</li>
               <li>Soumettez la demande</li>
             </ol>
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-              <p class="text-blue-800 text-sm"><strong>Important :</strong> Votre demande doit être validée par un Super Admin. Vous recevrez une notification une fois approuvée ou refusée.</p>
+            <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg mt-4">
+              <p class="text-terracotta-deep text-sm"><strong>Important :</strong> Votre demande doit être validée par un Super Admin. Vous recevrez une notification une fois approuvée ou refusée.</p>
             </div>
           `
         }
@@ -538,8 +538,8 @@ const HelpCenter: React.FC = () => {
               <li>Vérifiez le récapitulatif et le montant</li>
               <li>Confirmez et effectuez le paiement via Stripe</li>
             </ol>
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-4">
-              <p class="text-green-800 text-sm"><strong>Bon à savoir :</strong> Le changement de plan est immédiat. Si vous passez à un plan supérieur, le montant sera calculé au prorata de la période restante.</p>
+            <div class="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-4">
+              <p class="text-ds-success text-sm"><strong>Bon à savoir :</strong> Le changement de plan est immédiat. Si vous passez à un plan supérieur, le montant sera calculé au prorata de la période restante.</p>
             </div>
           `
         },
@@ -610,8 +610,8 @@ const HelpCenter: React.FC = () => {
               </li>
               <li>Enregistrez vos modifications</li>
             </ol>
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-4">
-              <p class="text-blue-800 text-sm"><strong>Confidentialité :</strong> Vous pouvez contrôler la visibilité de vos informations dans les paramètres de confidentialité.</p>
+            <div class="bg-terracotta-soft border-l-4 border-terracotta p-4 rounded-r-lg mt-4">
+              <p class="text-terracotta-deep text-sm"><strong>Confidentialité :</strong> Vous pouvez contrôler la visibilité de vos informations dans les paramètres de confidentialité.</p>
             </div>
           `
         },
@@ -698,7 +698,7 @@ const HelpCenter: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link 
             to="/" 
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
+            className="inline-flex items-center text-ds-info hover:text-ds-info transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
@@ -706,7 +706,7 @@ const HelpCenter: React.FC = () => {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                <HelpCircle className="w-8 h-8 text-indigo-600" />
+                <HelpCircle className="w-8 h-8 text-ds-info" />
                 Centre d'aide
               </h1>
               <p className="text-slate-600 mt-2">
@@ -740,8 +740,8 @@ const HelpCenter: React.FC = () => {
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <MessageSquare className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <MessageSquare className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 FAQ
               </h3>
             </div>
@@ -755,8 +755,8 @@ const HelpCenter: React.FC = () => {
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <BookOpen className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <BookOpen className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Documentation
               </h3>
             </div>
@@ -770,8 +770,8 @@ const HelpCenter: React.FC = () => {
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-200 group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <Mail className="w-6 h-6 text-indigo-600" />
-              <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <Mail className="w-6 h-6 text-ds-info" />
+              <h3 className="font-semibold text-slate-900 group-hover:text-ds-info transition-colors">
                 Nous contacter
               </h3>
             </div>
@@ -794,7 +794,7 @@ const HelpCenter: React.FC = () => {
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="bg-indigo-100 text-indigo-600 p-3 rounded-lg">
+                  <div className="bg-ds-info-soft text-ds-info p-3 rounded-lg">
                     {category.icon}
                   </div>
                   <div className="text-left">
@@ -828,7 +828,7 @@ const HelpCenter: React.FC = () => {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-white transition-colors text-left"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="text-indigo-600">
+                          <div className="text-ds-info">
                             {article.icon}
                           </div>
                           <h3 className="font-medium text-slate-900">
@@ -867,13 +867,13 @@ const HelpCenter: React.FC = () => {
             </h3>
             <p className="text-slate-600 mb-6">
               Essayez avec d'autres mots-clés ou consultez notre{' '}
-              <Link to="/legal/faq" className="text-indigo-600 hover:text-indigo-800 underline">
+              <Link to="/legal/faq" className="text-ds-info hover:text-ds-info underline">
                 FAQ
               </Link>
             </p>
             <a
               href="mailto:contact-synerj@teachtech.fr"
-              className="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-ds-info text-white px-6 py-3 rounded-lg hover:bg-ds-info transition-colors"
             >
               <Mail className="w-5 h-5" />
               Contacter le support
@@ -888,14 +888,14 @@ const HelpCenter: React.FC = () => {
               <h2 className="text-2xl font-bold mb-2">
                 Vous ne trouvez pas ce que vous cherchez ?
               </h2>
-              <p className="text-indigo-100">
+              <p className="text-ds-info">
                 Notre équipe de support est là pour vous aider. Contactez-nous par e-mail 
                 et nous vous répondrons dans les plus brefs délais.
               </p>
             </div>
             <a
               href="mailto:contact-synerj@teachtech.fr"
-              className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors flex items-center gap-2 flex-shrink-0"
+              className="bg-white text-ds-info px-8 py-3 rounded-lg font-semibold hover:bg-ds-info-soft transition-colors flex items-center gap-2 flex-shrink-0"
             >
               <Mail className="w-5 h-5" />
               Contacter le support
@@ -905,15 +905,15 @@ const HelpCenter: React.FC = () => {
 
         {/* Liens vers autres pages */}
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/legal/notices" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/notices" className="text-ds-info hover:text-ds-info underline">
             Mentions Légales
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
             Politique de confidentialité
           </Link>
           <span className="text-slate-300">•</span>
-          <Link to="/legal/terms" className="text-indigo-600 hover:text-indigo-800 underline">
+          <Link to="/legal/terms" className="text-ds-info hover:text-ds-info underline">
             CGU
           </Link>
         </div>

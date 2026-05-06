@@ -76,14 +76,14 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   const getColorClasses = () => {
     switch (color) {
       case 'blue':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+        return 'bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta';
       case 'green':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+        return 'bg-ds-success-soft dark:bg-ds-success-soft/30 text-ds-success dark:text-ds-success';
       case 'orange':
-        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300';
+        return 'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning';
       case 'red':
       default:
-        return 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400';
+        return 'bg-ds-danger-soft dark:bg-ds-danger-soft/30 text-ds-danger dark:text-ds-danger';
     }
   };
 
@@ -198,7 +198,7 @@ export const HeaderNotificationBadge: React.FC<HeaderNotificationBadgeProps> = (
   return (
     <button
       onClick={onClick}
-      className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+      className="relative p-2 text-encre-2 dark:text-encre-3 hover:text-terracotta dark:hover:text-terracotta transition-colors"
       aria-label={`${totalCount} notification${totalCount > 1 ? 's' : ''} non lue${totalCount > 1 ? 's' : ''}`}
     >
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

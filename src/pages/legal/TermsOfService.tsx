@@ -10,13 +10,13 @@ const TermsOfService: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link 
             to="/" 
-            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors mb-4"
+            className="inline-flex items-center text-ds-info hover:text-ds-info transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour à l'accueil
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <FileText className="w-8 h-8 text-indigo-600" />
+            <FileText className="w-8 h-8 text-ds-info" />
             Conditions Générales d'Utilisation
           </h1>
           <p className="text-slate-600 mt-2">
@@ -31,14 +31,14 @@ const TermsOfService: React.FC = () => {
           
           {/* Avertissement important */}
           <section>
-            <div className="bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-r-lg">
+            <div className="bg-ds-info-soft border-l-4 border-ds-info p-6 rounded-r-lg">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-6 h-6 text-ds-info flex-shrink-0 mt-0.5" />
                 <div>
-                  <h2 className="text-lg font-semibold text-indigo-900 mb-2">
+                  <h2 className="text-lg font-semibold text-ds-info mb-2">
                     Veuillez lire attentivement ces conditions
                   </h2>
-                  <p className="text-indigo-800 text-sm">
+                  <p className="text-ds-info text-sm">
                     En utilisant SynerJ, vous acceptez sans réserve les présentes Conditions Générales 
                     d'Utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
                   </p>
@@ -51,46 +51,46 @@ const TermsOfService: React.FC = () => {
           <section className="bg-slate-50 rounded-lg p-6">
             <h2 className="text-xl font-semibold text-slate-900 mb-4">Sommaire</h2>
             <nav className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <a href="#article1" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article1" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 1. Définitions
               </a>
-              <a href="#article2" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article2" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 2. Objet
               </a>
-              <a href="#article3" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article3" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 3. Accès au service
               </a>
-              <a href="#article4" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article4" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 4. Création de compte
               </a>
-              <a href="#article5" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article5" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 5. Abonnements et tarifs
               </a>
-              <a href="#article6" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article6" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 6. Obligations des utilisateurs
               </a>
-              <a href="#article7" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article7" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 7. Propriété intellectuelle
               </a>
-              <a href="#article8" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article8" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 8. Données personnelles
               </a>
-              <a href="#article9" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article9" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 9. Responsabilité
               </a>
-              <a href="#article10" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article10" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 10. Garanties
               </a>
-              <a href="#article11" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article11" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 11. Résiliation
               </a>
-              <a href="#article12" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article12" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 12. Modification des CGU
               </a>
-              <a href="#article13" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article13" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 13. Droit applicable et juridiction
               </a>
-              <a href="#article14" className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm">
+              <a href="#article14" className="text-ds-info hover:text-ds-info hover:underline text-sm">
                 14. Contact
               </a>
             </nav>
@@ -99,7 +99,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 1 : Définitions */}
           <section id="article1">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <FileText className="w-6 h-6 text-indigo-600" />
+              <FileText className="w-6 h-6 text-ds-info" />
               Article 1 - Définitions
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -161,7 +161,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 2 : Objet */}
           <section id="article2">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-indigo-600" />
+              <CheckCircle className="w-6 h-6 text-ds-info" />
               Article 2 - Objet
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -189,7 +189,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 3 : Accès au service */}
           <section id="article3">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Users className="w-6 h-6 text-indigo-600" />
+              <Users className="w-6 h-6 text-ds-info" />
               Article 3 - Accès au service
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -225,7 +225,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 4 : Création de compte */}
           <section id="article4">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <UserCheck className="w-6 h-6 text-indigo-600" />
+              <UserCheck className="w-6 h-6 text-ds-info" />
               Article 4 - Création de compte
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -259,28 +259,28 @@ const TermsOfService: React.FC = () => {
                 <p className="text-slate-700 mb-3">La Plateforme propose différents rôles avec des niveaux d'accès distincts :</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-start gap-2">
-                    <Shield className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <Shield className="w-4 h-4 text-ds-info flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-slate-900">Super Admin</p>
                       <p className="text-slate-700">Accès complet à toutes les fonctionnalités de gestion</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Users className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <Users className="w-4 h-4 text-ds-info flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-slate-900">Administrateur de Club</p>
                       <p className="text-slate-700">Gestion de son club, événements, membres, matériel</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-ds-info flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-slate-900">Membre</p>
                       <p className="text-slate-700">Participation aux événements, consultations</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <CreditCard className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <CreditCard className="w-4 h-4 text-ds-info flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-slate-900">Sponsor</p>
                       <p className="text-slate-700">Gestion de son profil sponsor et visibilité</p>
@@ -294,7 +294,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 5 : Abonnements et tarifs */}
           <section id="article5">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <CreditCard className="w-6 h-6 text-indigo-600" />
+              <CreditCard className="w-6 h-6 text-ds-info" />
               Article 5 - Abonnements et tarifs
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -309,15 +309,15 @@ const TermsOfService: React.FC = () => {
                     Fonctionnalités de base avec limitations (nombre de membres, événements, stockage).
                   </p>
                 </div>
-                <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-lg p-4">
-                  <p className="font-semibold text-blue-900">Plan Essentiel (payant)</p>
-                  <p className="text-blue-800 text-sm mt-1">
+                <div className="bg-terracotta-soft border-l-4 border-terracotta rounded-r-lg p-4">
+                  <p className="font-semibold text-terracotta-deep">Plan Essentiel (payant)</p>
+                  <p className="text-terracotta-deep text-sm mt-1">
                     Fonctionnalités avancées avec limites étendues.
                   </p>
                 </div>
-                <div className="bg-indigo-50 border-l-4 border-indigo-600 rounded-r-lg p-4">
-                  <p className="font-semibold text-indigo-900">Plan Premium (payant)</p>
-                  <p className="text-indigo-800 text-sm mt-1">
+                <div className="bg-ds-info-soft border-l-4 border-ds-info rounded-r-lg p-4">
+                  <p className="font-semibold text-ds-info">Plan Premium (payant)</p>
+                  <p className="text-ds-info text-sm mt-1">
                     Accès complet sans limitation, support prioritaire.
                   </p>
                 </div>
@@ -341,8 +341,8 @@ const TermsOfService: React.FC = () => {
               <p className="text-slate-700">
                 Les abonnements sont reconduits tacitement à chaque échéance, sauf résiliation par l'Utilisateur.
               </p>
-              <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-3">
-                <p className="text-green-800 text-sm">
+              <div className="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-3">
+                <p className="text-ds-success text-sm">
                   <strong>Résiliation :</strong> Vous pouvez résilier votre abonnement à tout moment depuis 
                   vos paramètres de compte ou votre portail client Stripe. La résiliation prend effet à la 
                   fin de la période de facturation en cours. Aucun remboursement au prorata ne sera effectué.
@@ -370,7 +370,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 6 : Obligations des utilisateurs */}
           <section id="article6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <AlertCircle className="w-6 h-6 text-indigo-600" />
+              <AlertCircle className="w-6 h-6 text-ds-info" />
               Article 6 - Obligations des utilisateurs
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -390,12 +390,12 @@ const TermsOfService: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4 mt-4">
-                <p className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+              <div className="bg-ds-danger-soft border-l-4 border-ds-danger rounded-r-lg p-4 mt-4">
+                <p className="font-semibold text-ds-danger mb-2 flex items-center gap-2">
                   <XCircle className="w-5 h-5" />
                   ❌ Usages interdits :
                 </p>
-                <ul className="list-disc list-inside text-red-800 ml-4 space-y-1 text-sm">
+                <ul className="list-disc list-inside text-ds-danger ml-4 space-y-1 text-sm">
                   <li>Publier des contenus illégaux, diffamatoires, haineux ou pornographiques</li>
                   <li>Usurper l'identité d'une personne ou d'une entité</li>
                   <li>Diffuser des virus, malwares ou tout code malveillant</li>
@@ -421,7 +421,7 @@ const TermsOfService: React.FC = () => {
               <h3 className="text-lg font-semibold text-slate-900 mt-4">6.3 Signalement</h3>
               <p className="text-slate-700">
                 Tout Utilisateur peut signaler un contenu ou un comportement inapproprié en contactant : 
-                <a href="mailto:contact-synerj@teachtech.fr" className="text-indigo-600 hover:text-indigo-800 underline ml-1">
+                <a href="mailto:contact-synerj@teachtech.fr" className="text-ds-info hover:text-ds-info underline ml-1">
                   contact-synerj@teachtech.fr
                 </a>
               </p>
@@ -431,7 +431,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 7 : Propriété intellectuelle */}
           <section id="article7">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-indigo-600" />
+              <Shield className="w-6 h-6 text-ds-info" />
               Article 7 - Propriété intellectuelle
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -462,8 +462,8 @@ const TermsOfService: React.FC = () => {
                 non exclusive pour héberger, stocker, reproduire et afficher ce contenu dans le cadre 
                 du fonctionnement de la Plateforme.
               </p>
-              <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mt-3">
-                <p className="text-green-800 text-sm">
+              <div className="bg-ds-success-soft border-l-4 border-ds-success p-4 rounded-r-lg mt-3">
+                <p className="text-ds-success text-sm">
                   <strong>Important :</strong> L'Éditeur n'utilise pas vos contenus à des fins commerciales 
                   et ne les partage pas avec des tiers sans votre consentement.
                 </p>
@@ -474,14 +474,14 @@ const TermsOfService: React.FC = () => {
           {/* Article 8 : Données personnelles */}
           <section id="article8">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Lock className="w-6 h-6 text-indigo-600" />
+              <Lock className="w-6 h-6 text-ds-info" />
               Article 8 - Données personnelles
             </h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-slate-700">
                 Le traitement de vos données personnelles est effectué conformément au Règlement Général 
                 sur la Protection des Données (RGPD) et à notre{' '}
-                <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+                <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
                   Politique de confidentialité
                 </Link>.
               </p>
@@ -489,16 +489,16 @@ const TermsOfService: React.FC = () => {
                 En utilisant la Plateforme, vous consentez à la collecte et au traitement de vos données 
                 personnelles dans les conditions décrites dans notre Politique de confidentialité.
               </p>
-              <div className="bg-indigo-50 rounded-lg p-4 mt-3">
-                <p className="font-semibold text-indigo-900 mb-2">Vos droits RGPD :</p>
-                <ul className="list-disc list-inside text-indigo-800 ml-4 space-y-1 text-sm">
+              <div className="bg-ds-info-soft rounded-lg p-4 mt-3">
+                <p className="font-semibold text-ds-info mb-2">Vos droits RGPD :</p>
+                <ul className="list-disc list-inside text-ds-info ml-4 space-y-1 text-sm">
                   <li>Droit d'accès et de rectification</li>
                   <li>Droit à l'effacement ("droit à l'oubli")</li>
                   <li>Droit à la portabilité des données</li>
                   <li>Droit d'opposition au traitement</li>
                   <li>Droit de réclamation auprès de la CNIL</li>
                 </ul>
-                <p className="text-indigo-800 text-sm mt-2">
+                <p className="text-ds-info text-sm mt-2">
                   Pour exercer ces droits : <a href="mailto:contact-synerj@teachtech.fr" className="underline">contact-synerj@teachtech.fr</a>
                 </p>
               </div>
@@ -508,7 +508,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 9 : Responsabilité */}
           <section id="article9">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Scale className="w-6 h-6 text-indigo-600" />
+              <Scale className="w-6 h-6 text-ds-info" />
               Article 9 - Responsabilité
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -551,7 +551,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 10 : Garanties */}
           <section id="article10">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-indigo-600" />
+              <CheckCircle className="w-6 h-6 text-ds-info" />
               Article 10 - Garanties
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -574,7 +574,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 11 : Résiliation */}
           <section id="article11">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <XCircle className="w-6 h-6 text-indigo-600" />
+              <XCircle className="w-6 h-6 text-ds-info" />
               Article 11 - Résiliation
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -620,7 +620,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 12 : Modification des CGU */}
           <section id="article12">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Clock className="w-6 h-6 text-indigo-600" />
+              <Clock className="w-6 h-6 text-ds-info" />
               Article 12 - Modification des CGU
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -643,7 +643,7 @@ const TermsOfService: React.FC = () => {
           {/* Article 13 : Droit applicable */}
           <section id="article13">
             <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <Scale className="w-6 h-6 text-indigo-600" />
+              <Scale className="w-6 h-6 text-ds-info" />
               Article 13 - Droit applicable et juridiction
             </h2>
             <div className="prose prose-slate max-w-none">
@@ -659,9 +659,9 @@ const TermsOfService: React.FC = () => {
                 les tribunaux compétents du ressort du siège social de l'Éditeur, sauf dispositions 
                 légales impératives contraires.
               </p>
-              <div className="bg-blue-50 rounded-lg p-4 mt-3">
-                <p className="text-blue-900 font-semibold mb-2">🇪🇺 Médiation pour les consommateurs</p>
-                <p className="text-blue-800 text-sm">
+              <div className="bg-terracotta-soft rounded-lg p-4 mt-3">
+                <p className="text-terracotta-deep font-semibold mb-2">🇪🇺 Médiation pour les consommateurs</p>
+                <p className="text-terracotta-deep text-sm">
                   Conformément à l'article L.612-1 du Code de la consommation, les consommateurs 
                   ont le droit de recourir gratuitement à un médiateur de la consommation en vue 
                   de la résolution amiable d'un litige.
@@ -675,21 +675,21 @@ const TermsOfService: React.FC = () => {
             <h2 className="text-2xl font-semibold text-slate-900 mb-4">
               Article 14 - Contact
             </h2>
-            <div className="bg-indigo-50 border-l-4 border-indigo-600 rounded-r-lg p-6">
-              <p className="text-indigo-900 font-semibold mb-3">
+            <div className="bg-ds-info-soft border-l-4 border-ds-info rounded-r-lg p-6">
+              <p className="text-ds-info font-semibold mb-3">
                 Pour toute question relative aux présentes CGU :
               </p>
               <div className="space-y-2">
-                <p className="text-indigo-800">
+                <p className="text-ds-info">
                   <strong>LD Teach & Tech</strong>
                 </p>
-                <p className="text-indigo-800">
+                <p className="text-ds-info">
                   <strong>E-mail :</strong>{' '}
-                  <a href="mailto:contact-synerj@teachtech.fr" className="underline hover:text-indigo-700">
+                  <a href="mailto:contact-synerj@teachtech.fr" className="underline hover:text-ds-info">
                     contact-synerj@teachtech.fr
                   </a>
                 </p>
-                <p className="text-indigo-800">
+                <p className="text-ds-info">
                   <strong>Adresse :</strong> 8 sentier du coteau, 41160 Busloup
                 </p>
               </div>
@@ -707,10 +707,10 @@ const TermsOfService: React.FC = () => {
                 })}
               </p>
               <div className="flex gap-4 text-sm">
-                <Link to="/legal/notices" className="text-indigo-600 hover:text-indigo-800 underline">
+                <Link to="/legal/notices" className="text-ds-info hover:text-ds-info underline">
                   Mentions Légales
                 </Link>
-                <Link to="/legal/privacy-policy" className="text-indigo-600 hover:text-indigo-800 underline">
+                <Link to="/legal/privacy-policy" className="text-ds-info hover:text-ds-info underline">
                   Politique de confidentialité
                 </Link>
               </div>

@@ -60,7 +60,7 @@ export function CheckoutButton({
       </button>
 
       {error && (
-        <p className="text-sm text-red-600 text-center">
+        <p className="text-sm text-ds-danger text-center">
           {error}
         </p>
       )}

@@ -600,10 +600,10 @@ const fetchEmailPreferences = async () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="dark-card shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h1 className="text-3xl font-bold dark-text">Paramètres du compte</h1>
-          <p className="dark-text-muted mt-2">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h1 className="text-3xl font-bold text-encre">Paramètres du compte</h1>
+          <p className="text-encre-3 mt-2">
             Gérez vos informations personnelles et paramètres de sécurité
           </p>
         </div>
@@ -611,8 +611,8 @@ const fetchEmailPreferences = async () => {
         {message && (
           <div className={`mx-6 mt-4 p-4 rounded-lg ${
             message.type === 'success' 
-              ? 'bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
-              : 'bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+              ? 'bg-ds-success-soft text-ds-success border border-ds-success dark:bg-ds-success-soft/20 dark:text-ds-success dark:border-ds-success' 
+              : 'bg-ds-danger-soft text-ds-danger border border-ds-danger dark:bg-ds-danger-soft dark:text-ds-danger dark:border-ds-danger'
           }`}>
             <div className="flex items-center">
               <AlertCircle className="h-5 w-5 mr-2" />
@@ -623,8 +623,8 @@ const fetchEmailPreferences = async () => {
 
         <div className="p-6 space-y-8">
           {/* Section Photo de Profil */}
-          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
-            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+          <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pb-8">
+            <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
               <Camera className="h-5 w-5 mr-2" />
               Photo de profil
             </h2>
@@ -635,35 +635,35 @@ const fetchEmailPreferences = async () => {
                   <img
                     src={profilePicture}
                     alt="Photo de profil"
-                    className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
-                    <User className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                  <div className="w-24 h-24 rounded-full bg-papier-3 dark:bg-slate-700 flex items-center justify-center border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+                    <User className="h-8 w-8 text-encre-3 dark:text-encre-3" />
                   </div>
                 )}
                 <button
                   onClick={triggerFileInput}
                   disabled={loading}
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-lg"
+                  className="absolute bottom-0 right-0 bg-terracotta text-white p-2 rounded-full hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta transition-colors shadow-lg"
                 >
                   <Camera className="h-4 w-4" />
                 </button>
               </div>
               
               <div>
-                <h3 className="font-medium dark-text">
+                <h3 className="font-medium text-encre">
                   {profile?.first_name} {profile?.last_name}
                 </h3>
-                <p className="text-sm dark-text-muted mb-2">{profile?.role}</p>
+                <p className="text-sm text-encre-3 mb-2">{profile?.role}</p>
                 <button
                   onClick={triggerFileInput}
                   disabled={loading}
-                  className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                  className="text-sm bg-papier-2 dark:bg-slate-700 text-encre-3 px-4 py-2 rounded-lg hover:bg-papier-3 dark:hover:bg-slate-600 transition-colors"
                 >
                   {loading ? 'Chargement...' : 'Changer la photo'}
                 </button>
-                <p className="text-xs dark-text-muted mt-1">
+                <p className="text-xs text-encre-3 mt-1">
                   Formats acceptés: JPG, PNG (max 2MB)
                 </p>
               </div>
@@ -679,8 +679,8 @@ const fetchEmailPreferences = async () => {
           </div>
 
           {/* Section Informations Personnelles */}
-          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
-            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+          <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pb-8">
+            <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
               <User className="h-5 w-5 mr-2" />
               Informations personnelles
             </h2>
@@ -688,7 +688,7 @@ const fetchEmailPreferences = async () => {
             <form onSubmit={handleProfileUpdate} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                  <label className="block text-sm font-medium text-encre-3 mb-2">
                     Prénom
                   </label>
                   <input
@@ -698,13 +698,13 @@ const fetchEmailPreferences = async () => {
                       ...profileForm,
                       first_name: e.target.value
                     })}
-                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     placeholder="Votre prénom"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                  <label className="block text-sm font-medium text-encre-3 mb-2">
                     Nom
                   </label>
                   <input
@@ -714,7 +714,7 @@ const fetchEmailPreferences = async () => {
                       ...profileForm,
                       last_name: e.target.value
                     })}
-                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     placeholder="Votre nom"
                   />
                 </div>
@@ -722,7 +722,7 @@ const fetchEmailPreferences = async () => {
 
               {/* Champ Pseudo */}
               <div>
-                <label className="block text-sm font-medium dark-text-muted mb-2">
+                <label className="block text-sm font-medium text-encre-3 mb-2">
                   Pseudo <span className="text-xs">(visible publiquement)</span>
                 </label>
                 <input
@@ -733,32 +733,32 @@ const fetchEmailPreferences = async () => {
                   
                   value={profileForm.pseudo}
                   onChange={(e) => handlePseudoChange(e.target.value)}
-                  className={`dark-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
-                    pseudoAvailable === true ? 'border-green-500' :
-                    pseudoAvailable === false ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  className={`bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent ${
+                    pseudoAvailable === true ? 'border-ds-success' :
+                    pseudoAvailable === false ? 'border-ds-danger' : 'border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)]'
                   }`}
                   placeholder="votre_pseudo"
                 />
-                <p className="text-xs dark-text-muted mt-1">
+                <p className="text-xs text-encre-3 mt-1">
                   3-30 caractères : lettres, chiffres, tirets (-) et underscores (_)
                 </p>
                 
                 {checkingPseudo && (
-                  <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 flex items-center">
-                    <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2"></div>
+                  <p className="mt-2 text-sm text-terracotta dark:text-terracotta flex items-center">
+                    <div className="animate-spin w-4 h-4 border-2 border-terracotta border-t-transparent rounded-full mr-2"></div>
                     Vérification du pseudo...
                   </p>
                 )}
                 
                 {pseudoAvailable === true && (
-                  <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
+                  <p className="mt-2 text-sm text-ds-success dark:text-ds-success flex items-center">
                     <Check className="w-4 h-4 mr-2" />
                     Pseudo disponible
                   </p>
                 )}
                 
                 {pseudoAvailable === false && profileForm.pseudo && profileForm.pseudo !== profile?.pseudo && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+                  <p className="mt-2 text-sm text-ds-danger dark:text-ds-danger flex items-center">
                     <AlertCircle className="w-4 h-4 mr-2" />
                     Pseudo déjà pris
                   </p>
@@ -769,7 +769,7 @@ const fetchEmailPreferences = async () => {
                 <button
                   type="submit"
                   disabled={loading || (pseudoAvailable === false && profileForm.pseudo !== profile?.pseudo)}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
+                  className="bg-terracotta text-white px-6 py-3 rounded-lg hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta disabled:opacity-50 transition-colors flex items-center"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {loading ? 'Sauvegarde...' : 'Sauvegarder les informations'}
@@ -779,14 +779,14 @@ const fetchEmailPreferences = async () => {
           </div>
 
           {/* ✅ NOUVELLE SECTION : Préférences Email */}
-          <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
-            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+          <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pb-8">
+            <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
               <Mail className="h-5 w-5 mr-2" />
               Préférences de notification email
             </h2>
             
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+            <div className="bg-terracotta-soft dark:bg-terracotta-soft p-4 rounded-lg mb-6">
+              <p className="text-sm text-terracotta-deep dark:text-terracotta">
                 Vous pouvez à tout moment activer ou désactiver les notifications email selon vos préférences. 
                 Ces paramètres respectent le RGPD et vous donnent un contrôle total sur vos données.
               </p>
@@ -794,10 +794,10 @@ const fetchEmailPreferences = async () => {
 
             <form onSubmit={handleEmailPreferencesUpdate} className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-papier-2 dark:bg-slate-700 rounded-lg">
                   <div>
-                    <h3 className="font-medium dark-text">Emails des clubs</h3>
-                    <p className="text-sm dark-text-muted">Notifications et actualités des clubs que vous suivez</p>
+                    <h3 className="font-medium text-encre">Emails des clubs</h3>
+                    <p className="text-sm text-encre-3">Notifications et actualités des clubs que vous suivez</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -809,14 +809,14 @@ const fetchEmailPreferences = async () => {
                       })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-papier-3 dark:bg-papier-3 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--ds-border-2)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[var(--ds-border-2)] peer-checked:bg-terracotta"></div>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-papier-2 dark:bg-slate-700 rounded-lg">
                   <div>
-                    <h3 className="font-medium dark-text">Emails de l'association</h3>
-                    <p className="text-sm dark-text-muted">Communications officielles de votre association</p>
+                    <h3 className="font-medium text-encre">Emails de l'association</h3>
+                    <p className="text-sm text-encre-3">Communications officielles de votre association</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -828,14 +828,14 @@ const fetchEmailPreferences = async () => {
                       })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-papier-3 dark:bg-papier-3 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--ds-border-2)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[var(--ds-border-2)] peer-checked:bg-terracotta"></div>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-papier-2 dark:bg-slate-700 rounded-lg">
                   <div>
-                    <h3 className="font-medium dark-text">Emails de la mairie</h3>
-                    <p className="text-sm dark-text-muted">Informations municipales et événements locaux</p>
+                    <h3 className="font-medium text-encre">Emails de la mairie</h3>
+                    <p className="text-sm text-encre-3">Informations municipales et événements locaux</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -847,14 +847,14 @@ const fetchEmailPreferences = async () => {
                       })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-papier-3 dark:bg-papier-3 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--ds-border-2)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[var(--ds-border-2)] peer-checked:bg-terracotta"></div>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-papier-2 dark:bg-slate-700 rounded-lg">
                   <div>
-                    <h3 className="font-medium dark-text">Emails des sponsors</h3>
-                    <p className="text-sm dark-text-muted">Offres et communications des partenaires du club</p>
+                    <h3 className="font-medium text-encre">Emails des sponsors</h3>
+                    <p className="text-sm text-encre-3">Offres et communications des partenaires du club</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -866,7 +866,7 @@ const fetchEmailPreferences = async () => {
                       })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-papier-3 dark:bg-papier-3 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--ds-border-2)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-[var(--ds-border-2)] peer-checked:bg-terracotta"></div>
                   </label>
                 </div>
               </div>
@@ -874,7 +874,7 @@ const fetchEmailPreferences = async () => {
               <button
                 type="submit"
                 disabled={emailPreferencesLoading}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
+                className="bg-terracotta text-white px-6 py-3 rounded-lg hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta disabled:opacity-50 transition-colors flex items-center"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 {emailPreferencesLoading ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
@@ -884,22 +884,22 @@ const fetchEmailPreferences = async () => {
 
           {/* Section Club (uniquement pour les Club Admins) */}
           {profile?.role === 'Club Admin' && clubData && (
-            <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
-              <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+            <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pb-8">
+              <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
                 <Building2 className="h-5 w-5 mr-2" />
                 Paramètres du club
               </h2>
               
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mb-6">
-                <h3 className="font-medium text-green-900 dark:text-green-400 mb-2">{clubData.name}</h3>
-                <p className="text-sm text-green-700 dark:text-green-300">
+              <div className="bg-ds-success-soft dark:bg-ds-success-soft/20 p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-ds-success dark:text-ds-success mb-2">{clubData.name}</h3>
+                <p className="text-sm text-ds-success dark:text-ds-success">
                   Vous êtes administrateur de ce club. Vous pouvez modifier les informations de contact et le logo.
                 </p>
               </div>
 
               {/* Logo du club */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold dark-text mb-4 flex items-center">
+                <h3 className="text-lg font-semibold text-encre mb-4 flex items-center">
                   <Camera className="h-5 w-5 mr-2" />
                   Logo du club
                 </h3>
@@ -910,35 +910,35 @@ const fetchEmailPreferences = async () => {
                       <img
                         src={clubData.logo_url}
                         alt={`Logo ${clubData.name}`}
-                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200 dark:border-gray-600"
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
-                        <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                      <div className="w-24 h-24 rounded-lg bg-papier-3 dark:bg-slate-700 flex items-center justify-center border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+                        <Building2 className="h-8 w-8 text-encre-3 dark:text-encre-3" />
                       </div>
                     )}
                     <button
                       onClick={() => clubLogoInputRef.current?.click()}
                       disabled={clubLoading}
-                      className="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors shadow-lg"
+                      className="absolute bottom-0 right-0 bg-ds-success text-white p-2 rounded-full hover:bg-ds-success dark:bg-ds-success dark:hover:bg-ds-success transition-colors shadow-lg"
                     >
                       <Camera className="h-4 w-4" />
                     </button>
                   </div>
                   
                   <div>
-                    <h4 className="font-medium dark-text">Logo du club</h4>
-                    <p className="text-sm dark-text-muted mb-2">
+                    <h4 className="font-medium text-encre">Logo du club</h4>
+                    <p className="text-sm text-encre-3 mb-2">
                       {clubData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
                     </p>
                     <button
                       onClick={() => clubLogoInputRef.current?.click()}
                       disabled={clubLoading}
-                      className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                      className="text-sm bg-papier-2 dark:bg-slate-700 text-encre-3 px-4 py-2 rounded-lg hover:bg-papier-3 dark:hover:bg-slate-600 transition-colors"
                     >
                       {clubLoading ? 'Chargement...' : 'Changer le logo'}
                     </button>
-                    <p className="text-xs dark-text-muted mt-1">
+                    <p className="text-xs text-encre-3 mt-1">
                       Formats acceptés: JPG, PNG (max 2MB)
                     </p>
                   </div>
@@ -955,7 +955,7 @@ const fetchEmailPreferences = async () => {
               
               <form onSubmit={handleClubUpdate} className="space-y-6 max-w-md">
                 <div>
-                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                  <label className="block text-sm font-medium text-encre-3 mb-2">
                     Email de contact du club
                   </label>
                   <input
@@ -965,17 +965,17 @@ const fetchEmailPreferences = async () => {
                       ...clubForm,
                       contact_email: e.target.value
                     })}
-                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
                     placeholder="contact@club.com"
                   />
-                  <p className="mt-2 text-sm dark-text-muted">
+                  <p className="mt-2 text-sm text-encre-3">
                     Cet email sera affiché aux membres et followers pour vous contacter. 
                     Laissez vide si vous ne souhaitez pas afficher d'email de contact.
                   </p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium dark-text-muted mb-2">
+                  <label className="block text-sm font-medium text-encre-3 mb-2">
                     Site web du club
                   </label>
                   <input
@@ -985,10 +985,10 @@ const fetchEmailPreferences = async () => {
                       ...clubForm,
                       website_url: e.target.value
                     })}
-                    className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
+                    className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent"
                     placeholder="https://www.monclub.com"
                   />
-                  <p className="mt-2 text-sm dark-text-muted">
+                  <p className="mt-2 text-sm text-encre-3">
                     URL complète du site web du club (optionnel). Sera affichée aux membres et followers.
                   </p>
                 </div>
@@ -996,7 +996,7 @@ const fetchEmailPreferences = async () => {
                 <button
                   type="submit"
                   disabled={clubLoading}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 transition-colors flex items-center"
+                  className="bg-ds-success text-white px-6 py-3 rounded-lg hover:bg-ds-success dark:bg-ds-success dark:hover:bg-ds-success disabled:opacity-50 transition-colors flex items-center"
                 >
                   <Globe className="h-4 w-4 mr-2" />
                   {clubLoading ? 'Sauvegarde...' : 'Mettre à jour les informations'}
@@ -1024,22 +1024,22 @@ const fetchEmailPreferences = async () => {
 
           {/* Section Association (uniquement pour les Super Admins) */}
           {profile?.role === 'Super Admin' && associationData && (
-            <div className="border-b border-gray-200 dark:border-gray-600 pb-8">
-              <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+            <div className="border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] pb-8">
+              <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
                 <Building2 className="h-5 w-5 mr-2" />
                 Paramètres de l'association
               </h2>
               
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
-                <h3 className="font-medium text-blue-900 dark:text-blue-400 mb-2">{associationData.name}</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+              <div className="bg-terracotta-soft dark:bg-terracotta-soft p-4 rounded-lg mb-6">
+                <h3 className="font-medium text-terracotta-deep dark:text-terracotta mb-2">{associationData.name}</h3>
+                <p className="text-sm text-terracotta-deep dark:text-terracotta">
                   Vous êtes super administrateur de cette association. Vous pouvez modifier le logo.
                 </p>
               </div>
 
               {/* Logo de l'association */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold dark-text mb-4 flex items-center">
+                <h3 className="text-lg font-semibold text-encre mb-4 flex items-center">
                   <Camera className="h-5 w-5 mr-2" />
                   Logo de l'association
                 </h3>
@@ -1050,35 +1050,35 @@ const fetchEmailPreferences = async () => {
                       <img
                         src={associationData.logo_url}
                         alt={`Logo ${associationData.name}`}
-                        className="w-24 h-24 rounded-lg object-cover border-4 border-gray-200 dark:border-gray-600"
+                        className="w-24 h-24 rounded-lg object-cover border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
-                        <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                      <div className="w-24 h-24 rounded-lg bg-papier-3 dark:bg-slate-700 flex items-center justify-center border-4 border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+                        <Building2 className="h-8 w-8 text-encre-3 dark:text-encre-3" />
                       </div>
                     )}
                     <button
                       onClick={() => associationLogoInputRef.current?.click()}
                       disabled={associationLoading}
-                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-lg"
+                      className="absolute bottom-0 right-0 bg-terracotta text-white p-2 rounded-full hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta transition-colors shadow-lg"
                     >
                       <Camera className="h-4 w-4" />
                     </button>
                   </div>
                   
                   <div>
-                    <h4 className="font-medium dark-text">Logo de l'association</h4>
-                    <p className="text-sm dark-text-muted mb-2">
+                    <h4 className="font-medium text-encre">Logo de l'association</h4>
+                    <p className="text-sm text-encre-3 mb-2">
                       {associationData.logo_url ? 'Logo actuel' : 'Aucun logo défini'}
                     </p>
                     <button
                       onClick={() => associationLogoInputRef.current?.click()}
                       disabled={associationLoading}
-                      className="text-sm bg-gray-100 dark:bg-slate-700 dark-text-muted px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                      className="text-sm bg-papier-2 dark:bg-slate-700 text-encre-3 px-4 py-2 rounded-lg hover:bg-papier-3 dark:hover:bg-slate-600 transition-colors"
                     >
                       {associationLoading ? 'Chargement...' : 'Changer le logo'}
                     </button>
-                    <p className="text-xs dark-text-muted mt-1">
+                    <p className="text-xs text-encre-3 mt-1">
                       Formats acceptés: JPG, PNG (max 2MB)
                     </p>
                   </div>
@@ -1097,14 +1097,14 @@ const fetchEmailPreferences = async () => {
 
           {/* Section Changement de Mot de Passe */}
           <div>
-            <h2 className="text-xl font-semibold dark-text mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-encre mb-4 flex items-center">
               <Lock className="h-5 w-5 mr-2" />
               Changer le mot de passe
             </h2>
             
             <form onSubmit={handlePasswordChange} className="space-y-6 max-w-md">
               <div>
-                <label className="block text-sm font-medium dark-text-muted mb-2">
+                <label className="block text-sm font-medium text-encre-3 mb-2">
                   Nouveau mot de passe
                 </label>
                 <input
@@ -1115,13 +1115,13 @@ const fetchEmailPreferences = async () => {
                     ...passwordForm,
                     newPassword: e.target.value
                   })}
-                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Nouveau mot de passe"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium dark-text-muted mb-2">
+                <label className="block text-sm font-medium text-encre-3 mb-2">
                   Confirmer le nouveau mot de passe
                 </label>
                 <input
@@ -1132,7 +1132,7 @@ const fetchEmailPreferences = async () => {
                     ...passwordForm,
                     confirmPassword: e.target.value
                   })}
-                  className="dark-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full px-4 py-3 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   placeholder="Confirmer le mot de passe"
                 />
               </div>
@@ -1140,13 +1140,13 @@ const fetchEmailPreferences = async () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center"
+                className="bg-terracotta text-white px-6 py-3 rounded-lg hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta disabled:opacity-50 transition-colors flex items-center"
               >
                 <Lock className="h-4 w-4 mr-2" />
                 {loading ? 'Changement...' : 'Changer le mot de passe'}
               </button>
               
-              <div className="text-sm dark-text-muted">
+              <div className="text-sm text-encre-3">
                 <p>Le mot de passe doit contenir au moins :</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
                   <li>8 caractères minimum</li>

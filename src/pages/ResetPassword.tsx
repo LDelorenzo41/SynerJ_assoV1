@@ -68,17 +68,17 @@ export default function ResetPassword() {
         <div className="max-w-md w-full mx-4">
           <div className="bg-white p-8 rounded-xl shadow-lg">
             <div className="text-center mb-8">
-              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-terracotta-soft rounded-full flex items-center justify-center mb-4">
                 {success ? (
-                  <CheckCircle className="h-8 w-8 text-green-600" />
+                  <CheckCircle className="h-8 w-8 text-ds-success" />
                 ) : (
-                  <Lock className="h-8 w-8 text-blue-600" />
+                  <Lock className="h-8 w-8 text-terracotta" />
                 )}
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-encre">
                 {success ? 'Mot de passe réinitialisé !' : 'Nouveau mot de passe'}
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-encre-2 mt-2">
                 {success
                   ? 'Redirection vers votre tableau de bord...'
                   : 'Choisissez un nouveau mot de passe sécurisé'}
@@ -86,7 +86,7 @@ export default function ResetPassword() {
             </div>
 
             {success ? (
-              <div className="bg-green-100 text-green-700 p-4 rounded-lg text-sm text-center">
+              <div className="bg-ds-success-soft text-ds-success p-4 rounded-lg text-sm text-center">
                 Votre mot de passe a été modifié avec succès !
                 <br />
                 Vous allez être redirigé dans quelques instants...
@@ -94,7 +94,7 @@ export default function ResetPassword() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Nouveau mot de passe
                   </label>
                   <input
@@ -102,14 +102,14 @@ export default function ResetPassword() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Minimum 6 caractères"
                     minLength={6}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-encre-2 mb-2">
                     Confirmer le mot de passe
                   </label>
                   <input
@@ -117,14 +117,14 @@ export default function ResetPassword() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Retapez votre mot de passe"
                     minLength={6}
                   />
                 </div>
 
                 {error && (
-                  <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">
+                  <div className="bg-ds-danger-soft text-ds-danger p-3 rounded-lg text-sm">
                     {error}
                   </div>
                 )}
@@ -132,7 +132,7 @@ export default function ResetPassword() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium"
+                  className="w-full py-3 px-6 bg-terracotta text-white rounded-lg hover:bg-terracotta-deep disabled:opacity-50 transition-colors font-medium"
                 >
                   {loading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe'}
                 </button>

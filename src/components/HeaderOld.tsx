@@ -86,7 +86,7 @@ export default function Header() {
 
     return (
       <div className="flex items-center space-x-2 text-sm">
-        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+        <div className="w-6 h-6 rounded-full bg-papier-2 flex items-center justify-center overflow-hidden">
           {associationInfo.logo_url ? (
             <img 
               src={associationInfo.logo_url} 
@@ -98,16 +98,16 @@ export default function Header() {
                 if (parent && !parent.querySelector('.fallback-icon')) {
                   const fallback = document.createElement('div');
                   fallback.className = 'fallback-icon';
-                  fallback.innerHTML = '<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4l-1-1-1 1-1-1-1 1V5z" clip-rule="evenodd"></path></svg>';
+                  fallback.innerHTML = '<svg class="w-4 h-4 text-encre-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4l-1-1-1 1-1-1-1 1V5z" clip-rule="evenodd"></path></svg>';
                   parent.appendChild(fallback);
                 }
               }}
             />
           ) : (
-            <Building className="w-4 h-4 text-gray-400" />
+            <Building className="w-4 h-4 text-encre-3" />
           )}
         </div>
-        <span className="text-gray-600 font-medium max-w-32 truncate hidden md:block">
+        <span className="text-encre-2 font-medium max-w-32 truncate hidden md:block">
           {associationInfo.name}
         </span>
       </div>
@@ -117,7 +117,7 @@ export default function Header() {
   const navigationItems = getNavigationItems();
 
   return (
-    <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+    <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-[var(--ds-border)] z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header principal */}
         <div className="flex justify-between items-center h-16">
@@ -147,7 +147,7 @@ export default function Header() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-encre-2 hover:text-terracotta hover:bg-terracotta-soft transition-colors"
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
@@ -156,7 +156,7 @@ export default function Header() {
               })}
 
               {/* Séparateur */}
-              <div className="h-6 w-px bg-gray-300 mx-2"></div>
+              <div className="h-6 w-px bg-papier-3 mx-2"></div>
 
               {/* Profil utilisateur */}
               <div className="flex items-center space-x-3">
@@ -164,18 +164,18 @@ export default function Header() {
                   <img
                     src={profile.avatar_url}
                     alt="Photo de profil"
-                    className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                    className="w-8 h-8 rounded-full object-cover border-2 border-[var(--ds-border)]"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200">
-                    <User className="h-4 w-4 text-gray-400" />
+                  <div className="w-8 h-8 rounded-full bg-papier-3 flex items-center justify-center border-2 border-[var(--ds-border)]">
+                    <User className="h-4 w-4 text-encre-3" />
                   </div>
                 )}
                 <div className="text-sm">
-                  <span className="text-gray-700 font-medium">
+                  <span className="text-encre-2 font-medium">
                     {profile?.first_name} {profile?.last_name}
                   </span>
-                  <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full inline-block ml-2">
+                  <div className="px-2 py-1 bg-terracotta-soft text-terracotta-deep text-xs rounded-full inline-block ml-2">
                     {profile?.role}
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function Header() {
               {/* Bouton déconnexion */}
               <button
                 onClick={handleSignOut}
-                className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors"
+                className="flex items-center space-x-1 px-3 py-2 text-sm text-encre-2 hover:text-ds-danger transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Déconnexion</span>
@@ -193,15 +193,15 @@ export default function Header() {
           ) : (
             /* Navigation utilisateur non connecté */
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="#features" className="text-encre-2 hover:text-encre transition-colors">
                 Fonctionnalités
               </a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="#how-it-works" className="text-encre-2 hover:text-encre transition-colors">
                 Comment ça marche
               </a>
               <Link
                 to="/login"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center px-4 py-2 bg-terracotta text-white font-medium rounded-lg hover:bg-terracotta-deep transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <LogIn className="h-4 w-4 mr-2" />
                 Se connecter
@@ -213,7 +213,7 @@ export default function Header() {
           <div className="md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 rounded-md text-encre-3 hover:text-encre-3 hover:bg-papier-2"
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -226,27 +226,27 @@ export default function Header() {
 
         {/* Menu mobile - contenu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 pt-4 pb-6">
+          <div className="md:hidden border-t border-[var(--ds-border)] pt-4 pb-6">
             {isAuthenticated ? (
               <div className="space-y-4">
                 {/* Profil mobile */}
-                <div className="flex items-center space-x-3 px-2 py-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3 px-2 py-3 bg-papier-2 rounded-lg">
                   {profile?.avatar_url ? (
                     <img
                       src={profile.avatar_url}
                       alt="Photo de profil"
-                      className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-[var(--ds-border)]"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-200">
-                      <User className="h-5 w-5 text-gray-400" />
+                    <div className="w-10 h-10 rounded-full bg-papier-3 flex items-center justify-center border-2 border-[var(--ds-border)]">
+                      <User className="h-5 w-5 text-encre-3" />
                     </div>
                   )}
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-encre">
                       {profile?.first_name} {profile?.last_name}
                     </div>
-                    <div className="text-xs text-gray-500">{profile?.role}</div>
+                    <div className="text-xs text-encre-3">{profile?.role}</div>
                   </div>
                 </div>
 
@@ -259,7 +259,7 @@ export default function Header() {
                         key={item.path}
                         to={item.path}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium text-encre-2 hover:text-terracotta hover:bg-terracotta-soft transition-colors"
                       >
                         <Icon className="h-5 w-5" />
                         <span>{item.label}</span>
@@ -274,7 +274,7 @@ export default function Header() {
                     handleSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium text-ds-danger hover:bg-ds-danger-soft transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
                   <span>Déconnexion</span>
@@ -285,14 +285,14 @@ export default function Header() {
               <div className="space-y-3">
                 <a 
                   href="#features" 
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900"
+                  className="block px-3 py-2 text-base font-medium text-encre-2 hover:text-encre"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Fonctionnalités
                 </a>
                 <a 
                   href="#how-it-works" 
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900"
+                  className="block px-3 py-2 text-base font-medium text-encre-2 hover:text-encre"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Comment ça marche
@@ -300,7 +300,7 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200"
+                  className="block w-full text-center px-4 py-2 bg-terracotta text-white font-medium rounded-lg hover:bg-terracotta-deep transition-all duration-200"
                 >
                   Se connecter
                 </Link>

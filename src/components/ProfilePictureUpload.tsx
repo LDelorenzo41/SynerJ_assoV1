@@ -64,8 +64,8 @@ export default function ProfilePictureUpload({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">
-        Photo de profil {required && <span className="text-red-500">*</span>}
+      <label className="block text-sm font-medium text-encre-2">
+        Photo de profil {required && <span className="text-ds-danger">*</span>}
       </label>
       
       <div className="flex items-center space-x-6">
@@ -76,13 +76,13 @@ export default function ProfilePictureUpload({
               <img
                 src={preview}
                 alt="Aperçu"
-                className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+                className="w-24 h-24 rounded-full object-cover border-4 border-[var(--ds-border)]"
               />
               {!disabled && (
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                  className="absolute -top-2 -right-2 bg-ds-danger text-white p-1 rounded-full hover:bg-ds-danger transition-colors"
                   title="Supprimer l'image"
                 >
                   <X className="h-3 w-3" />
@@ -90,8 +90,8 @@ export default function ProfilePictureUpload({
               )}
             </div>
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-200">
-              <User className="h-8 w-8 text-gray-400" />
+            <div className="w-24 h-24 rounded-full bg-papier-3 flex items-center justify-center border-4 border-[var(--ds-border)]">
+              <User className="h-8 w-8 text-encre-3" />
             </div>
           )}
           
@@ -99,7 +99,7 @@ export default function ProfilePictureUpload({
             <button
               type="button"
               onClick={triggerFileInput}
-              className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+              className="absolute bottom-0 right-0 bg-terracotta text-white p-2 rounded-full hover:bg-terracotta-deep transition-colors shadow-lg"
               title="Choisir une image"
             >
               <Camera className="h-4 w-4" />
@@ -114,23 +114,23 @@ export default function ProfilePictureUpload({
               <button
                 type="button"
                 onClick={triggerFileInput}
-                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                className="bg-papier-2 text-encre-2 px-4 py-2 rounded-lg hover:bg-papier-3 transition-colors text-sm"
               >
                 {preview ? 'Changer la photo' : 'Ajouter une photo'}
               </button>
             )}
             
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-encre-3 space-y-1">
               <p>Formats acceptés: JPG, PNG, GIF</p>
               <p>Taille maximum: 2MB</p>
-              {required && <p className="text-red-500">* Champ obligatoire</p>}
+              {required && <p className="text-ds-danger">* Champ obligatoire</p>}
             </div>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="text-ds-danger text-sm bg-ds-danger-soft border border-ds-danger rounded-lg p-3">
           {error}
         </div>
       )}
