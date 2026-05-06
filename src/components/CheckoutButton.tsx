@@ -36,8 +36,8 @@ export function CheckoutButton({
   const baseClasses = 'flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = variant === 'primary'
-    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800'
-    : 'bg-white border-2 border-primary-600 text-primary-600 hover:bg-primary-50';
+    ? 'bg-terracotta hover:bg-terracotta-deep text-white shadow-[inset_0_1px_0_rgba(255,255,255,.22),0_1px_2px_rgba(168,74,46,.25)]'
+    : 'bg-papier border-2 border-terracotta text-terracotta hover:bg-terracotta-soft';
 
   return (
     <div className="space-y-2">

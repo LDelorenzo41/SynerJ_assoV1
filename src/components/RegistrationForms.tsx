@@ -1332,7 +1332,7 @@ ${customPlanForm.name}`);
   };
 
   return (
-    <section id="registration" className="py-20 bg-white">
+    <section id="registration" className="py-20 bg-papier">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-encre mb-6">
@@ -1347,7 +1347,7 @@ ${customPlanForm.name}`);
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div 
               onClick={() => setActiveForm('association')}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-terracotta"
+              className="group bg-papier p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-terracotta"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -1367,7 +1367,7 @@ ${customPlanForm.name}`);
 
             <div 
               onClick={() => setActiveForm('club')}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-success"
+              className="group bg-papier p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-success"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-100 to-green-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -1390,7 +1390,7 @@ ${customPlanForm.name}`);
                 setActiveForm('user');
                 setUserStep(1);
               }}
-              className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-info-soft"
+              className="group bg-papier p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-3 border-2 border-transparent hover:border-ds-info-soft"
             >
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-r from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -1412,7 +1412,7 @@ ${customPlanForm.name}`);
 
         {/* Association Form */}
         {activeForm === 'association' && (
-          <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+          <div className="max-w-4xl mx-auto bg-papier p-8 rounded-2xl shadow-xl border">
             <h2 className="text-3xl font-bold text-encre mb-8 text-center">Créer une Structure</h2>
             
             <form onSubmit={handleCreateAssociation} className="space-y-8">
@@ -1612,7 +1612,7 @@ ${customPlanForm.name}`);
 
         {/* Custom Plan Request Form */}
         {activeForm === 'custom-plan' && (
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+          <div className="max-w-2xl mx-auto bg-papier p-8 rounded-2xl shadow-xl border">
             <div className="text-center mb-8">
               <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pink-100 to-pink-200 rounded-2xl flex items-center justify-center mb-4">
                 <Sparkles className="h-8 w-8 text-ds-danger" />
@@ -1750,7 +1750,7 @@ ${customPlanForm.name}`);
 
         {/* Club Form */}
         {activeForm === 'club' && (
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+          <div className="max-w-2xl mx-auto bg-papier p-8 rounded-2xl shadow-xl border">
             <h2 className="text-3xl font-bold text-encre mb-6 text-center">Créer un Club</h2>
             <form onSubmit={handleCreateClub} className="space-y-6">
               <div>
@@ -1942,7 +1942,7 @@ ${customPlanForm.name}`);
 
         {/* User Registration Form - Multi-step */}
         {activeForm === 'user' && (
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl border">
+          <div className="max-w-2xl mx-auto bg-papier p-8 rounded-2xl shadow-xl border">
             <form onSubmit={handleUserRegistration}>
               {renderUserFormStep()}
             </form>

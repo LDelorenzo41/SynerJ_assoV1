@@ -58,7 +58,7 @@ const MailingForm: React.FC<MailingFormProps> = ({
         : `Sponsor ${sponsorInfo?.level}`;
 
     return (
-      <div className="bg-white border border-[var(--ds-border)] rounded-lg p-6 max-w-2xl mx-auto">
+      <div className="bg-papier border border-[var(--ds-border)] rounded-lg p-6 max-w-2xl mx-auto">
         {/* En-tête email simulé */}
         <div className="border-b border-[var(--ds-border)] pb-4 mb-6">
           <div className="text-sm text-encre-3 mb-2">
@@ -147,7 +147,7 @@ const MailingForm: React.FC<MailingFormProps> = ({
   // Modale de confirmation
   const ConfirmModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-papier-2 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="bg-papier dark:bg-papier-2 rounded-lg p-6 max-w-md w-full mx-4">
         <div className="flex items-center gap-3 mb-4">
           <Send className="w-6 h-6 text-terracotta" />
           <h3 className="text-lg font-semibold text-encre dark:text-white">
