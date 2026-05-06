@@ -38,10 +38,6 @@ import ClubInvitations from './pages/ClubInvitations';
 import AcceptInvitation from './pages/AcceptInvitation';
 import UseInvitationLink from './pages/UseInvitationLink';
 
-// [DS migration] Echantillon visuel du Design System "papier chaleureux"
-// Route publique /ds-preview, sera supprime en Phase 11.
-import DSPreview from './pages/_ds-preview/DSPreview';
-
 function App() {
   const { isAuthenticated, loading } = useAuthNew();
 
@@ -153,9 +149,6 @@ function App() {
           path="/legal/documentation"
           element={<Documentation />}
         />
-
-        {/* [DS migration] Echantillon visuel — sera retire en Phase 11 */}
-        <Route path="/ds-preview" element={<DSPreview />} />
         
         {/* ============ ROUTES PROTÉGÉES AVEC Layout ============ */}
         
