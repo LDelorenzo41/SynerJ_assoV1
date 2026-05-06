@@ -54,7 +54,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
                   if (parent && !parent.querySelector('.fallback-icon')) {
                     const fallback = document.createElement('div');
                     fallback.className = 'fallback-icon flex items-center justify-center w-full h-full';
-                    fallback.innerHTML = '<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4l-1-1-1 1-1-1-1 1V5z" clip-rule="evenodd"></path></svg>';
+                    fallback.innerHTML = '<svg class="w-4 h-4 text-encre-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4l-1-1-1 1-1-1-1 1V5z" clip-rule="evenodd"></path></svg>';
                     parent.appendChild(fallback);
                   }
                 }}

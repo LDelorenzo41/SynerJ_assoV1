@@ -47,8 +47,8 @@ export const DarkModeToggle: React.FC<DarkModeToggleProps> = ({ className = '' }
       onClick={toggleDarkMode}
       className={`
         flex items-center justify-center p-2 rounded-lg transition-all duration-200
-        bg-gray-100 hover:bg-gray-200 dark:bg-dark-bg-tertiary dark:hover:bg-dark-hover-primary
-        text-gray-700 dark:text-dark-text-primary
+        bg-papier-2 hover:bg-papier-3 dark:bg-bg-papier-tertiary dark:hover:bg-hover:bg-papier-2-primary
+        text-encre-2 dark:text-text-encre-primary
         ${className}
       `}
       title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}

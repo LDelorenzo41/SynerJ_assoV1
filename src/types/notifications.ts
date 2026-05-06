@@ -246,14 +246,14 @@ export function getNotificationIcon(type: NotificationType): string {
  */
 export function getNotificationBadgeColor(type: NotificationType): string {
   const colors = {
-    nouveau_club: 'bg-blue-500',
-    nouvel_event: 'bg-green-500',
-    demande_materiel: 'bg-orange-500',
-    reponse_materiel: 'bg-red-500',
-    nouvelle_communication: 'bg-purple-500' // NOUVEAU
+    nouveau_club: 'bg-terracotta',
+    nouvel_event: 'bg-ds-success',
+    demande_materiel: 'bg-ds-warning',
+    reponse_materiel: 'bg-ds-danger',
+    nouvelle_communication: 'bg-ds-info' // NOUVEAU
   };
   
-  return colors[type] || 'bg-gray-500';
+  return colors[type] || 'bg-papier-3';
 }
 
 /**

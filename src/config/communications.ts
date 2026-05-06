@@ -44,20 +44,20 @@ export const VISIBILITY_ICONS = {
  * Classes CSS pour les badges de priorité
  */
 export const PRIORITY_BADGE_CLASSES = {
-  Low: 'px-2 py-1 text-xs font-medium rounded-full text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800',
-  Normal: 'px-2 py-1 text-xs font-medium rounded-full text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900',
-  High: 'px-2 py-1 text-xs font-medium rounded-full text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900',
-  Urgent: 'px-2 py-1 text-xs font-medium rounded-full text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900 animate-pulse',
+  Low: 'px-2 py-1 text-xs font-medium rounded-full text-encre-2 bg-papier-2 dark:text-encre-3 dark:bg-papier-2',
+  Normal: 'px-2 py-1 text-xs font-medium rounded-full text-terracotta bg-terracotta-soft dark:text-terracotta dark:bg-terracotta-soft',
+  High: 'px-2 py-1 text-xs font-medium rounded-full text-ds-warning bg-ds-warning-soft dark:text-ds-warning dark:bg-ds-warning-soft',
+  Urgent: 'px-2 py-1 text-xs font-medium rounded-full text-ds-danger bg-ds-danger-soft dark:text-ds-danger dark:bg-ds-danger-soft animate-pulse',
 } as const;
 
 /**
  * Classes CSS pour les bordures de priorité
  */
 export const PRIORITY_BORDER_CLASSES = {
-  Low: 'border-l-4 border-gray-400',
-  Normal: 'border-l-4 border-blue-400',
-  High: 'border-l-4 border-orange-400',
-  Urgent: 'border-l-4 border-red-400',
+  Low: 'border-l-4 border-[var(--ds-border-2)]',
+  Normal: 'border-l-4 border-terracotta',
+  High: 'border-l-4 border-ds-warning',
+  Urgent: 'border-l-4 border-ds-danger',
 } as const;
 
 /**
@@ -545,7 +545,7 @@ export function formatExpirationStatus(expiresAt: string | null): {
     return {
       status: 'active',
       message: 'Pas d\'expiration',
-      className: 'text-gray-500'
+      className: 'text-encre-3'
     };
   }
 
@@ -558,7 +558,7 @@ export function formatExpirationStatus(expiresAt: string | null): {
     return {
       status: 'expired',
       message: 'Expirée',
-      className: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20'
+      className: 'text-ds-danger bg-ds-danger-soft dark:text-ds-danger dark:bg-ds-danger-soft'
     };
   }
 
@@ -568,14 +568,14 @@ export function formatExpirationStatus(expiresAt: string | null): {
       message: diffDays === 0 ? 'Expire aujourd\'hui' : 
                diffDays === 1 ? 'Expire demain' : 
                `Expire dans ${diffDays} jours`,
-      className: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20'
+      className: 'text-ds-warning bg-ds-warning-soft dark:text-ds-warning dark:bg-ds-warning-soft/20'
     };
   }
 
   return {
     status: 'active',
     message: `Expire le ${expiration.toLocaleDateString('fr-FR')}`,
-    className: 'text-gray-500'
+    className: 'text-encre-3'
   };
 }
 

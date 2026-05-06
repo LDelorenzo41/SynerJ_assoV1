@@ -384,7 +384,7 @@ Je voulais te partager un événement qui arrive bientôt : "${event.name}".
                     className="w-full px-3 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:bg-papier-3 dark:text-white font-mono text-sm"
                   />
                 ) : (
-                  <div className="p-3 bg-terracotta-soft dark:bg-terracotta-soft border border-blue-200 dark:border-blue-700 rounded-lg text-sm max-h-64 overflow-y-auto">
+                  <div className="p-3 bg-terracotta-soft dark:bg-terracotta-soft border border-terracotta dark:border-terracotta rounded-lg text-sm max-h-64 overflow-y-auto">
                     <pre className="whitespace-pre-wrap text-encre-2 dark:text-encre-3 font-sans">
                       {editableMessage || generateEmailContent()}
                     </pre>
@@ -496,7 +496,7 @@ export default function MonCalendrier() {
           {calendarEventsCount > 0 && (
             <button
               onClick={exportCalendarToICS}
-              className="flex items-center px-4 py-2 bg-ds-success dark:bg-green-700 text-white rounded-lg hover:bg-ds-success dark:hover:bg-ds-success transition-colors"
+              className="flex items-center px-4 py-2 bg-ds-success dark:bg-ds-success-soft text-white rounded-lg hover:bg-ds-success dark:hover:bg-ds-success transition-colors"
             >
               <Download className="h-4 w-4 mr-2" />
               Exporter (.ics)
@@ -506,10 +506,10 @@ export default function MonCalendrier() {
       </div>
 
       {error && (
-        <div className="bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-red-700 rounded-lg p-4">
+        <div className="bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-lg p-4">
           <div className="flex items-center">
             <div className="text-ds-danger dark:text-ds-danger mr-2">⚠️</div>
-            <div className="text-ds-danger dark:text-red-200">{error}</div>
+            <div className="text-ds-danger dark:text-ds-danger">{error}</div>
           </div>
         </div>
       )}
@@ -570,7 +570,7 @@ export default function MonCalendrier() {
                             {event.visibility === 'Public' ? (
                               <Eye className="h-4 w-4 text-ds-success dark:text-ds-success" />
                             ) : (
-                              <EyeOff className="h-4 w-4 text-ds-warning dark:text-orange-400" />
+                              <EyeOff className="h-4 w-4 text-ds-warning dark:text-ds-warning" />
                             )}
                             
                             {isEventPast(event.date) && (

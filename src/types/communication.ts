@@ -122,10 +122,10 @@ export const COMMUNICATION_PRIORITY_LABELS: Record<CommunicationPriority, string
 };
 
 export const COMMUNICATION_PRIORITY_COLORS: Record<CommunicationPriority, string> = {
-  Low: 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800',
-  Normal: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900',
-  High: 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900',
-  Urgent: 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900'
+  Low: 'text-encre-2 bg-papier-2 dark:text-encre-3 dark:bg-papier-2',
+  Normal: 'text-terracotta bg-terracotta-soft dark:text-terracotta dark:bg-terracotta-soft',
+  High: 'text-ds-warning bg-ds-warning-soft dark:text-ds-warning dark:bg-ds-warning-soft',
+  Urgent: 'text-ds-danger bg-ds-danger-soft dark:text-ds-danger dark:bg-ds-danger-soft'
 };
 
 // ============================================
