@@ -47,7 +47,7 @@ const ExpandableDescription = ({ description }: { description: string | null }) 
 
   if (!shouldShowToggle) {
     return (
-      <p className="dark-text-muted text-sm mb-4">
+      <p className="text-encre-3 text-sm mb-4">
         {description}
       </p>
     );
@@ -55,14 +55,14 @@ const ExpandableDescription = ({ description }: { description: string | null }) 
 
   return (
     <div className="mb-4">
-      <p className={`dark-text-muted text-sm transition-all duration-200 ${
+      <p className={`text-encre-3 text-sm transition-all duration-200 ${
         isExpanded ? '' : 'line-clamp-2'
       }`}>
         {description}
       </p>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="text-blue-600 dark:text-blue-400 text-xs hover:text-blue-700 dark:hover:text-blue-300 mt-1 flex items-center transition-colors"
+        className="text-terracotta dark:text-terracotta text-xs hover:text-terracotta-deep dark:hover:text-terracotta mt-1 flex items-center transition-colors"
       >
         {isExpanded ? (
           <>
@@ -84,7 +84,7 @@ const ExpandableDescription = ({ description }: { description: string | null }) 
 const ClubLogo = ({ logoUrl, clubName }: { logoUrl: string | null; clubName: string }) => {
   if (logoUrl) {
     return (
-      <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-600 flex-shrink-0">
+      <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-[var(--ds-border)] dark:border-[var(--ds-border-2)] flex-shrink-0">
         <img
           src={logoUrl}
           alt={`Logo ${clubName}`}
@@ -95,8 +95,8 @@ const ClubLogo = ({ logoUrl, clubName }: { logoUrl: string | null; clubName: str
             const parent = target.parentElement;
             if (parent) {
               parent.innerHTML = `
-                <div class="w-full h-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center">
-                  <div class="w-8 h-8 text-gray-400 dark:text-slate-400">
+                <div class="w-full h-full bg-papier-3 dark:bg-slate-700 flex items-center justify-center">
+                  <div class="w-8 h-8 text-encre-3 dark:text-slate-400">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0v-3.5a2.5 2.5 0 015 0V21m0 0h4.5a2.5 2.5 0 005-2.5v-8.5a2.5 2.5 0 00-2.5-2.5H15"></path>
                     </svg>
@@ -111,8 +111,8 @@ const ClubLogo = ({ logoUrl, clubName }: { logoUrl: string | null; clubName: str
   }
 
   return (
-    <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-slate-700 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 flex-shrink-0">
-      <Building2 className="h-8 w-8 text-gray-400 dark:text-slate-400" />
+    <div className="w-16 h-16 rounded-lg bg-papier-3 dark:bg-slate-700 flex items-center justify-center border-2 border-[var(--ds-border)] dark:border-[var(--ds-border-2)] flex-shrink-0">
+      <Building2 className="h-8 w-8 text-encre-3 dark:text-slate-400" />
     </div>
   );
 };
@@ -212,7 +212,7 @@ export default function Clubs() {
   const getClubActionButton = (club: Club) => {
     if (club.id === profile?.club_id) {
       return (
-        <div className="flex items-center text-green-600 dark:text-green-400 text-sm font-medium">
+        <div className="flex items-center text-ds-success dark:text-ds-success text-sm font-medium">
           <Shield className="h-4 w-4 mr-1" />
           Mon Club
         </div>
@@ -226,8 +226,8 @@ export default function Clubs() {
           onClick={() => handleFollowClub(club.id)}
           className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
             isFollowing 
-              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50'
-              : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50'
+              ? 'bg-ds-success-soft dark:bg-ds-success-soft/30 text-ds-success dark:text-ds-success hover:bg-ds-success-soft dark:hover:bg-ds-success-soft/50'
+              : 'bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta hover:bg-terracotta-soft dark:hover:bg-terracotta-soft/50'
           }`}
         >
           {isFollowing ? (
@@ -253,21 +253,21 @@ export default function Clubs() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold dark-text">Clubs</h1>
+          <h1 className="text-3xl font-bold text-encre">Clubs</h1>
         </div>
 
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+        <div className="bg-ds-warning-soft dark:bg-ds-warning-soft/20 border border-ds-warning dark:border-ds-warning rounded-lg p-6">
           <div className="flex items-start">
-            <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-1" />
+            <AlertCircle className="h-6 w-6 text-ds-warning dark:text-ds-warning mr-3 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Association requise</h2>
-              <p className="text-yellow-800 dark:text-yellow-300 mb-4">
+              <h2 className="text-lg font-semibold text-ds-warning dark:text-ds-warning mb-2">Association requise</h2>
+              <p className="text-ds-warning dark:text-ds-warning mb-4">
                 Pour découvrir les clubs, vous devez d'abord rejoindre une association. 
                 Rendez-vous sur votre tableau de bord pour choisir une association à suivre.
               </p>
               <a
                 href="/dashboard"
-                className="dark-btn-primary inline-flex items-center px-4 py-2 rounded-lg transition-colors"
+                className="bg-terracotta text-white hover:bg-terracotta-deep inline-flex items-center px-4 py-2 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Aller au tableau de bord
@@ -282,7 +282,7 @@ export default function Clubs() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-terracotta dark:border-terracotta"></div>
       </div>
     );
   }
@@ -290,11 +290,11 @@ export default function Clubs() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-        <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+        <AlertCircle className="h-12 w-12 text-ds-danger dark:text-ds-danger mx-auto mb-4" />
+        <p className="text-ds-danger dark:text-ds-danger mb-4">{error}</p>
         <button 
           onClick={fetchClubs}
-          className="dark-btn-primary px-4 py-2 rounded-lg transition-colors"
+          className="bg-terracotta text-white hover:bg-terracotta-deep px-4 py-2 rounded-lg transition-colors"
         >
           Réessayer
         </button>
@@ -306,8 +306,8 @@ export default function Clubs() {
     <div className="space-y-6">
       {/* MODIFIÉ: Header avec dark mode */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold dark-text">Clubs</h1>
-        <div className="flex items-center text-sm dark-text-muted">
+        <h1 className="text-3xl font-bold text-encre">Clubs</h1>
+        <div className="flex items-center text-sm text-encre-3">
           <Users className="h-4 w-4 mr-1" />
           {profile?.role === 'Super Admin' ? 'Gestion des clubs' :
            profile?.role === 'Club Admin' ? 'Vue admin' :
@@ -317,19 +317,19 @@ export default function Clubs() {
       </div>
 
       {/* MODIFIÉ: Informations contextuelles avec dark mode */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+      <div className="bg-terracotta-soft dark:bg-terracotta-soft border border-terracotta dark:border-terracotta p-4 rounded-lg">
         <div className="flex items-start">
           <div className="flex-shrink-0">
-            <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Users className="h-5 w-5 text-terracotta dark:text-terracotta" />
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+            <h3 className="text-sm font-medium text-terracotta-deep dark:text-terracotta">
               {profile?.role === 'Super Admin' && 'Gestion complète des clubs'}
               {profile?.role === 'Club Admin' && 'Vue administrative de votre club'}
               {profile?.role === 'Member' && 'Votre club et clubs à suivre'}
               {profile?.role === 'Supporter' && 'Clubs à suivre dans votre association'}
             </h3>
-            <div className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+            <div className="mt-1 text-sm text-terracotta-deep dark:text-terracotta">
               {profile?.role === 'Super Admin' && 'Vous pouvez voir tous les codes d\'invitation et gérer tous les clubs.'}
               {profile?.role === 'Club Admin' && 'Vous pouvez voir le code d\'invitation de votre club uniquement.'}
               {profile?.role === 'Member' && 'Vous pouvez suivre d\'autres clubs pour recevoir leurs actualités publiques.'}
@@ -344,12 +344,12 @@ export default function Clubs() {
         {clubs.map((club) => (
           <div
             key={club.id}
-            className={`dark-card rounded-lg shadow-sm border-2 transition-all duration-200 hover:shadow-md ${
+            className={`bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border-2 transition-all duration-200 hover:shadow-md ${
               club.id === profile?.club_id 
-                ? 'border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20' 
+                ? 'border-ds-success dark:border-ds-success bg-ds-success-soft dark:bg-ds-success-soft/20' 
                 : followedClubs.has(club.id)
-                ? 'border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-600'
+                ? 'border-terracotta dark:border-terracotta bg-terracotta-soft dark:bg-terracotta-soft'
+                : 'border-[var(--ds-border)] dark:border-[var(--ds-border-2)]'
             }`}
           >
             <div className="p-6">
@@ -360,11 +360,11 @@ export default function Clubs() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-semibold dark-text mb-2 truncate">
+                      <h3 className="text-xl font-semibold text-encre mb-2 truncate">
                         {club.name}
                       </h3>
                       <div className="space-y-1">
-                        <div className="flex items-center dark-text-muted text-sm">
+                        <div className="flex items-center text-encre-3 text-sm">
                           <Mail className="h-4 w-4 mr-1 flex-shrink-0" />
                           <span className="truncate">
                             {club.contact_email || "Contact via l'association"}
@@ -376,7 +376,7 @@ export default function Clubs() {
                             href={getWebsiteUrl(club.website_url) || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                            className="flex items-center text-sm text-ds-info dark:text-ds-info hover:text-ds-info dark:hover:text-ds-info transition-colors"
                           >
                             <ExternalLink className="h-4 w-4 mr-1 flex-shrink-0" />
                             <span className="truncate">Site web</span>
@@ -396,28 +396,28 @@ export default function Clubs() {
 
               {/* MODIFIÉ: Code d'invitation avec dark mode */}
               {shouldShowClubCode(club) && (
-                <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-600 p-3 rounded-lg mb-4">
+                <div className="bg-papier-2 dark:bg-slate-800/50 border border-[var(--ds-border)] dark:border-slate-600 p-3 rounded-lg mb-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium dark-text uppercase tracking-wide">
+                    <span className="text-xs font-medium text-encre uppercase tracking-wide">
                       Code d'invitation
                     </span>
                     {profile?.role === 'Super Admin' && (
-                      <span className="text-xs text-blue-600 dark:text-blue-400">Admin</span>
+                      <span className="text-xs text-terracotta dark:text-terracotta">Admin</span>
                     )}
                     {canSeeOwnClubCode && club.id === profile?.club_id && (
-                      <span className="text-xs text-green-600 dark:text-green-400">Mon club</span>
+                      <span className="text-xs text-ds-success dark:text-ds-success">Mon club</span>
                     )}
                   </div>
-                  <p className="text-lg font-mono font-bold dark-text mt-1">
+                  <p className="text-lg font-mono font-bold text-encre mt-1">
                     {club.club_code}
                   </p>
                 </div>
               )}
 
-              <div className="flex items-center justify-between text-xs dark-text-muted">
+              <div className="flex items-center justify-between text-xs text-encre-3">
                 <span>Créé le {new Date(club.created_at).toLocaleDateString('fr-FR')}</span>
                 {followedClubs.has(club.id) && club.id !== profile?.club_id && (
-                  <span className="text-blue-600 dark:text-blue-400 font-medium">Suivi</span>
+                  <span className="text-terracotta dark:text-terracotta font-medium">Suivi</span>
                 )}
               </div>
             </div>
@@ -428,10 +428,10 @@ export default function Clubs() {
       {/* MODIFIÉ: Message vide avec dark mode */}
       {clubs.length === 0 && (
         <div className="text-center py-12">
-          <Users className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
-          <p className="dark-text-muted mb-2">Aucun club trouvé dans votre association.</p>
+          <Users className="h-12 w-12 text-encre-3 dark:text-slate-500 mx-auto mb-4" />
+          <p className="text-encre-3 mb-2">Aucun club trouvé dans votre association.</p>
           {profile?.role === 'Super Admin' && (
-            <p className="text-sm dark-text-muted">Les nouveaux clubs apparaîtront ici automatiquement.</p>
+            <p className="text-sm text-encre-3">Les nouveaux clubs apparaîtront ici automatiquement.</p>
           )}
         </div>
       )}
