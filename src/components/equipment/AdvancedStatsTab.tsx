@@ -76,8 +76,8 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-        <span className="ml-2 dark-text-muted">Chargement des statistiques avancées...</span>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta dark:border-terracotta"></div>
+        <span className="ml-2 text-encre-3">Chargement des statistiques avancées...</span>
       </div>
     );
   }
@@ -85,10 +85,10 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 mb-4">Erreur : {error}</div>
+        <div className="text-ds-danger mb-4">Erreur : {error}</div>
         <button 
           onClick={loadAdvancedStats}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="bg-terracotta text-white px-4 py-2 rounded-lg hover:bg-terracotta-deep"
         >
           Réessayer
         </button>
@@ -105,14 +105,14 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
       {/* Header avec actions */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold dark-text">Statistiques Avancées</h2>
-          <p className="dark-text-muted">Analyse complète de l'utilisation du matériel</p>
+          <h2 className="text-2xl font-bold text-encre">Statistiques Avancées</h2>
+          <p className="text-encre-3">Analyse complète de l'utilisation du matériel</p>
         </div>
         <div className="flex space-x-3">
           <button
             onClick={loadAdvancedStats}
             disabled={loading}
-            className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 dark-text"
+            className="flex items-center px-4 py-2 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-lg hover:bg-papier-2 dark:hover:bg-papier-3 disabled:opacity-50 text-encre"
           >
             <RefreshCcw className="h-4 w-4 mr-2" />
             Actualiser
@@ -120,7 +120,7 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
           <button
             onClick={handleExportCSV}
             disabled={exporting}
-            className="flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50"
+            className="flex items-center px-4 py-2 bg-ds-success dark:bg-ds-success text-white rounded-lg hover:bg-ds-success dark:hover:bg-ds-success disabled:opacity-50"
           >
             <Download className="h-4 w-4 mr-2" />
             {exporting ? 'Export...' : 'Exporter CSV'}
@@ -168,28 +168,28 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
 
       {/* Clubs les plus actifs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+        <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
           <div className="flex items-center mb-4">
-            <Users className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
-            <h3 className="text-lg font-semibold dark-text">Clubs les plus actifs</h3>
+            <Users className="h-5 w-5 text-terracotta dark:text-terracotta mr-2" />
+            <h3 className="text-lg font-semibold text-encre">Clubs les plus actifs</h3>
           </div>
           <div className="space-y-3">
             {stats.clubs.most_active.slice(0, 5).map((club: any, index: number) => (
-              <div key={club.club_id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div key={club.club_id} className="flex items-center justify-between p-3 bg-papier-2 dark:bg-papier-3/50 rounded-lg">
                 <div className="flex items-center">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white mr-3 ${
-                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                    index === 0 ? 'bg-ds-warning' : index === 1 ? 'bg-papier-3' : index === 2 ? 'bg-ds-warning' : 'bg-terracotta'
                   }`}>
                     {index + 1}
                   </div>
                   <div>
-                    <div className="font-medium dark-text">{club.club_name}</div>
-                    <div className="text-sm dark-text-muted">{club.total_requests} demandes</div>
+                    <div className="font-medium text-encre">{club.club_name}</div>
+                    <div className="text-sm text-encre-3">{club.total_requests} demandes</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium text-green-600 dark:text-green-400">{club.approval_rate}%</div>
-                  <div className="text-xs dark-text-muted">approuvées</div>
+                  <div className="text-sm font-medium text-ds-success dark:text-ds-success">{club.approval_rate}%</div>
+                  <div className="text-xs text-encre-3">approuvées</div>
                 </div>
               </div>
             ))}
@@ -197,21 +197,21 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
         </div>
 
         {/* Équipements les plus populaires */}
-        <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+        <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
           <div className="flex items-center mb-4">
-            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
-            <h3 className="text-lg font-semibold dark-text">Équipements populaires</h3>
+            <TrendingUp className="h-5 w-5 text-ds-success dark:text-ds-success mr-2" />
+            <h3 className="text-lg font-semibold text-encre">Équipements populaires</h3>
           </div>
           <div className="space-y-3">
             {stats.equipment.most_popular.slice(0, 5).map((equipment: any, index: number) => (
-              <div key={equipment.equipment_id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div key={equipment.equipment_id} className="flex items-center justify-between p-3 bg-papier-2 dark:bg-papier-3/50 rounded-lg">
                 <div>
-                  <div className="font-medium dark-text">{equipment.equipment_name}</div>
-                  <div className="text-sm dark-text-muted">{equipment.category}</div>
+                  <div className="font-medium text-encre">{equipment.equipment_name}</div>
+                  <div className="text-sm text-encre-3">{equipment.category}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium text-blue-600 dark:text-blue-400">{equipment.times_requested}</div>
-                  <div className="text-xs dark-text-muted">{equipment.utilization_rate}% utilisé</div>
+                  <div className="text-sm font-medium text-terracotta dark:text-terracotta">{equipment.times_requested}</div>
+                  <div className="text-xs text-encre-3">{equipment.utilization_rate}% utilisé</div>
                 </div>
               </div>
             ))}
@@ -220,20 +220,20 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
       </div>
 
       {/* Tendances mensuelles */}
-      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
         <div className="flex items-center mb-4">
-          <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400 mr-2" />
-          <h3 className="text-lg font-semibold dark-text">Tendances mensuelles</h3>
+          <BarChart3 className="h-5 w-5 text-ds-info dark:text-ds-info mr-2" />
+          <h3 className="text-lg font-semibold text-encre">Tendances mensuelles</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {stats.trends.monthly_requests.slice(0, 6).map((month: any) => (
-            <div key={`${month.year}-${month.month}`} className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="text-xs dark-text-muted uppercase tracking-wide">{month.month} {month.year}</div>
-              <div className="text-2xl font-bold dark-text mt-1">{month.total_requests}</div>
-              <div className="text-xs dark-text-muted">demandes</div>
+            <div key={`${month.year}-${month.month}`} className="text-center p-4 bg-papier-2 dark:bg-papier-3/50 rounded-lg">
+              <div className="text-xs text-encre-3 uppercase tracking-wide">{month.month} {month.year}</div>
+              <div className="text-2xl font-bold text-encre mt-1">{month.total_requests}</div>
+              <div className="text-xs text-encre-3">demandes</div>
               <div className="mt-2 flex justify-center space-x-2">
-                <span className="text-xs text-green-600 dark:text-green-400">{month.approved} ✓</span>
-                <span className="text-xs text-red-600 dark:text-red-400">{month.rejected} ✗</span>
+                <span className="text-xs text-ds-success dark:text-ds-success">{month.approved} ✓</span>
+                <span className="text-xs text-ds-danger dark:text-ds-danger">{month.rejected} ✗</span>
               </div>
             </div>
           ))}
@@ -241,19 +241,19 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
       </div>
 
       {/* Catégories les plus demandées */}
-      <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
         <div className="flex items-center mb-4">
-          <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400 mr-2" />
-          <h3 className="text-lg font-semibold dark-text">Catégories les plus demandées</h3>
+          <Zap className="h-5 w-5 text-ds-warning dark:text-ds-warning mr-2" />
+          <h3 className="text-lg font-semibold text-encre">Catégories les plus demandées</h3>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(stats.performance.busiest_equipment_categories)
             .sort(([,a], [,b]) => (b as number) - (a as number))
             .slice(0, 8)
             .map(([category, count]) => (
-              <div key={category} className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="text-2xl font-bold dark-text">{count as number}</div>
-                <div className="text-sm dark-text-muted">{category}</div>
+              <div key={category} className="text-center p-4 bg-papier-2 dark:bg-papier-3/50 rounded-lg">
+                <div className="text-2xl font-bold text-encre">{count as number}</div>
+                <div className="text-sm text-encre-3">{category}</div>
               </div>
             ))}
         </div>
@@ -261,21 +261,21 @@ export function AdvancedStatsTab({ associationId }: AdvancedStatsTabProps) {
 
       {/* Équipements inutilisés */}
       {stats.equipment.least_used.length > 0 && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
+        <div className="bg-ds-warning-soft dark:bg-ds-warning-soft/30 border border-ds-warning dark:border-ds-warning rounded-lg p-6">
           <div className="flex items-center mb-4">
-            <Package className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-2" />
-            <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">Équipements jamais demandés</h3>
+            <Package className="h-5 w-5 text-ds-warning dark:text-ds-warning mr-2" />
+            <h3 className="text-lg font-semibold text-ds-warning dark:text-ds-warning">Équipements jamais demandés</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {stats.equipment.least_used.slice(0, 6).map((equipment: any) => (
-              <div key={equipment.equipment_id} className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-yellow-200 dark:border-yellow-600">
-                <div className="font-medium dark-text">{equipment.equipment_name}</div>
-                <div className="text-sm dark-text-muted">{equipment.category}</div>
+              <div key={equipment.equipment_id} className="bg-white dark:bg-papier-2 p-3 rounded-lg border border-ds-warning dark:border-ds-warning">
+                <div className="font-medium text-encre">{equipment.equipment_name}</div>
+                <div className="text-sm text-encre-3">{equipment.category}</div>
               </div>
             ))}
           </div>
           {stats.equipment.least_used.length > 6 && (
-            <div className="mt-3 text-sm text-yellow-700 dark:text-yellow-300">
+            <div className="mt-3 text-sm text-ds-warning dark:text-ds-warning">
               ... et {stats.equipment.least_used.length - 6} autres équipements
             </div>
           )}
@@ -296,22 +296,22 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, icon: Icon, color, subtitle }: MetricCardProps) {
   const colorClasses: Record<string, string> = {
-    green: 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30',
-    blue: 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30',
-    purple: 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30',
-    orange: 'text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30',
+    green: 'text-ds-success dark:text-ds-success bg-ds-success-soft dark:bg-ds-success-soft/30',
+    blue: 'text-terracotta dark:text-terracotta bg-terracotta-soft dark:bg-terracotta-soft/30',
+    purple: 'text-ds-info dark:text-ds-info bg-ds-info-soft dark:bg-ds-info-soft/30',
+    orange: 'text-ds-warning dark:text-ds-warning bg-ds-warning-soft dark:bg-ds-warning-soft/30',
   };
 
   return (
-    <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+    <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
       <div className="flex items-center">
         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
           <Icon className="h-6 w-6" />
         </div>
         <div className="ml-4 flex-1">
-          <p className="text-sm font-medium dark-text-muted">{title}</p>
-          <p className="text-2xl font-bold dark-text">{value}</p>
-          {subtitle && <p className="text-xs dark-text-muted">{subtitle}</p>}
+          <p className="text-sm font-medium text-encre-3">{title}</p>
+          <p className="text-2xl font-bold text-encre">{value}</p>
+          {subtitle && <p className="text-xs text-encre-3">{subtitle}</p>}
         </div>
       </div>
     </div>
@@ -321,17 +321,17 @@ function MetricCard({ title, value, icon: Icon, color, subtitle }: MetricCardPro
 // Composant pour les statistiques de base (réutilisé)
 function StatsCard({ title, data }: { title: string; data: Record<string, number> }) {
   return (
-    <div className="dark-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
-      <h3 className="text-lg font-semibold dark-text mb-4">{title}</h3>
+    <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] p-6">
+      <h3 className="text-lg font-semibold text-encre mb-4">{title}</h3>
       <div className="space-y-3">
         {Object.entries(data).map(([key, value]) => (
           <div key={key} className="flex justify-between items-center">
-            <span className="dark-text-muted capitalize">
+            <span className="text-encre-3 capitalize">
               {key === 'available' ? 'Disponible' : 
                key === 'maintenance' ? 'En maintenance' : 
                key === 'broken' ? 'Cassé' : key}
             </span>
-            <span className="font-medium dark-text">{value}</span>
+            <span className="font-medium text-encre">{value}</span>
           </div>
         ))}
       </div>

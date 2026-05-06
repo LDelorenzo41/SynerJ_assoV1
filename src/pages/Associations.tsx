@@ -190,7 +190,7 @@ export default function Associations() {
             onError={() => setImageError(true)}
           />
         ) : (
-          <Building className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+          <Building className="h-8 w-8 text-ds-info dark:text-ds-info" />
         )}
       </div>
     );
@@ -200,9 +200,9 @@ export default function Associations() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <Building className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
-          <p className="text-xl dark-text-muted">Accès refusé</p>
-          <p className="text-sm dark-text-muted mt-2">Rôle Super Admin requis</p>
+          <Building className="h-16 w-16 text-encre-3 dark:text-slate-600 mx-auto mb-4" />
+          <p className="text-xl text-encre-3">Accès refusé</p>
+          <p className="text-sm text-encre-3 mt-2">Rôle Super Admin requis</p>
         </div>
       </div>
     );
@@ -211,7 +211,7 @@ export default function Associations() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-ds-info dark:border-ds-info"></div>
       </div>
     );
   }
@@ -220,8 +220,8 @@ export default function Associations() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <Building className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
-          <p className="text-xl dark-text-muted">Aucune structure trouvée</p>
+          <Building className="h-16 w-16 text-encre-3 dark:text-slate-600 mx-auto mb-4" />
+          <p className="text-xl text-encre-3">Aucune structure trouvée</p>
         </div>
       </div>
     );
@@ -230,7 +230,7 @@ export default function Associations() {
   return (
     <div className="space-y-6">
       {/* Header avec logo et infos principales */}
-      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg overflow-hidden">
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 px-6 py-8">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-6">
@@ -241,12 +241,12 @@ export default function Associations() {
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="text-3xl font-bold dark-input px-3 py-2 rounded-lg mb-2"
+                    className="text-3xl font-bold bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 px-3 py-2 rounded-lg mb-2"
                   />
                 ) : (
-                  <h1 className="text-3xl font-bold dark-text mb-2">{association.name}</h1>
+                  <h1 className="text-3xl font-bold text-encre mb-2">{association.name}</h1>
                 )}
-                <div className="flex items-center space-x-4 text-sm dark-text-muted">
+                <div className="flex items-center space-x-4 text-sm text-encre-3">
                   {editing ? (
                     <>
                       <div className="flex items-center">
@@ -256,7 +256,7 @@ export default function Associations() {
                           value={editForm.city}
                           onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
                           placeholder="Ville"
-                          className="dark-input px-2 py-1 rounded text-sm"
+                          className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 px-2 py-1 rounded text-sm"
                         />
                       </div>
                       <div className="flex items-center">
@@ -265,7 +265,7 @@ export default function Associations() {
                           type="email"
                           value={editForm.email}
                           onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                          className="dark-input px-2 py-1 rounded text-sm"
+                          className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 px-2 py-1 rounded text-sm"
                         />
                       </div>
                       <div className="flex items-center">
@@ -275,7 +275,7 @@ export default function Associations() {
                           value={editForm.phone}
                           onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                           placeholder="Téléphone"
-                          className="dark-input px-2 py-1 rounded text-sm"
+                          className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 px-2 py-1 rounded text-sm"
                         />
                       </div>
                     </>
@@ -307,7 +307,7 @@ export default function Associations() {
                 <>
                   <button
                     onClick={handleSave}
-                    className="p-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 rounded-lg transition-colors shadow-sm"
+                    className="p-2 text-white bg-ds-success hover:bg-ds-success dark:bg-ds-success-soft dark:hover:bg-ds-success rounded-lg transition-colors shadow-sm"
                     title="Enregistrer"
                   >
                     <Save className="h-5 w-5" />
@@ -323,7 +323,7 @@ export default function Associations() {
                         description: association.description || '',
                       });
                     }}
-                    className="p-2 text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-lg transition-colors shadow-sm"
+                    className="p-2 text-white bg-ds-danger hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger rounded-lg transition-colors shadow-sm"
                     title="Annuler"
                   >
                     <X className="h-5 w-5" />
@@ -332,7 +332,7 @@ export default function Associations() {
               ) : (
                 <button
                   onClick={() => setEditing(true)}
-                  className="p-2 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg transition-colors shadow-sm"
+                  className="p-2 text-white bg-terracotta hover:bg-terracotta-deep dark:bg-terracotta-deep dark:hover:bg-terracotta-deep rounded-lg transition-colors shadow-sm"
                   title="Modifier"
                 >
                   <Edit className="h-5 w-5" />
@@ -349,11 +349,11 @@ export default function Associations() {
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 placeholder="Description de la structure"
-                className="w-full dark-input px-3 py-2 rounded-lg"
+                className="w-full bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 px-3 py-2 rounded-lg"
               />
             ) : (
               association.description && (
-                <p className="text-sm dark-text-muted max-w-3xl">
+                <p className="text-sm text-encre-3 max-w-3xl">
                   {association.description}
                 </p>
               )
@@ -362,80 +362,80 @@ export default function Associations() {
         </div>
 
         {/* Statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border-t border-gray-200 dark:border-gray-600">
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <div className="bg-terracotta-soft dark:bg-terracotta-soft p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm dark-text-muted">Clubs</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{clubs.length}</p>
+                <p className="text-sm text-encre-3">Clubs</p>
+                <p className="text-2xl font-bold text-terracotta dark:text-terracotta">{clubs.length}</p>
               </div>
-              <Building className="h-8 w-8 text-blue-600 dark:text-blue-400 opacity-50" />
+              <Building className="h-8 w-8 text-terracotta dark:text-terracotta opacity-50" />
             </div>
           </div>
 
-          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+          <div className="bg-ds-success-soft dark:bg-ds-success-soft/20 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm dark-text-muted">Membres</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.totalMembers}</p>
+                <p className="text-sm text-encre-3">Membres</p>
+                <p className="text-2xl font-bold text-ds-success dark:text-ds-success">{stats.totalMembers}</p>
               </div>
-              <Users className="h-8 w-8 text-green-600 dark:text-green-400 opacity-50" />
+              <Users className="h-8 w-8 text-ds-success dark:text-ds-success opacity-50" />
             </div>
           </div>
 
-          <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+          <div className="bg-ds-info-soft dark:bg-ds-info-soft/20 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm dark-text-muted">Admins Club</p>
-                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalClubAdmins}</p>
+                <p className="text-sm text-encre-3">Admins Club</p>
+                <p className="text-2xl font-bold text-ds-info dark:text-ds-info">{stats.totalClubAdmins}</p>
               </div>
-              <Users className="h-8 w-8 text-purple-600 dark:text-purple-400 opacity-50" />
+              <Users className="h-8 w-8 text-ds-info dark:text-ds-info opacity-50" />
             </div>
           </div>
 
-          <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+          <div className="bg-ds-warning-soft dark:bg-ds-warning-soft/20 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm dark-text-muted">Supporters</p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.totalSupporters}</p>
+                <p className="text-sm text-encre-3">Supporters</p>
+                <p className="text-2xl font-bold text-ds-warning dark:text-ds-warning">{stats.totalSupporters}</p>
               </div>
-              <Users className="h-8 w-8 text-orange-600 dark:text-orange-400 opacity-50" />
+              <Users className="h-8 w-8 text-ds-warning dark:text-ds-warning opacity-50" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Code de Structure */}
-      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-xl font-semibold dark-text flex items-center">
-            <Building className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <h2 className="text-xl font-semibold text-encre flex items-center">
+            <Building className="h-5 w-5 mr-2 text-ds-info dark:text-ds-info" />
             Code de Structure
           </h2>
         </div>
         <div className="p-6">
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-700">
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6 border-2 border-ds-info-soft dark:border-ds-info">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm dark-text-muted mb-2">Code à partager avec les clubs</p>
+                <p className="text-sm text-encre-3 mb-2">Code à partager avec les clubs</p>
                 <div className="flex items-center space-x-4">
-                  <code className="text-3xl font-mono font-bold text-purple-600 dark:text-purple-400 tracking-wider">
+                  <code className="text-3xl font-mono font-bold text-ds-info dark:text-ds-info tracking-wider">
                     {association.association_code}
                   </code>
                   <button
                     onClick={copyCodeToClipboard}
-                    className="p-2 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 rounded-lg transition-colors border border-purple-200 dark:border-purple-700"
+                    className="p-2 bg-white dark:bg-slate-700 hover:bg-papier-2 dark:hover:bg-slate-600 rounded-lg transition-colors border border-ds-info-soft dark:border-ds-info"
                     title="Copier le code"
                   >
                     {copiedCode ? (
-                      <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <Check className="h-5 w-5 text-ds-success dark:text-ds-success" />
                     ) : (
-                      <Copy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <Copy className="h-5 w-5 text-ds-info dark:text-ds-info" />
                     )}
                   </button>
                 </div>
                 {copiedCode && (
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">Code copié !</p>
+                  <p className="text-sm text-ds-success dark:text-ds-success mt-2">Code copié !</p>
                 )}
               </div>
             </div>
@@ -444,15 +444,15 @@ export default function Associations() {
       </div>
 
       {/* Liste des Clubs */}
-      <div className="dark-card shadow-sm rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
-          <h2 className="text-xl font-semibold dark-text flex items-center">
-            <Building className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
+      <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm shadow-sm rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--ds-border)] dark:border-[var(--ds-border-2)] flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-encre flex items-center">
+            <Building className="h-5 w-5 mr-2 text-ds-success dark:text-ds-success" />
             Clubs de la Structure ({clubs.length})
           </h2>
           <Link
             to="/clubs"
-            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center"
+            className="text-sm text-terracotta dark:text-terracotta hover:text-terracotta-deep dark:hover:text-terracotta flex items-center"
           >
             Gérer les clubs
             <ExternalLink className="h-4 w-4 ml-1" />
@@ -461,36 +461,36 @@ export default function Associations() {
         <div className="p-6">
           {clubs.length === 0 ? (
             <div className="text-center py-12">
-              <Building className="h-16 w-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
-              <p className="text-lg dark-text-muted mb-2">Aucun club enregistré</p>
-              <p className="text-sm dark-text-muted">Les clubs peuvent rejoindre votre structure en utilisant le code ci-dessus</p>
+              <Building className="h-16 w-16 text-encre-3 dark:text-slate-600 mx-auto mb-4" />
+              <p className="text-lg text-encre-3 mb-2">Aucun club enregistré</p>
+              <p className="text-sm text-encre-3">Les clubs peuvent rejoindre votre structure en utilisant le code ci-dessus</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {clubs.map((club) => (
-                <div key={club.id} className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={club.id} className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-ds-success dark:border-ds-success rounded-lg p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3 flex-1 min-w-0 mr-2">
-                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <div className="w-12 h-12 rounded-full bg-ds-success-soft dark:bg-ds-success-soft/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {club.logo_url ? (
                           <img src={club.logo_url} alt={club.name} className="w-full h-full object-cover" />
                         ) : (
-                          <Building className="h-6 w-6 text-green-600 dark:text-green-400" />
+                          <Building className="h-6 w-6 text-ds-success dark:text-ds-success" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold dark-text truncate">{club.name}</h3>
+                        <h3 className="font-semibold text-encre truncate">{club.name}</h3>
                         
                         <div className="mt-2 space-y-1">
-                          <p className="text-xs dark-text-muted flex items-center">
+                          <p className="text-xs text-encre-3 flex items-center">
                             <Mail className="h-3 w-3 mr-1" />
                             {club.club_email}
                           </p>
-                          <p className="text-xs font-mono text-green-600 dark:text-green-400 flex items-center">
+                          <p className="text-xs font-mono text-ds-success dark:text-ds-success flex items-center">
                             <Building className="h-3 w-3 mr-1" />
                             {club.club_code}
                           </p>
-                          <p className="text-xs dark-text-muted flex items-center">
+                          <p className="text-xs text-encre-3 flex items-center">
                             <Calendar className="h-3 w-3 mr-1" />
                             {new Date(club.created_at).toLocaleDateString('fr-FR')}
                           </p>
@@ -499,7 +499,7 @@ export default function Associations() {
                               href={club.website_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center hover:underline"
+                              className="text-xs text-terracotta dark:text-terracotta hover:text-terracotta-deep dark:hover:text-terracotta flex items-center hover:underline"
                             >
                               <Globe className="h-3 w-3 mr-1" />
                               Site web
@@ -508,13 +508,13 @@ export default function Associations() {
                           )}
                         </div>
                         {club.description && (
-                          <p className="text-xs dark-text-muted mt-2 line-clamp-2">{club.description}</p>
+                          <p className="text-xs text-encre-3 mt-2 line-clamp-2">{club.description}</p>
                         )}
                       </div>
                     </div>
                     <button
                       onClick={() => openDeleteModal(club)}
-                      className="p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30 rounded-lg transition-colors flex-shrink-0"
+                      className="p-2 text-ds-danger hover:bg-ds-danger-soft dark:text-ds-danger dark:hover:bg-ds-danger-soft/30 rounded-lg transition-colors flex-shrink-0"
                       title="Supprimer le club"
                     >
                       <Trash2 className="h-5 w-5" />
@@ -532,28 +532,28 @@ export default function Associations() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6 shadow-xl">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              <div className="p-3 bg-ds-danger-soft dark:bg-ds-danger-soft/30 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-ds-danger dark:text-ds-danger" />
               </div>
-              <h3 className="text-xl font-semibold dark-text">Confirmer la suppression</h3>
+              <h3 className="text-xl font-semibold text-encre">Confirmer la suppression</h3>
             </div>
 
             {deleteModal.loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 dark:border-red-400"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ds-danger dark:border-ds-danger"></div>
               </div>
             ) : (
               <>
                 <div className="mb-6 space-y-3">
-                  <p className="dark-text">
+                  <p className="text-encre">
                     Êtes-vous sûr de vouloir supprimer le club <span className="font-semibold">{deleteModal.info?.clubName}</span> ?
                   </p>
                   
                   <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
-                    <p className="text-sm dark-text-muted mb-2">
+                    <p className="text-sm text-encre-3 mb-2">
                       <strong>Cette action va :</strong>
                     </p>
-                    <ul className="text-sm dark-text-muted space-y-1 list-disc list-inside">
+                    <ul className="text-sm text-encre-3 space-y-1 list-disc list-inside">
                       <li>Supprimer définitivement le club</li>
                       <li>Supprimer tous les événements du club ({deleteModal.info?.eventCount || 0})</li>
                       <li>Convertir {deleteModal.info?.memberCount || 0} membre(s) en <strong>Supporters</strong></li>
@@ -561,7 +561,7 @@ export default function Associations() {
                     </ul>
                   </div>
 
-                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                  <p className="text-sm text-ds-danger dark:text-ds-danger font-medium">
                     ⚠️ Cette action est irréversible
                   </p>
                 </div>
@@ -569,13 +569,13 @@ export default function Associations() {
                 <div className="flex space-x-3">
                   <button
                     onClick={closeDeleteModal}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 dark-text rounded-lg transition-colors"
+                    className="flex-1 px-4 py-2 bg-papier-3 dark:bg-slate-700 hover:bg-papier-3 dark:hover:bg-slate-600 text-encre rounded-lg transition-colors"
                   >
                     Annuler
                   </button>
                   <button
                     onClick={handleDeleteClub}
-                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white rounded-lg transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-ds-danger hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger text-white rounded-lg transition-colors font-medium"
                   >
                     Supprimer le club
                   </button>

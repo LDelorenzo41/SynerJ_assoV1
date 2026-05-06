@@ -288,7 +288,7 @@ export function RequestsTabPaginated({
               px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors
               ${selectedStatus === status.value
                 ? `bg-${status.color}-100 dark:bg-${status.color}-900/30 text-${status.color}-700 dark:text-${status.color}-300 border-2 border-${status.color}-500`
-                : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500'
+                : 'bg-papier-2 dark:bg-slate-700 text-encre-2 dark:text-encre-3 border-2 border-transparent hover:border-[var(--ds-border-2)] dark:hover:border-[var(--ds-border-2)]'
               }
             `}
           >
@@ -302,9 +302,9 @@ export function RequestsTabPaginated({
 
       {/* Liste des demandes paginée */}
       {paginatedRequests.length === 0 ? (
-        <div className="text-center py-12 dark-card rounded-lg border border-gray-200 dark:border-gray-600">
-          <Package className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <p className="dark-text-muted">Aucune demande dans cette catégorie</p>
+        <div className="text-center py-12 bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
+          <Package className="h-12 w-12 text-encre-3 dark:text-encre-3 mx-auto mb-4" />
+          <p className="text-encre-3">Aucune demande dans cette catégorie</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -318,44 +318,44 @@ export function RequestsTabPaginated({
             return (
               <div
                 key={request.id}
-                className="dark-card rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-600"
+                className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg shadow-sm p-6 border border-[var(--ds-border)] dark:border-[var(--ds-border-2)]"
               >
                 {/* En-tête de la demande */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold dark-text">{request.event_name}</h3>
+                      <h3 className="text-lg font-semibold text-encre">{request.event_name}</h3>
                       
                       {/* Badge de statut */}
                       <span className={`
                         px-3 py-1 rounded-full text-xs font-medium
-                        ${request.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' : ''}
-                        ${request.status === 'approved' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : ''}
-                        ${request.status === 'partially_approved' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : ''}
-                        ${request.status === 'rejected' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' : ''}
+                        ${request.status === 'pending' ? 'bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning' : ''}
+                        ${request.status === 'approved' ? 'bg-ds-success-soft dark:bg-ds-success-soft/30 text-ds-success dark:text-ds-success' : ''}
+                        ${request.status === 'partially_approved' ? 'bg-terracotta-soft dark:bg-terracotta-soft/30 text-terracotta-deep dark:text-terracotta' : ''}
+                        ${request.status === 'rejected' ? 'bg-ds-danger-soft dark:bg-ds-danger-soft/30 text-ds-danger dark:text-ds-danger' : ''}
                       `}>
                         {STATUS_LABELS.request[request.status as keyof typeof STATUS_LABELS.request]}
                       </span>
 
                       {/* Badge temporel */}
                       {timeStatus === 'upcoming' && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-ds-info-soft dark:bg-ds-info-soft/30 text-ds-info dark:text-ds-info">
                           À venir
                         </span>
                       )}
                       {timeStatus === 'ongoing' && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-ds-warning-soft dark:bg-ds-warning-soft/30 text-ds-warning dark:text-ds-warning">
                           En cours
                         </span>
                       )}
                       {timeStatus === 'past' && (
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-papier-2 dark:bg-papier-3 text-encre-2 dark:text-encre-3">
                           Passée
                         </span>
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm dark-text-muted">
+                    <div className="flex items-center gap-4 text-sm text-encre-3">
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
                         <span>{request.club?.name}</span>
@@ -376,7 +376,7 @@ export function RequestsTabPaginated({
                   {/* Bouton de suppression */}
                   <button
                     onClick={() => setDeletingRequest(request.id)}
-                    className="ml-4 p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                    className="ml-4 p-2 text-ds-danger dark:text-ds-danger hover:bg-ds-danger-soft dark:hover:bg-ds-danger-soft rounded-md transition-colors"
                     title="Supprimer la demande"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -385,16 +385,16 @@ export function RequestsTabPaginated({
 
                 {/* Notes de la demande */}
                 {request.notes && (
-                  <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-md">
-                    <p className="text-sm dark-text-muted italic">"{request.notes}"</p>
+                  <div className="mb-4 p-3 bg-papier-2 dark:bg-slate-700/50 rounded-md">
+                    <p className="text-sm text-encre-3 italic">"{request.notes}"</p>
                   </div>
                 )}
 
                 {/* Notes admin (rejet) */}
                 {request.rejected_reason && (
-                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-                    <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">Raison du rejet :</p>
-                    <p className="text-sm text-red-600 dark:text-red-300">{request.rejected_reason}</p>
+                  <div className="mb-4 p-3 bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-md">
+                    <p className="text-sm font-medium text-ds-danger dark:text-ds-danger mb-1">Raison du rejet :</p>
+                    <p className="text-sm text-ds-danger dark:text-ds-danger">{request.rejected_reason}</p>
                   </div>
                 )}
 
@@ -406,23 +406,23 @@ export function RequestsTabPaginated({
                     return (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 rounded-md"
+                        className="flex items-center justify-between p-3 bg-papier-2 dark:bg-slate-700/50 rounded-md"
                       >
                         <div className="flex items-center gap-3">
-                          <Package className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          <Package className="h-5 w-5 text-encre-3 dark:text-encre-3" />
                           <div>
-                            <p className="font-medium dark-text">{item.equipment_item?.name}</p>
-                            <p className="text-sm dark-text-muted">{item.equipment_item?.category}</p>
+                            <p className="font-medium text-encre">{item.equipment_item?.name}</p>
+                            <p className="text-sm text-encre-3">{item.equipment_item?.category}</p>
                           </div>
                         </div>
                         
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="text-sm font-medium dark-text">
+                            <p className="text-sm font-medium text-encre">
                               Quantité: {item.quantity_requested}
                             </p>
                             {itemAvailability && request.status === 'pending' && (
-                              <p className={`text-xs ${itemAvailability.is_available ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                              <p className={`text-xs ${itemAvailability.is_available ? 'text-ds-success dark:text-ds-success' : 'text-ds-danger dark:text-ds-danger'}`}>
                                 {itemAvailability.is_available 
                                   ? `✓ ${itemAvailability.available_quantity} disponibles`
                                   : `✗ Seulement ${itemAvailability.available_quantity} disponibles`
@@ -433,8 +433,8 @@ export function RequestsTabPaginated({
                           
                           {itemAvailability && request.status === 'pending' && (
                             itemAvailability.is_available 
-                              ? <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                              : <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                              ? <CheckCircle className="h-5 w-5 text-ds-success dark:text-ds-success" />
+                              : <AlertTriangle className="h-5 w-5 text-ds-danger dark:text-ds-danger" />
                           )}
                         </div>
                       </div>
@@ -444,10 +444,10 @@ export function RequestsTabPaginated({
 
                 {/* Actions pour les demandes en attente */}
                 {request.status === 'pending' && (
-                  <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <div className="flex gap-3 pt-4 border-t border-[var(--ds-border)] dark:border-[var(--ds-border-2)]">
                     {isLoading ? (
-                      <div className="flex items-center gap-2 text-sm dark-text-muted">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                      <div className="flex items-center gap-2 text-sm text-encre-3">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-terracotta dark:border-terracotta"></div>
                         Vérification de disponibilité...
                       </div>
                     ) : (
@@ -455,7 +455,7 @@ export function RequestsTabPaginated({
                         <button
                           onClick={() => handleFullApprove(request)}
                           disabled={processingRequest === request.id || !allAvailable}
-                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-md"
+                          className="flex items-center gap-2 px-4 py-2 bg-ds-success text-white hover:bg-ds-success dark:bg-ds-success dark:hover:bg-ds-success disabled:opacity-50 disabled:cursor-not-allowed rounded-md"
                         >
                           <CheckCircle className="h-4 w-4" />
                           {processingRequest === request.id ? 'Approbation...' : 'Approuver'}
@@ -474,7 +474,7 @@ export function RequestsTabPaginated({
                             setApprovingRequest(request.id);
                           }}
                           disabled={processingRequest === request.id}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 rounded-md"
+                          className="flex items-center gap-2 px-4 py-2 bg-terracotta text-white hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta disabled:opacity-50 rounded-md"
                         >
                           <Edit3 className="h-4 w-4" />
                           Approbation partielle
@@ -483,7 +483,7 @@ export function RequestsTabPaginated({
                         <button
                           onClick={() => setRejectingRequest(request.id)}
                           disabled={processingRequest === request.id}
-                          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 rounded-md"
+                          className="flex items-center gap-2 px-4 py-2 bg-ds-danger text-white hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger disabled:opacity-50 rounded-md"
                         >
                           <XCircle className="h-4 w-4" />
                           Rejeter
@@ -504,7 +504,7 @@ export function RequestsTabPaginated({
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-papier-2 dark:bg-slate-700 text-encre-2 dark:text-encre-3 rounded-md hover:bg-papier-3 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-4 w-4" />
             Précédent
@@ -517,8 +517,8 @@ export function RequestsTabPaginated({
                 onClick={() => setCurrentPage(page)}
                 className={`w-10 h-10 rounded-md font-medium ${
                   currentPage === page
-                    ? 'bg-blue-600 dark:bg-blue-500 text-white'
-                    : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                    ? 'bg-terracotta dark:bg-terracotta text-white'
+                    : 'bg-papier-2 dark:bg-slate-700 text-encre-2 dark:text-encre-3 hover:bg-papier-3 dark:hover:bg-slate-600'
                 }`}
               >
                 {page}
@@ -529,7 +529,7 @@ export function RequestsTabPaginated({
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-papier-2 dark:bg-slate-700 text-encre-2 dark:text-encre-3 rounded-md hover:bg-papier-3 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Suivant
             <ChevronRight className="h-4 w-4" />
@@ -540,9 +540,9 @@ export function RequestsTabPaginated({
       {/* Modal d'approbation partielle */}
       {approvingRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="dark-card rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold dark-text mb-4">Approbation partielle</h3>
-            <p className="dark-text-muted mb-4">
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-encre mb-4">Approbation partielle</h3>
+            <p className="text-encre-3 mb-4">
               Ajustez les quantités à approuver pour chaque item (0 = non approuvé) :
             </p>
             
@@ -555,26 +555,26 @@ export function RequestsTabPaginated({
                 const maxApprovalQuantity = itemAvailability ? Math.min(ri.quantity_requested, itemAvailability.available_quantity) : 0;
                 
                 return (
-                  <div key={ri.id} className="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                  <div key={ri.id} className="mb-4 p-4 border border-[var(--ds-border)] dark:border-[var(--ds-border-2)] rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h5 className="font-medium dark-text">{ri.equipment_item?.name}</h5>
-                        <p className="text-sm dark-text-muted">{ri.equipment_item?.category}</p>
+                        <h5 className="font-medium text-encre">{ri.equipment_item?.name}</h5>
+                        <p className="text-sm text-encre-3">{ri.equipment_item?.category}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm dark-text-muted">
+                        <div className="text-sm text-encre-3">
                           Demandé: {ri.quantity_requested} | Disponible: {itemAvailability?.available_quantity || 0}
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <label className="text-sm font-medium dark-text-muted">Quantité à approuver:</label>
+                      <label className="text-sm font-medium text-encre-3">Quantité à approuver:</label>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => updateApprovalQuantity(ri.equipment_item_id, (approvalItems[ri.equipment_item_id] || 0) - 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 flex items-center justify-center"
+                          className="w-8 h-8 rounded-full bg-papier-3 dark:bg-slate-600 hover:bg-papier-3 dark:hover:bg-slate-500 flex items-center justify-center"
                         >
                           <Minus className="h-4 w-4" />
                         </button>
@@ -584,18 +584,18 @@ export function RequestsTabPaginated({
                           max={maxApprovalQuantity}
                           value={approvalItems[ri.equipment_item_id] || 0}
                           onChange={(e) => updateApprovalQuantity(ri.equipment_item_id, parseInt(e.target.value) || 0)}
-                          className="dark-input w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+                          className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-16 text-center border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded px-2 py-1"
                         />
                         <button
                           type="button"
                           onClick={() => updateApprovalQuantity(ri.equipment_item_id, (approvalItems[ri.equipment_item_id] || 0) + 1)}
                           disabled={(approvalItems[ri.equipment_item_id] || 0) >= maxApprovalQuantity}
-                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 disabled:opacity-50 flex items-center justify-center"
+                          className="w-8 h-8 rounded-full bg-papier-3 dark:bg-slate-600 hover:bg-papier-3 dark:hover:bg-slate-500 disabled:opacity-50 flex items-center justify-center"
                         >
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>
-                      <span className="text-sm dark-text-muted">max: {maxApprovalQuantity}</span>
+                      <span className="text-sm text-encre-3">max: {maxApprovalQuantity}</span>
                     </div>
                   </div>
                 );
@@ -608,14 +608,14 @@ export function RequestsTabPaginated({
                   setApprovingRequest(null);
                   setApprovalItems({});
                 }}
-                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
+                className="px-4 py-2 text-encre-3 hover:bg-papier-2 dark:hover:bg-slate-600 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-md"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handlePartialApprove(approvingRequest)}
                 disabled={processingRequest === approvingRequest}
-                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 rounded-md"
+                className="px-4 py-2 bg-terracotta text-white hover:bg-terracotta-deep dark:bg-terracotta dark:hover:bg-terracotta disabled:opacity-50 rounded-md"
               >
                 {processingRequest === approvingRequest ? 'Approbation...' : 'Approuver'}
               </button>
@@ -627,16 +627,16 @@ export function RequestsTabPaginated({
       {/* Modal de rejet */}
       {rejectingRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="dark-card rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold dark-text mb-4">Rejeter la demande</h3>
-            <p className="dark-text-muted mb-4">
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-encre mb-4">Rejeter la demande</h3>
+            <p className="text-encre-3 mb-4">
               Veuillez indiquer la raison du rejet de cette demande :
             </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              className="dark-input w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 mb-4"
+              className="bg-papier border border-[var(--ds-border-2)] text-encre placeholder:text-encre-3 w-full border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-md px-3 py-2 mb-4"
               placeholder="Raison du rejet..."
             />
             <div className="flex justify-end gap-3">
@@ -645,14 +645,14 @@ export function RequestsTabPaginated({
                   setRejectingRequest(null);
                   setRejectReason('');
                 }}
-                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md"
+                className="px-4 py-2 text-encre-3 hover:bg-papier-2 dark:hover:bg-slate-600 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-md"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleReject(rejectingRequest)}
                 disabled={!rejectReason.trim() || processingRequest === rejectingRequest}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 rounded-md"
+                className="px-4 py-2 bg-ds-danger text-white hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger disabled:opacity-50 rounded-md"
               >
                 {processingRequest === rejectingRequest ? 'Rejet...' : 'Confirmer le rejet'}
               </button>
@@ -664,22 +664,22 @@ export function RequestsTabPaginated({
       {/* Modal de confirmation de suppression */}
       {deletingRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="dark-card rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold dark-text mb-4 flex items-center gap-2">
-              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+          <div className="bg-papier rounded-ds-md border border-[var(--ds-border)] shadow-ds-sm rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-encre mb-4 flex items-center gap-2">
+              <AlertCircle className="h-6 w-6 text-ds-danger dark:text-ds-danger" />
               Confirmer la suppression
             </h3>
             
             <div className="space-y-3 mb-6">
-              <p className="dark-text font-medium">
+              <p className="text-encre font-medium">
                 Êtes-vous sûr de vouloir supprimer cette demande de matériel ?
               </p>
               
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
-                <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-2">
+              <div className="bg-ds-danger-soft dark:bg-ds-danger-soft border border-ds-danger dark:border-ds-danger rounded-md p-4">
+                <p className="text-sm text-ds-danger dark:text-ds-danger font-medium mb-2">
                   ⚠️ Attention : Cette action est irréversible !
                 </p>
-                <ul className="text-sm text-red-600 dark:text-red-400 space-y-1 list-disc list-inside">
+                <ul className="text-sm text-ds-danger dark:text-ds-danger space-y-1 list-disc list-inside">
                   <li>La demande sera <strong>définitivement supprimée</strong></li>
                   <li>Tous les items associés seront supprimés</li>
                   <li>Cette demande <strong>disparaîtra des statistiques</strong></li>
@@ -690,14 +690,14 @@ export function RequestsTabPaginated({
               {(() => {
                 const request = requests.find((r: any) => r.id === deletingRequest);
                 return request && (
-                  <div className="bg-gray-50 dark:bg-slate-700/50 rounded-md p-3">
-                    <p className="text-sm dark-text-muted">
+                  <div className="bg-papier-2 dark:bg-slate-700/50 rounded-md p-3">
+                    <p className="text-sm text-encre-3">
                       <strong>Demande :</strong> {request.event_name}
                     </p>
-                    <p className="text-sm dark-text-muted">
+                    <p className="text-sm text-encre-3">
                       <strong>Club :</strong> {request.club?.name}
                     </p>
-                    <p className="text-sm dark-text-muted">
+                    <p className="text-sm text-encre-3">
                       <strong>Statut :</strong> {STATUS_LABELS.request[request.status as keyof typeof STATUS_LABELS.request]}
                     </p>
                   </div>
@@ -709,14 +709,14 @@ export function RequestsTabPaginated({
               <button
                 onClick={() => setDeletingRequest(null)}
                 disabled={processingRequest === deletingRequest}
-                className="px-4 py-2 dark-text-muted hover:bg-gray-50 dark:hover:bg-slate-600 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50"
+                className="px-4 py-2 text-encre-3 hover:bg-papier-2 dark:hover:bg-slate-600 border border-[var(--ds-border-2)] dark:border-[var(--ds-border-2)] rounded-md disabled:opacity-50"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleDeleteRequest(deletingRequest)}
                 disabled={processingRequest === deletingRequest}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:opacity-50 rounded-md flex items-center gap-2"
+                className="px-4 py-2 bg-ds-danger text-white hover:bg-ds-danger dark:bg-ds-danger dark:hover:bg-ds-danger disabled:opacity-50 rounded-md flex items-center gap-2"
               >
                 <Trash2 className="h-4 w-4" />
                 {processingRequest === deletingRequest ? 'Suppression...' : 'Oui, supprimer définitivement'}
